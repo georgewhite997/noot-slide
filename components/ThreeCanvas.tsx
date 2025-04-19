@@ -1,0 +1,115 @@
+"use client";
+
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Physics } from "@react-three/rapier";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { Ground } from "./Ground";
+import {
+  OrbitControls,
+  PerformanceMonitor,
+  PerspectiveCamera,
+} from "@react-three/drei"; // Import OrbitControls
+import * as THREE from "three";
+import { Player } from "./Player";
+import { useAtomValue } from "jotai";
+import { gameStateAtom, videoSettingsAtom } from "@/atoms";
+
+export const ThreeCanvas = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const videoSettings = useAtomValue(videoSettingsAtom);
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      const MAX_MOBILE_WIDTH = 500;
+      const MAX_MOBILE_HEIGHT = 1000;
+      const width = Math.min(window.innerWidth, MAX_MOBILE_WIDTH);
+      const height = Math.min(window.innerHeight, MAX_MOBILE_HEIGHT);
+      setDimensions({ width, height });
+    };
+
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
+    return () => window.removeEventListener("resize", updateDimensions);
+  }, []);
+
+
+  return (
+    <>
+      <div
+        ref={containerRef}
+        className="w-full flex absolute top-0 left-0 justify-center items-center overflow-hidden bg-black"
+      >
+        {dimensions.width > 0 && dimensions.height > 0 && (
+          <>
+            <Canvas
+              style={{
+                width: dimensions.width,
+                height: dimensions.height,
+                maxWidth: "100%",
+                maxHeight: "100%",
+              }}
+              gl={{
+                antialias: videoSettings.antialiasing,
+                powerPreference: "high-performance",
+              }}
+              dpr={videoSettings.dpr}
+              shadows={videoSettings.shadows}
+            >
+              <PerformanceMonitor
+                onChange={(api) => {
+                  console.log("FPS:", api.fps);
+                }}
+              />
+              <Scene />
+            </Canvas>
+          </>
+        )}
+      </div>
+    </>
+  );
+};
+
+const Scene = () => {
+  const gameState = useAtomValue(gameStateAtom);
+  const { scene, gl } = useThree(); // Access the scene and renderer (gl)
+
+  useEffect(() => {
+    gl.setClearColor(0xd4e8f0, 1);
+    gl.shadowMap.enabled = true;
+    gl.shadowMap.type = THREE.PCFSoftShadowMap;
+    gl.outputColorSpace = THREE.LinearSRGBColorSpace;
+
+    scene.fog = new THREE.FogExp2(0xd4e8f0, 0.002);
+  }, []);
+
+  return (
+    <>
+      <PerspectiveCamera
+        makeDefault // Makes this the default camera for the scene
+        fov={75}
+        near={0.5}
+        far={20000}
+        position={[0, 5, 0]}
+      />
+      <ambientLight color={0x787878} intensity={1} />
+      <Suspense>
+        <Physics
+          // paused={gameState === "in-menu"}
+          gravity={[0, -9.81, 0]}
+          timeStep="vary"
+          // debug
+        >
+          <Ground />
+        </Physics>
+      </Suspense>
+
+      <OrbitControls
+        makeDefault
+        enablePan={true} // Allows WASD and right-click panning
+        enableZoom={true} // Allows scroll wheel zooming
+        enableRotate={true} // Allows left-click rotation
+      />
+    </>
+  );
+};
