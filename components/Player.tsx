@@ -10,8 +10,7 @@ import {
 } from "@react-three/rapier";
 import { SLOPE_ANGLE, lanes } from "./shared";
 import { useAtom, useSetAtom } from "jotai";
-import { equipmentMock } from "@/utils";
-import { currentFishesAtom, gameStateAtom, hasFishingNetAtom, scoreAtom } from "@/atoms";
+import { currentFishesAtom, gameStateAtom, haloQuantityAtom, hasFishingNetAtom, scoreAtom } from "@/atoms";
 
 const LANE_TRANSITION_SPEED = 2.5;
 const CAMERA_POSITION_SMOOTHING = 3; // Lower = smoother but slower
@@ -19,8 +18,6 @@ const CAMERA_LOOKAT_SMOOTHING = 5; // Lower = smoother but slower
 const SWAY_AMPLITUDE = 0.035;
 
 const PLAYER_START_POSITION = new THREE.Vector3(0, 10, -20);
-
-const equipment = equipmentMock;
 
 export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved: (chunkName: string) => void }) {
   const [score, setScore] = useAtom(scoreAtom);
@@ -40,15 +37,15 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const rightTurnAction = useRef<THREE.AnimationAction | null>(null);
   const leftTurnAction = useRef<THREE.AnimationAction | null>(null);
   const lastRemovedName = useRef<string | null>(null);
+  const hasHalo = useRef(false);
+
 
   const magnetCollectedAt = useRef<number>(0);
   const magnetDuration = useRef<number>(0);
 
   const multiplierCollectedAt = useRef<number>(0);
   const multiplierDuration = useRef<number>(0);
-
-  //@ts-expect-error temporary fix
-  const [hasHalo, setHasHalo] = useState(equipment.find((item) => item.name === "Abstract Halo")?.quantity > 0);
+  const [haloQuantity, setHaloQuantity] = useAtom(haloQuantityAtom);
   const [hasMultiplier, setHasMultiplier] = useState(false);
 
   const touchStartX = useRef<number>(0);
@@ -405,8 +402,9 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
       if (name.startsWith("deadly-obstacle")) {
         const chunk = event.other.rigidBodyObject.parent?.name.startsWith('chunk-') ? event.other.rigidBodyObject.parent : event.other.rigidBodyObject.parent?.parent?.name.startsWith('chunk-') ? event.other.rigidBodyObject.parent?.parent : event.other.rigidBodyObject.parent?.parent?.parent?.name.startsWith('chunk-') ? event.other.rigidBodyObject.parent?.parent?.parent : event.other.rigidBodyObject.parent?.parent?.parent?.parent?.name.startsWith('chunk-') ? event.other.rigidBodyObject.parent?.parent?.parent.parent : null
-        if (hasHalo) {
-          setHasHalo(false);
+        if (hasHalo.current) {
+          setHaloQuantity(prev => prev - 1);
+          hasHalo.current = false
           if (chunk) {
             onChunkRemoved(chunk.name);
             lastRemovedName.current = chunk.name;
@@ -544,6 +542,15 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       mixer.current.update(clampedDelta); // Delta is the time between frames
     }
 
+    const halo = scene.getObjectByName("halo");
+    if (halo) {
+      if (hasHalo.current) {
+        halo.visible = true;
+      } else {
+        halo.visible = false;
+      }
+    }
+
     // Get current position and velocity
     const currentPosition = ref.current.translation();
 
@@ -588,13 +595,10 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     if (gameState === "game-over" || gameState === "in-menu") {
       ref.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
 
-      // @ts-expect-error  temporary fix
-      if (equipment.find((item) => item.name === "Abstract Halo")?.quantity > 0) {
-        setHasHalo(true);
-      }
       setHasFishingNet(false);
       setHasMultiplier(false);
-
+      hasHalo.current = haloQuantity > 0;
+      lastRemovedName.current = null;
       targetZVelocity.current = -3;
     } else {
       if (
@@ -690,9 +694,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       rotation={[SLOPE_ANGLE, Math.PI, 0]}
       ccd={true}
     >
-      {hasHalo && (
-        <Halo />
-      )}
+      <Halo />
       {hasFishingNet && (
         <FishingNetIndicator />
       )}
@@ -714,7 +716,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
 const Halo = memo(function Halo() {
   return (
-    <mesh position={[0, 1.7, 0.2]} rotation={[Math.PI / 2, 0, 0]}>
+    <mesh name="halo" visible={false} position={[0, 1.7, 0.2]} rotation={[Math.PI / 2, 0, 0]}>
       <torusGeometry args={[0.2, 0.02]} />
       <meshBasicMaterial color="#41f09c" />
     </mesh>

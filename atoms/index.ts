@@ -1,6 +1,5 @@
 // src/atoms.ts
 import { atom } from "jotai";
-import { useRef } from "react";
 
 export type GameState = "playing" | "game-over" | "in-menu";
 export type VideoSettings = {
@@ -11,7 +10,8 @@ export type VideoSettings = {
 
 // Define the atom with a type
 export const gameStateAtom = atom<GameState>(
-    process.env.NODE_ENV === "development" ? "playing" : "in-menu",
+    "in-menu",
+    // process.env.NODE_ENV === "development" ? "playing" : "in-menu",
 );
 
 export const videoSettingsAtom = atom<VideoSettings>({
@@ -23,3 +23,4 @@ export const videoSettingsAtom = atom<VideoSettings>({
 export const currentFishesAtom = atom<number>(0);
 export const scoreAtom = atom<number>(0);
 export const hasFishingNetAtom = atom<boolean>(false);
+export const haloQuantityAtom = atom<number>(0);
