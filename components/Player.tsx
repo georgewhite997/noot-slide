@@ -376,9 +376,8 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     if (event.other.rigidBodyObject) {
       const name = event.other.rigidBodyObject.name;
 
-
-
       if (name === "ground" || name === "obstacle-fixed") {
+        // console.log({name})
         isJumping.current = false;
       }
 

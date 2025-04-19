@@ -14,7 +14,7 @@ import {
   IObstacle,
 } from "./shared";
 import { useAtomValue } from "jotai";
-import { gameStateAtom } from "@/atoms";
+import { gameStateAtom, scoreAtom } from "@/atoms";
 import { getSnowBumps } from "@/utils";
 import { getObstacles, Obstacle } from "./Obstacles";
 import { Segment } from "./Segment";
@@ -38,6 +38,7 @@ const onTextureLoaded = (texture: THREE.Texture) => {
 
 export const Ground = memo(function Ground() {
   const gameState = useAtomValue(gameStateAtom);
+  const score = useAtomValue(scoreAtom);
   const [segments, setSegments] = useState<ISegment[]>([]);
   const lastPushedIndex = useRef<number | null>(null);
 
@@ -55,7 +56,7 @@ export const Ground = memo(function Ground() {
       const zOffset = -i * (SEGMENT_LENGTH * Math.cos(SLOPE_ANGLE));
       const yOffset = i * (SEGMENT_LENGTH * Math.sin(SLOPE_ANGLE));
 
-      const obstacles = i === 0 ? [] : getObstacles();
+      const obstacles = i === 0 ? [] : getObstacles(["easy"]);
 
       const object = scene.getObjectByName(`segment-snow-${i}`) as THREE.Mesh;
       if (object && object.geometry) {
@@ -110,7 +111,19 @@ export const Ground = memo(function Ground() {
       const newZ = furthestZ - SEGMENT_LENGTH * Math.cos(SLOPE_ANGLE);
       const newY = furthestY + SEGMENT_LENGTH * Math.sin(SLOPE_ANGLE);
 
-      const obstacles = getObstacles();
+      // Determine allowed difficulties based on score
+      let allowedDifficulties: ("easy" | "medium" | "hard")[];
+      if (score > 500) {
+        allowedDifficulties = ["easy", "medium"];
+      } else if (score < 800) {
+        allowedDifficulties = ["easy", "medium", "hard"];
+      } else if (score > 1200) {
+        allowedDifficulties = ["medium", "hard"];
+      } else {
+        allowedDifficulties = ["easy", "medium"];
+      }
+
+      const obstacles = getObstacles(allowedDifficulties);
 
       setSegments((prevSegments) => {
         const newSegments = [
@@ -225,7 +238,7 @@ export const Ground = memo(function Ground() {
     <>
       <Player onChunkRemoved={onChunkRemoved} />
       {segments.map((segment) => (
-        <Fragment key={segment.index}>
+        <Fragment key={`${segment.index}-${segment.zOffset}`}>
           <Segment
             segment={segment}
             colorMap={colorMap}
@@ -250,6 +263,14 @@ export const Ground = memo(function Ground() {
 
 const SegmentObstacles = memo(function SegmentObstacles({ segment, colorMap, normalMap }: { segment: ISegment, colorMap: THREE.Texture, normalMap: THREE.Texture }) {
   const fishGltf = useLoader(GLTFLoader, '/fish.glb')
+  const modelsGltf = useLoader(GLTFLoader, '/models.glb')
+
+  //print all modelsGltf.scene.children.name
+  // useEffect(() => {
+  //   modelsGltf.scene.children.forEach((child) => {
+  //     console.log(child.name);
+  //   });
+  // }, [modelsGltf]);
 
   return (
     <>
@@ -265,6 +286,7 @@ const SegmentObstacles = memo(function SegmentObstacles({ segment, colorMap, nor
                   snowNormalMap={normalMap}
                   {...{ obstacle }}
                   fishGltf={fishGltf}
+                  modelsGltf={modelsGltf}
                 />
               ))}
             </group>
