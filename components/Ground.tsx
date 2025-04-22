@@ -28,7 +28,6 @@ const worldMatrixComponent1 = new THREE.Quaternion().setFromEuler(
 );
 const worldMatrixComponent2 = new THREE.Vector3(1, 1, 1);
 
-
 const onTextureLoaded = (texture: THREE.Texture) => {
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
