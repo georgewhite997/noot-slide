@@ -55,7 +55,7 @@ export const Ground = memo(function Ground() {
       const zOffset = -i * (SEGMENT_LENGTH * Math.cos(SLOPE_ANGLE));
       const yOffset = i * (SEGMENT_LENGTH * Math.sin(SLOPE_ANGLE));
 
-      const obstacles = i === 0 ? [] : getObstacles(["hard"]);
+      const obstacles = i === 0 ? [] : getObstacles(["easy"]);
 
       const object = scene.getObjectByName(`segment-snow-${i}`) as THREE.Mesh;
       if (object && object.geometry) {
@@ -112,14 +112,16 @@ export const Ground = memo(function Ground() {
 
       // Determine allowed difficulties based on score
       let allowedDifficulties: ("easy" | "medium" | "hard")[];
-      if (score > 500) {
+      if (score < 600) {
         allowedDifficulties = ["easy", "medium"];
-      } else if (score < 800) {
-        allowedDifficulties = ["easy", "medium", "hard"];
+      } else if (score > 800) {
+        allowedDifficulties = ["medium"];
       } else if (score > 1200) {
         allowedDifficulties = ["medium", "hard"];
+      } else if (score > 2500) {
+        allowedDifficulties = ["hard"]
       } else {
-        allowedDifficulties = ["easy", "medium"];
+        allowedDifficulties = ["easy"];
       }
 
       const obstacles = getObstacles(allowedDifficulties);

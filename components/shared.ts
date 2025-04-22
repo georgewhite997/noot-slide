@@ -45,8 +45,8 @@ export interface IObstacle {
     position: [number, number, number];
     type: IObstacleType;
     rampConfig?: {
-        hasRock?: boolean;
-        hasSnowman?: boolean;
+        hasSmallObstacle?: boolean;
+        hasBigObstacle?: boolean;
     };
 }
 
@@ -65,4 +65,9 @@ export interface IChunk {
     obstacleSpacing: number;
     possibleDifficulties: ("easy" | "medium" | "hard")[];
     get: (chunk: IChunk, entryLane: laneType, entropy: number, difficulty: "easy" | "medium" | "hard") => IObstacle[];
+}
+
+export interface IObstacleTypeWithChance {
+    type: IObstacleType;
+    chance: number;
 }
