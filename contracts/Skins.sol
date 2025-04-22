@@ -11,18 +11,15 @@ contract Skins is Ownable {
     mapping(address => uint16[]) public userSkins;
     mapping(address => mapping(uint16 => bool)) private owns;
 
-    event PaymentTokenSet(address indexed token);
     event SkinPriceSet(uint16 indexed skinId, uint256 price);
     event SkinPurchased(address indexed buyer, uint16 indexed skinId, uint256 price);
 
     constructor(address _initialOwner, address _paymentToken) Ownable(_initialOwner) {
         paymentToken = _paymentToken;
-        emit PaymentTokenSet(_paymentToken);
     }
 
     function setPaymentToken(address token) external onlyOwner {
         paymentToken = token;
-        emit PaymentTokenSet(token);
     }
 
     function setSkinPrice(uint16 skinId, uint256 price) external onlyOwner {

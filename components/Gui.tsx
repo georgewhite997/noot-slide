@@ -1,20 +1,23 @@
 import {
   useLoginWithAbstract,
   useAbstractClient,
-  useCreateSession,
 } from "@abstract-foundation/agw-react";
 import { useAccount } from "wagmi";
-import { useAbstractSession } from "@/hooks/useAbstractSession"
+import { useAbstractSession } from "@/hooks/useAbstractSession";
 import {
-  contractAddress,
-  abi,
+  registryContractAddress,
+  registryAbi,
+  powerupsContractAddress,
+  powerupsAbi,
+  // skinsContractAddress,
+  // skinsAbi,
   usePublicClient,
   powerups as powerupsMeta,
   IPowerUp,
   chain,
 } from "@/utils";
 import { useEffect, useState, memo } from "react";
-import { Account, formatEther, parseAbi, parseEther, toFunctionSelector } from "viem";
+import { formatEther, parseAbi, parseEther } from "viem";
 import { useAtom, useSetAtom } from "jotai";
 import {
   gameStateAtom,
@@ -22,16 +25,17 @@ import {
   currentFishesAtom,
   scoreAtom,
   haloQuantityAtom,
+  hasSlowSkisAtom,
+  hasLuckyCharmAtom,
+  speedyStartQuantityAtom,
   GameState,
+  abstractSessionAtom,
+  SessionData,
 } from "@/atoms";
 import { toast, Toaster } from "react-hot-toast";
-import { getGeneralPaymasterInput } from "viem/zksync";
-import { privateKeyToAccount } from "viem/accounts";
-import { LimitType, SessionConfig } from "@abstract-foundation/agw-client/sessions";
-import { generatePrivateKey } from "viem/accounts";
 import ConnectButton from "./ConnectButton";
 
-type PowerUps = Array<IPowerUp & { quantity: number }>;
+type PowerUps = Array<IPowerUp & { quantity: number; isDisabled: boolean }>;
 
 const MenuStates = {
   powerups: "powerups",
@@ -42,20 +46,19 @@ const MenuStates = {
 
 type MenuState = (typeof MenuStates)[keyof typeof MenuStates];
 
-type SessionData = {
-  session: SessionConfig;
-  sessionSigner: Account;
-} | null;
+const registryContract = { address: registryContractAddress, abi: registryAbi };
+const powerupsContract = { address: powerupsContractAddress, abi: powerupsAbi };
+// const skinsContract = { address: skinsContractAddress, abi: skinsAbi };
 
 export const Gui = memo(function Gui() {
-  const { address, status, isConnected } = useAccount();
-  const { getStoredSession, createAndStoreSession, clearStoredSession } =
-    useAbstractSession(chain);
+  const { address, isConnected } = useAccount();
+  const { getStoredSession, createAndStoreSession } = useAbstractSession(chain);
   const { data: abstractClient } = useAbstractClient();
   const publicClient = usePublicClient();
 
-  const [session, setSession] = useState<SessionData>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [session, setSession] = useAtom<SessionData>(abstractSessionAtom);
+  const [isLoadingWalletData, setIsLoadingWalletData] =
+    useState<boolean>(false);
 
   const [gameState, setGameState] = useAtom(gameStateAtom);
   const [menuState, setMenuState] = useState<MenuState>(MenuStates.landingPage);
@@ -63,48 +66,115 @@ export const Gui = memo(function Gui() {
   const [score, setScore] = useAtom(scoreAtom);
   const [powerUps, setPowerUps] = useState<PowerUps>([]);
   const setHaloQuantity = useSetAtom(haloQuantityAtom);
+  const setHasSlowSkis = useSetAtom(hasSlowSkisAtom);
+  const setHasLuckyCharm = useSetAtom(hasLuckyCharmAtom);
+  const setSpeedyStartQuantity = useSetAtom(speedyStartQuantityAtom);
 
   const [isRegistered, setIsRegistered] = useState(false);
 
-  const fetchWallet = async () => {
-    if (!publicClient || !address) return;
+  const fetchWallet = async (session: SessionData) => {
+    console.log("1213ASDASD9819991299123993699")
+    if (!publicClient || !address || !session || !abstractClient) return;
 
-    const wagmiContract = { address: contractAddress, abi };
 
+    // return;
+    // const { session, sessionSigner } = abstractSession;
+    // console.log("adasd", s?.session, s?.sessionSigner)
+    const sessionClient = abstractClient.toSessionClient(session.sessionSigner, session.session);
+
+    const x = await sessionClient.writeContract({
+      address: powerupsContractAddress,
+      abi: parseAbi(['function usePowerup(uint16 _powerupId, uint256 _quantity) public']),
+      functionName: "usePowerup",
+      account: sessionClient.account.address,
+      chain,
+      args: [3, BigInt(1)],
+    })
+    console.log(x)
+
+    // return;
+    // const tx = await sessionClient.writeContract({
+    //   address: powerupsContractAddress,
+    //   abi: powerupsAbi,
+    //   functionName: "usePowerup",
+    //   account: sessionClient.account.address,
+    //   chain,
+    //   args: [3, BigInt(1)]
+    // })
+    // console.log(tx)
+    // const tx = await abstractClient.writeContract({
+    //   address: powerupsContractAddress,
+    //   abi: powerupsAbi,
+    //   functionName: "usePowerup",
+
+    //   // account: sessionClient.account,
+    //   // chain,
+    //   // abi: parseAbi(['function usePowerup(uint16,uint256) public']),
+    //   // functionName: 'usePowerup',
+    //   args: [3, BigInt(1)]
+    // })
+    // console.log(tx)
+
+
+    // return
     const ids = powerupsMeta.map((p) => p.id);
 
-    const [registeredRes,
-      //  ownedRes
-
-    ] = await publicClient.multicall({
+    console.log(registryContractAddress, powerupsContractAddress)
+    const [registeredRes, ownedRes] = await publicClient.multicall({
       contracts: [
         {
-          ...wagmiContract,
+          ...registryContract,
           functionName: "registeredAddresses",
           args: [address as `0x${string}`],
         },
-        // {
-        //   ...wagmiContract,
-        //   functionName: "getOwnedPowerups",
-        //   args: [address as `0x${string}`, ids],
-        // },
+        {
+          ...powerupsContract,
+          functionName: "getOwnedPowerups",
+          args: [address as `0x${string}`, ids],
+        },
       ],
     });
 
     const registered = registeredRes.result as boolean;
-    // const owned = ownedRes.result as number[];
-    const owned = [0, 0, 0, 0]
+    const owned = ownedRes.result as number[] || new Array(powerupsMeta.length).fill(0);
+    const disabledIds = JSON.parse(
+      localStorage.getItem("disabledPowerups") || "[]",
+    ) as number[];
 
     setIsRegistered(registered);
     setPowerUps(
       owned.map((qty, i) => {
         const meta = powerupsMeta[i];
+        const hasDisabledIndex = disabledIds.indexOf(meta.id);
+        const quantity = Number(qty);
+
+
         if (meta.name === "Abstract Halo") {
-          setHaloQuantity(Number(qty));
+          const x = hasDisabledIndex == -1 ? quantity : 0;
+          setHaloQuantity(x);
+          console.log("halo", meta.id)
         }
-        return { ...meta, quantity: Number(qty) };
+
+        if (meta.name === "Speedy Start") {
+          setSpeedyStartQuantity(hasDisabledIndex == -1 ? quantity : 0);
+        }
+
+        if (meta.name === "Slow Skis") {
+          setHasSlowSkis(hasDisabledIndex == -1 ? quantity > 0 : false);
+        }
+
+        if (meta.name === "Lucky Charm") {
+          setHasLuckyCharm(hasDisabledIndex == -1 ? quantity > 0 : false);
+        }
+
+        return { ...meta, quantity, isDisabled: hasDisabledIndex !== -1 };
       }),
     );
+
+
+    if (!session && owned.some((qty) => qty > 0)) {
+      await handleCreateSession();
+    }
   };
 
   const register = async () => {
@@ -113,21 +183,21 @@ export const Gui = memo(function Gui() {
     const bal = await publicClient.getBalance({
       address: abstractClient.account.address as `0x${string}`,
     });
+
     if (!bal) return toast.error("Error getting balance");
 
-    const wagmiContract = { address: contractAddress, abi };
-    const [feeRes, regRes] = await publicClient.multicall({
+    const [feeRes, registeredRes] = await publicClient.multicall({
       contracts: [
-        { ...wagmiContract, functionName: "registrationFee" },
+        { ...registryContract, functionName: "registrationFee" },
         {
-          ...wagmiContract,
+          ...registryContract,
           functionName: "registeredAddresses",
           args: [address as `0x${string}`],
         },
       ],
     });
 
-    if (regRes.result) {
+    if (registeredRes.result) {
       setIsRegistered(true);
       return toast.error("You are already registered");
     }
@@ -142,8 +212,8 @@ export const Gui = memo(function Gui() {
     try {
       toast.loading("Registering…");
       await abstractClient.writeContract({
-        address: contractAddress,
-        abi,
+        address: registryContractAddress,
+        abi: registryAbi,
         functionName: "register",
         value: fee,
       });
@@ -157,42 +227,36 @@ export const Gui = memo(function Gui() {
     }
   };
 
-  const { data: agwClient } = useAbstractClient();
-
-
-  const handlePurchase = async (item: PowerUps[number]) => {
-    console.log("handle1337")
+  const handlePurchase = async (item: PowerUps[number], quantity = 1) => {
     if (!abstractClient || !publicClient) return;
 
-
-    const sessionClient = agwClient?.toSessionClient(sessionSigner, session);
-    console.log("CREATED SESSION CLIENT")
-
-    const hash = await sessionClient?.writeContract({
-      account: sessionClient.account,
-      chain,
-      abi: parseAbi(["function mint(address,uint256) external"]),
-      address: "0xC4822AbB9F05646A9Ce44EFa6dDcda0Bf45595AA",
-      functionName: "mint",
-      args: [sessionClient.account.address, BigInt(1)],
-    });
-    console.log("CREATED HASH")
-    console.log(hash)
-
-    return
+    console.log("ASDSD133712399")
+    // set prices
+    // for (let i = 0; i < powerupsMeta.length; i++) {
+    //   const powerup = powerupsMeta[i];
+    //   const price = parseEther(powerup.price.toString())
+    //   const tx = await abstractClient.writeContract({
+    //     address: powerupsContractAddress,
+    //     abi: powerupsAbi,
+    //     functionName: "setPowerupPrice",
+    //     args: [powerup.id, price],
+    //   })
+    //   console.log("tx", tx)
+    // }
+    // return;
 
     const bal = await publicClient.getBalance({
       address: abstractClient.account.address as `0x${string}`,
     });
+
     if (!bal) return toast.error("Failed to get balance");
 
-    const quantity = 1;
     const cost = parseEther(item.price.toString()) * BigInt(quantity);
     if (bal < cost) return toast.error("You don't have enough balance");
 
     await abstractClient.writeContract({
-      address: contractAddress,
-      abi,
+      address: powerupsContractAddress,
+      abi: powerupsAbi,
       functionName: "purchasePowerups",
       value: cost,
       args: [[item.id], [quantity]],
@@ -204,18 +268,72 @@ export const Gui = memo(function Gui() {
         pu.id === item.id ? { ...pu, quantity: pu.quantity + quantity } : pu,
       ),
     );
+
     if (item.name === "Abstract Halo") setHaloQuantity((p) => p + quantity);
+    if (item.name === "Speedy Start")
+      setSpeedyStartQuantity((p) => p + quantity);
+    if (item.name === "Slow Skis") setHasSlowSkis(true);
+    if (item.name === "Lucky Charm") setHasLuckyCharm(true);
+
+    if (!session) {
+      await handleCreateSession();
+    }
+  };
+
+  const togglePowerup = (item: PowerUps[number]) => {
+    setPowerUps((prev) => {
+      let newState = null;
+      const newArr = prev.map((pu) => {
+        if (pu.id === item.id) {
+          newState = !pu.isDisabled;
+          return { ...pu, isDisabled: newState };
+        }
+        return pu;
+      });
+
+      let localStorageDisabled = JSON.parse(
+        localStorage.getItem("disabledPowerups") || "[]",
+      ) as number[];
+      if (newState) {
+        localStorageDisabled.push(item.id);
+      } else {
+        localStorageDisabled = localStorageDisabled.filter(
+          (id) => id !== item.id,
+        );
+      }
+      localStorage.setItem(
+        "disabledPowerups",
+        JSON.stringify(localStorageDisabled),
+      );
+
+      if (item.name === "Abstract Halo") setHaloQuantity(0);
+      if (item.name === "Speedy Start") setSpeedyStartQuantity(0);
+      if (item.name === "Slow Skis") setHasSlowSkis(false);
+      if (item.name === "Lucky Charm") setHasLuckyCharm(false);
+
+      return newArr;
+    });
   };
 
   useEffect(() => {
-    fetchWallet();
-  }, [address]);
+    (async () => {
+      if (isConnected) {
+        setIsLoadingWalletData(true)
+        if (abstractClient?.account) {
+          const s = await checkForExistingSession();
+          fetchWallet(s)
+          setIsLoadingWalletData(false)
+        } else {
+          setSession(null);
+        }
+      }
+    })()
+  }, [address, isConnected, abstractClient?.account]);
 
   const checkForExistingSession = async () => {
-    setIsLoading(true);
-
+    let session = null
     try {
-      const session = await getStoredSession() as SessionData;
+      session = await getStoredSession(powerupsContractAddress);
       if (session) {
         setSession(session);
       } else {
@@ -223,55 +341,39 @@ export const Gui = memo(function Gui() {
       }
     } catch (error) {
       console.error("Error checking for session:", error);
-      alert(
-        `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
-    } finally {
-      setIsLoading(false);
     }
+
+    return session
   };
 
   const handleCreateSession = async () => {
-    setIsLoading(true);
+    if (!isConnected) {
+      return;
+    }
 
+    const s = await checkForExistingSession()
+    if (s?.session) return
+
+    toast.loading("Approve session creation");
     try {
-      const session = await createAndStoreSession() as SessionData;
+      const session = await createAndStoreSession();
       if (session) {
         setSession(session);
       }
     } catch (error) {
       console.error("Error creating session:", error);
       alert(
-        `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+        `Error: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     } finally {
-      setIsLoading(false);
+      toast.dismiss();
     }
   };
-
-  const handleClearSession = () => {
-    try {
-      clearStoredSession();
-      setSession(null);
-    } catch (error) {
-      console.error("Error clearing session:", error);
-      alert(
-        `Error: ${error instanceof Error ? error.message : "Unknown error"}`
-      );
-    }
-  };
-
-
-  useEffect(() => {
-    if (isConnected) {
-      checkForExistingSession();
-    } else {
-      setSession(null);
-    }
-  }, [isConnected]);
 
 
   const overlay = gameState === "game-over" || gameState === "in-menu";
+
+
 
   return (
     <>
@@ -303,37 +405,41 @@ export const Gui = memo(function Gui() {
                 />
               )}
 
-              {menuState === MenuStates.landingPage && (
-                <LandingPage
-                  isConnected={isConnected}
-                  address={address}
-                  abstractReady={!!abstractClient && status === "connected"}
-                  isRegistered={isRegistered}
-                  register={register}
-                  setGameState={setGameState}
-                  setMenuState={setMenuState}
-                  powerUps={powerUps}
-                  handlePurchase={handlePurchase}
-                />
+              {isConnected ? (
+                <>
+                  {menuState === MenuStates.landingPage && (
+                    <LandingPage
+                      isLoading={isLoadingWalletData}
+                      address={address}
+                      isRegistered={isRegistered}
+                      register={register}
+                      setGameState={setGameState}
+                      setMenuState={setMenuState}
+                      powerUps={powerUps}
+                      handlePurchase={handlePurchase}
+                    />
+                  )}
+
+                  {menuState === MenuStates.powerups && (
+                    <Powerups
+                      onClose={() => setMenuState(MenuStates.landingPage)}
+                      address={address as `0x${string}`}
+                      powerUps={powerUps}
+                      handlePurchase={handlePurchase}
+                      onToggle={togglePowerup}
+                    />
+                  )}
+
+                  {menuState === MenuStates.skins && (
+                    <Skins
+                      onClose={() => setMenuState(MenuStates.landingPage)}
+                      address={address as `0x${string}`}
+                    />
+                  )}
+                </>
+              ) : (
+                <ConnectButton />
               )}
-
-              {menuState === MenuStates.powerups && (
-                <Powerups
-                  onClose={() => setMenuState(MenuStates.landingPage)}
-                  address={address as `0x${string}`}
-                  powerUps={powerUps}
-                  handlePurchase={handlePurchase}
-                />
-              )}
-
-              {menuState === MenuStates.skins && (
-                <Skins
-                  onClose={() => setMenuState(MenuStates.landingPage)}
-                  address={address as `0x${string}`}
-                />
-              )}
-
-
             </>
           )}
         </div>
@@ -345,7 +451,7 @@ export const Gui = memo(function Gui() {
 type SkinsProps = {
   onClose: () => void;
   address: string;
-}
+};
 
 const Skins = ({ onClose, address }: SkinsProps) => {
   if (!address) return null;
@@ -361,11 +467,10 @@ const Skins = ({ onClose, address }: SkinsProps) => {
         </button>
       </div>
 
-
       <h1>Skins</h1>
     </div>
-  )
-}
+  );
+};
 
 type GameOverProps = {
   score: number;
@@ -427,110 +532,105 @@ const GameOver = ({
     >
       Change Skins
     </button>
-
   </>
 );
 
 type LandingProps = {
-  isConnected: boolean;
   address?: string;
-  abstractReady: boolean;
   isRegistered: boolean;
   register: () => void;
   setGameState: (gs: GameState) => void;
   setMenuState: (ms: MenuState) => void;
   powerUps: PowerUps;
   handlePurchase: (p: PowerUps[number]) => void;
+  isLoading: boolean;
 };
 
 const LandingPage = ({
-  isConnected,
   address,
-  abstractReady,
   isRegistered,
   register,
   setGameState,
   setMenuState,
+  isLoading,
 }: LandingProps) => {
-
   const { logout } = useLoginWithAbstract();
 
   return (
     <>
       <h1
-        className="mb-10 cursor-pointer text-4xl font-bold"
+        className="mb-10 text-4xl font-bold"
         onClick={() => setGameState("playing")}
       >
         Noot Slide
       </h1>
 
       <div className="flex items-center justify-center gap-4">
-        {!isConnected ? (
-          <ConnectButton />
-        ) : (
-          <div className="flex flex-col items-center gap-4">
-            <p>
-              connected as {address?.slice(0, 6)}…{address?.slice(-4)}
-            </p>
-
+        <div className="flex flex-col items-center gap-4">
+          <p>
+            connected as {address?.slice(0, 6)}…{address?.slice(-4)}
+          </p>
+          {isLoading ? (
+            <>loading...</>
+          ) : (
             <button
               className="rounded bg-blue-500 px-4 py-2 text-white"
-              disabled={!abstractReady}
               onClick={() =>
                 isRegistered ? setGameState("playing") : register()
               }
             >
               {isRegistered ? "Play the game" : "Register to play"}
             </button>
+          )}
 
-            <button
-              className="rounded bg-blue-500 px-4 py-2 text-white"
-              onClick={logout}
-            >
-              Logout
-            </button>
+          <button
+            className="rounded bg-blue-500 px-4 py-2 text-white"
+            onClick={logout}
+          >
+            Logout
+          </button>
 
-            <button
-              className="rounded bg-blue-500 px-4 py-2 text-white"
-              onClick={() => setMenuState(MenuStates.videoSettings)}
-            >
-              Change Video settings
-            </button>
+          <button
+            className="rounded bg-blue-500 px-4 py-2 text-white"
+            onClick={() => setMenuState(MenuStates.videoSettings)}
+          >
+            Change Video settings
+          </button>
 
+          <button
+            className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
+            onClick={() => setMenuState(MenuStates.powerups)}
+          >
+            Change Powerups
+          </button>
 
-            <button
-              className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
-              onClick={() => setMenuState(MenuStates.powerups)}
-            >
-              Change Powerups
-            </button>
-
-            <button
-              className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
-              onClick={() => setMenuState(MenuStates.skins)}
-            >
-              Change Skins
-            </button>
-
-
-          </div>
-        )}
+          <button
+            className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
+            onClick={() => setMenuState(MenuStates.skins)}
+          >
+            Change Skins
+          </button>
+        </div>
       </div>
-
     </>
-  )
-}
+  );
+};
 
 type PowerupsProps = {
   onClose: () => void;
   address: string;
   powerUps: PowerUps;
-  handlePurchase: (p: PowerUps[number]) => void;
-}
+  handlePurchase: (p: PowerUps[number], quantity?: number) => void;
+  onToggle: (p: PowerUps[number]) => void;
+};
 
-const Powerups = ({ onClose, address, powerUps, handlePurchase }: PowerupsProps) => {
-  if (!address) return null;
-
+const Powerups = ({
+  onClose,
+  address,
+  powerUps,
+  handlePurchase,
+  onToggle,
+}: PowerupsProps) => {
   return (
     <div className="mx-auto mt-10 flex max-w-full flex-col items-center gap-4 md:max-w-[500px]">
       <div className="relative w-full">
@@ -543,50 +643,72 @@ const Powerups = ({ onClose, address, powerUps, handlePurchase }: PowerupsProps)
       </div>
 
       <h2 className="text-2xl font-bold">Your powerups</h2>
-      {powerUps.map((item) => {
-        return (
-          <div
-            key={item.id}
-            className="flex w-full rounded border border-gray-300 p-4"
-          >
-            <div className="w-1/5">{/* placeholder for img */}</div>
-            <div className="w-4/5 text-sm">
-              <p className="mb-1 text-center text-base font-semibold">
-                {item.name}
-              </p>
-              <p>{item.description}</p>
+      {powerUps.length > 0
+        ? powerUps.map((item) => {
+          const [quantity, setQuantity] = useState(1);
 
-              {item.type === "one-time" ? (
-                <>
-                  <p>Owned: {item.quantity}</p>
-                  <button
-                    className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
-                    onClick={() => handlePurchase(item)}
-                  >
-                    {item.price} ETH
-                  </button>
-                </>
-              ) : (
-                <>
-                  <p>Permanent upgrade</p>
-                  {item.quantity > 0 ? (
-                    <div className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-center text-white">
-                      Owned
+          return (
+            <div
+              key={item.id}
+              className="flex w-full rounded border border-gray-300 p-4"
+            >
+              <div className="w-1/5">{/* placeholder for img */}</div>
+              <div className="w-4/5 text-sm">
+                <p className="mb-1 text-center text-base font-semibold">
+                  {item.name}
+                </p>
+                <p>{item.description}</p>
+
+                {item.type === "one-time" ? (
+                  <>
+                    <p>Owned: {item.quantity}</p>
+                    <div className="flex gap-2">
+                      <button
+                        className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
+                        onClick={() => handlePurchase(item, quantity)}
+                      >
+                        Buy for {item.price} ETH
+                      </button>
+                      <input
+                        className="rounded bg-gray-200 px-2 py-1 text-center text-black"
+                        type="number"
+                        value={quantity}
+                        onChange={(e) => setQuantity(Number(e.target.value))}
+                        min={1}
+                        max={100}
+                      />
                     </div>
-                  ) : (
-                    <button
-                      className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
-                      onClick={() => handlePurchase(item)}
-                    >
-                      Buy
-                    </button>
-                  )}
-                </>
+                  </>
+                ) : (
+                  <>
+                    <p>Permanent upgrade</p>
+                    {item.quantity > 0 ? (
+                      <div className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-center text-white">
+                        Owned
+                      </div>
+                    ) : (
+                      <button
+                        className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
+                        onClick={() => handlePurchase(item)}
+                      >
+                        Buy for {item.price} ETH
+                      </button>
+                    )}
+                  </>
+                )}
+              </div>
+              {item.quantity > 0 && (
+                <button
+                  className="mt-2 max-w-min max-h-min rounded bg-blue-500 px-2 py-1 text-white"
+                  onClick={() => onToggle(item)}
+                >
+                  {item.isDisabled ? "Enable" : "Disable"}
+                </button>
               )}
             </div>
-          </div>
-        );
-      })}
+          );
+        })
+        : null}
     </div>
   );
 };
@@ -598,7 +720,7 @@ const Switch = ({
   checked: boolean;
   onCheckedChange: (val: boolean) => void;
 }) => (
-  <label className="flex items-center gap-2 cursor-pointer select-none">
+  <label className="flex items-center gap-2 select-none">
     <input
       type="checkbox"
       className="h-4 w-4"

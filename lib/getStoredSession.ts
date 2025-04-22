@@ -7,8 +7,10 @@ import { LOCAL_STORAGE_KEY_PREFIX } from "./constants";
 import { getEncryptionKey } from "./getEncryptionKey";
 import { decrypt } from "./decryptSession";
 import { validateSession } from "./validateSession";
-import { SupportedChain } from "@/config/chain";
+import { SupportedChain } from "@/utils";
 import type { Address } from "viem";
+import { privateKeyToAccount } from "viem/accounts"
+import { SessionData } from "@/atoms";
 
 /**
  * @function getStoredSession
@@ -39,26 +41,34 @@ import type { Address } from "viem";
 export const getStoredSession = async (
   abstractClient: AbstractClient,
   address: Address,
+  targetAddress: Address,
   chain: SupportedChain,
   createSessionAsync: (params: {
     session: SessionConfig;
   }) => Promise<{ transactionHash?: `0x${string}`; session: SessionConfig }>
-): Promise<object | null> => {
-  console.log("Getting stored session for address:", address);
+): Promise<SessionData> => {
   if (!address) return null;
 
   const encryptedData = localStorage.getItem(
     `${LOCAL_STORAGE_KEY_PREFIX}${address}`
   );
+
   if (!encryptedData) return null;
 
   try {
     const key = await getEncryptionKey(address);
     const decryptedData = await decrypt(encryptedData, key);
     const parsedData = JSON.parse(decryptedData);
+    if (!parsedData.session.callPolicies.some((policy: any) => policy.target.toLowerCase() === targetAddress.toLowerCase())) {
+      return null
+    }
+
     const sessionHash = getSessionHash(parsedData.session);
     await validateSession(abstractClient, address, sessionHash, chain, createSessionAsync);
-    return parsedData;
+    const sessionSigner = privateKeyToAccount(parsedData.privateKey);
+
+
+    return { session: parsedData.session, sessionSigner };
   } catch (error) {
     console.error("Failed to decrypt session:", error);
     return null;

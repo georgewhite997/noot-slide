@@ -13,7 +13,7 @@ const config: HardhatUserConfig = {
       enableEraVMExtensions: false,
     },
   },
-  defaultNetwork: "abstractMainnet",
+  defaultNetwork: "abstractTestnet",
   networks: {
     abstractTestnet: {
       url: "https://api.testnet.abs.xyz",

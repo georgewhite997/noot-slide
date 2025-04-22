@@ -32,11 +32,6 @@ contract Powerups is Ownable {
 
         require(msg.value >= totalCost, "Insufficient payment");
 
-        if (msg.value > totalCost) {
-            (bool refunded, ) = payable(msg.sender).call{value: msg.value - totalCost}("");
-            require(refunded, "Refund failed");
-        }
-
         emit PowerupsPurchased(msg.sender, _powerupIds, _quantities);
     }
 
@@ -55,7 +50,7 @@ contract Powerups is Ownable {
     }
 
     function usePowerup(uint16 _powerupId, uint256 _quantity) public {
-        require(powerupsOwned[msg.sender][_powerupId] >= _quantity && _quantity > 0, "Not enough powerup to use");
+        require(powerupsOwned[msg.sender][_powerupId] >= _quantity, "Not enough powerup to use");
 
         powerupsOwned[msg.sender][_powerupId] -= _quantity;
     }

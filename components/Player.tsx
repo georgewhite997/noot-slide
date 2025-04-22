@@ -9,8 +9,11 @@ import {
   RigidBody,
 } from "@react-three/rapier";
 import { SLOPE_ANGLE, lanes } from "./shared";
-import { useAtom, useSetAtom } from "jotai";
-import { currentFishesAtom, gameStateAtom, haloQuantityAtom, hasFishingNetAtom, scoreAtom } from "@/atoms";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, hasFishingNetAtom, scoreAtom } from "@/atoms";
+import { useAbstractClient } from "@abstract-foundation/agw-react";
+import { chain, powerups, powerupsAbi, powerupsContractAddress } from "@/utils";
+import { parseAbi } from "viem";
 
 const LANE_TRANSITION_SPEED = 2.5;
 const CAMERA_POSITION_SMOOTHING = 3; // Lower = smoother but slower
@@ -51,6 +54,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const touchStartX = useRef<number>(0);
   const touchStartY = useRef<number>(0);
   const isTouchActive = useRef<boolean>(false);
+  const abstractSession = useAtomValue(abstractSessionAtom);
 
   const targetZVelocity = useRef(-3);
   const lastTakenFishes = useRef<Set<string>>(new Set());
@@ -284,6 +288,43 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     };
   }, []);
 
+  const { data: agwClient } = useAbstractClient();
+
+
+  const utilizeHalo = async () => {
+    if (!abstractSession || !agwClient) return;
+    try {
+
+      const { session, sessionSigner } = abstractSession;
+      const sessionClient = agwClient.toSessionClient(sessionSigner, session);
+
+      console.log("19UTILIZING", {
+        session, sessionSigner,
+        account: sessionClient.account,
+        powerupsContractAddress,
+        args: [powerups.findIndex(p => p.name === 'Abstract Halo'), 1]
+      })
+
+      const tx = await sessionClient.writeContract({
+        address: powerupsContractAddress,
+        abi: powerupsAbi,
+        functionName: "usePowerup",
+        account: sessionClient.account,
+        chain,
+        // abi: parseAbi(['function usePowerup(uint16,uint256) public']),
+        // functionName: 'usePowerup',
+        // address: powerupsContractAddress,
+        args: [powerups.find(p => p.name === 'Abstract Halo')!.id, BigInt(1)]
+      })
+
+      console.log({ tx })
+    } catch (e) {
+      console.log(e)
+      endGame();
+      playDeathAnimation();
+    }
+  }
+
   const jump = () => {
     if (isJumping.current || gameState === "game-over") return;
 
@@ -404,6 +445,8 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
         const chunk = event.other.rigidBodyObject.parent?.name.startsWith('chunk-') ? event.other.rigidBodyObject.parent : event.other.rigidBodyObject.parent?.parent?.name.startsWith('chunk-') ? event.other.rigidBodyObject.parent?.parent : event.other.rigidBodyObject.parent?.parent?.parent?.name.startsWith('chunk-') ? event.other.rigidBodyObject.parent?.parent?.parent : event.other.rigidBodyObject.parent?.parent?.parent?.parent?.name.startsWith('chunk-') ? event.other.rigidBodyObject.parent?.parent?.parent.parent : null
         if (hasHalo.current) {
           setHaloQuantity(prev => prev - 1);
+          utilizeHalo();
+
           hasHalo.current = false
           if (chunk) {
             onChunkRemoved(chunk.name);
@@ -544,10 +587,14 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
     const halo = scene.getObjectByName("halo");
     if (halo) {
-      if (hasHalo.current) {
-        halo.visible = true;
+      if (!abstractSession) {
+        hasHalo.current = false;
       } else {
-        halo.visible = false;
+        if (hasHalo.current) {
+          halo.visible = true;
+        } else {
+          halo.visible = false;
+        }
       }
     }
 

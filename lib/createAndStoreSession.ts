@@ -7,6 +7,8 @@ import {
 import { LOCAL_STORAGE_KEY_PREFIX } from "./constants";
 import { getEncryptionKey } from "./getEncryptionKey";
 import { encrypt } from "./encryptSession";
+import { powerupsContractAddress } from "@/utils";
+import { SessionData } from "@/atoms";
 
 /**
  * @function createAndStoreSession
@@ -40,10 +42,7 @@ export const createAndStoreSession = async (
   createSessionAsync: (params: {
     session: SessionConfig;
   }) => Promise<{ transactionHash?: `0x${string}`; session: SessionConfig }>
-): Promise<{
-  session: SessionConfig;
-  privateKey: Address;
-} | null> => {
+): Promise<SessionData> => {
   console.log("Creating session for address:", userAddress);
   if (!userAddress) return null;
 
@@ -54,7 +53,7 @@ export const createAndStoreSession = async (
     const { session } = await createSessionAsync({
       session: {
         signer: sessionSigner.address,
-        expiresAt: BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24),
+        expiresAt: BigInt(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 30),
         feeLimit: {
           limitType: LimitType.Lifetime,
           limit: parseEther("1"),
@@ -62,8 +61,8 @@ export const createAndStoreSession = async (
         },
         callPolicies: [
           {
-            target: "0xC4822AbB9F05646A9Ce44EFa6dDcda0Bf45595AA", // NFT contract
-            selector: toFunctionSelector("mint(address,uint256)"),
+            target: powerupsContractAddress,
+            selector: toFunctionSelector("usePowerup(uint16,uint256)"),
             valueLimit: {
               limitType: LimitType.Unlimited,
               limit: BigInt(0),
@@ -90,7 +89,7 @@ export const createAndStoreSession = async (
       `${LOCAL_STORAGE_KEY_PREFIX}${userAddress}`,
       encryptedData
     );
-    return sessionData;
+    return { session, sessionSigner };
   } catch (error) {
     console.error("Failed to create session:", error);
     throw new Error("Session creation failed");

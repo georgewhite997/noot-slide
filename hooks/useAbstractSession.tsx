@@ -5,6 +5,7 @@ import { validateSession } from "../lib/validateSession";
 import { createAndStoreSession } from "../lib/createAndStoreSession";
 import { clearStoredSession } from "../lib/clearStoredSession";
 import type { SupportedChain } from "@/utils";
+import { Address } from "viem";
 
 /**
  * @function useAbstractSession
@@ -39,17 +40,21 @@ export const useAbstractSession = (chain: SupportedChain) => {
     const { createSessionAsync } = useCreateSession();
     const { data: client } = useAbstractClient();
 
-    if (!address || !client)
+    if (!address || !client) {
+        const nullFunction = () => {
+            console.log("NULL BECAUSE", { address, client })
+        }
         return {
-            getStoredSession: () => null,
-            validateSession: () => null,
-            createAndStoreSession: () => null,
-            clearStoredSession: () => null,
+            getStoredSession: nullFunction,
+            validateSession: nullFunction,
+            createAndStoreSession: nullFunction,
+            clearStoredSession: nullFunction,
         };
+    }
 
     return {
-        getStoredSession: () =>
-            getStoredSession(client, address, chain, createSessionAsync),
+        getStoredSession: (targetAddress: Address) =>
+            getStoredSession(client, address, targetAddress, chain, createSessionAsync),
         validateSession: (sessionHash: `0x${string}`) =>
             validateSession(client, address, sessionHash, chain, createSessionAsync),
         createAndStoreSession: () =>

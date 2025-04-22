@@ -1,6 +1,6 @@
 import { clearStoredSession } from "./clearStoredSession";
 import { createAndStoreSession } from "./createAndStoreSession";
-import { SupportedChain } from "@/config/chain";
+import { SupportedChain } from "@/utils";
 import { abstractTestnet } from "viem/chains";
 import type { AbstractClient } from "@abstract-foundation/agw-client";
 import type { Address } from "viem";
@@ -39,9 +39,6 @@ export const validateSession = async (
 
   try {
     const status = await abstractClient.getSessionStatus(sessionHash);
-
-    console.log("status", status);
-    console.log("chain", chain);
 
     // On Abstract testnet, any session is allowed, so we skip the check
     // However, on mainnet, we need to check if the session is both whitelisted and active.

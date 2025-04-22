@@ -3,6 +3,11 @@ import { abstract, abstractTestnet } from "viem/chains";
 import { useEffect, useState } from "react";
 import { eip712WalletActions } from "viem/zksync";
 import Registry from "../artifacts-zk/contracts/Registry.sol/Registry.json";
+import Powerups from "../artifacts-zk/contracts/Powerups.sol/Powerups.json";
+// import Skins from "../artifacts-zk/contracts/Skins.sol/Skins.json";
+import registryAddress from "../artifacts-zk/contracts/Registry.sol/Registry-address.json";
+import powerupsAddress from "../artifacts-zk/contracts/Powerups.sol/Powerups-address.json";
+// import { address as SkinsAddress } from "../artifacts-zk/contracts/Skins.sol/Skins-address.json";
 import { createNoise2D } from "simplex-noise";
 
 const dockerizedNode = defineChain({
@@ -38,8 +43,14 @@ export function usePublicClient(): PublicClient | null {
   return publicClient;
 }
 
-export const abi = [...Registry.abi] as const;
-export const contractAddress = (Registry as any).address as `0x${string}`;
+export const registryAbi = [...Registry.abi] as const;
+export const registryContractAddress = registryAddress.address as `0x${string}`;
+
+export const powerupsAbi = [...Powerups.abi] as const;
+export const powerupsContractAddress = powerupsAddress.address as `0x${string}`;
+
+// export const skinsAbi = [...Skins.abi] as const;
+// export const skinsContractAddress = skinsAddress as `0x${string}`;
 
 // MADE BY GROK
 // function to generate snow on the ground
@@ -89,28 +100,28 @@ export const powerups: IPowerUp[] = [
     name: "Slow Skis",
     description: "Decreases the speed of the entire game by 15%.",
     type: "permanent",
-    price: 0.01,
+    price: 0.0022,
   },
   {
     id: 2,
     name: "Lucky charm",
     description: "Increases the amount of in-game pickups.",
     type: "permanent",
-    price: 0.01,
+    price: 0.0022,
   },
   {
     id: 3,
     name: "Abstract Halo",
     description: "Grants extra life on your first crash.",
     type: "one-time",
-    price: 0.01,
+    price: 0.0005,
   },
   {
     id: 4,
     name: "Speedy start",
     description: "Grants 1,000 distance points to your score from the start.",
     type: "one-time",
-    price: 0.01,
+    price: 0.0005,
   },
 ];
 
