@@ -17,92 +17,6 @@ const RUNWAY_LENGTH = 8;
 const RAMP_SLOPE = -0.9;
 
 const chunks: IChunk[] = [
-  // {
-  //   name: "lying_tree",
-  //   length: 5,
-  //   obstacleSpacing: 2,
-  //   possibleDifficulties: ["easy"],
-  //   get: (
-  //     { length, obstacleSpacing }: IChunk,
-  //     entryLane: laneType,
-  //     entropy: number,
-  //     difficulty: "easy" | "medium" | "hard"
-  //   ) => {
-  //     const obstacles: IObstacle[] = [];
-
-  //     // Add the lying tree at the end of the chunk
-  //     obstacles.push({
-  //       position: [0, 0, (length - 1) * obstacleSpacing] as [number, number, number],
-  //       type: "lying-tree-long",
-  //     });
-
-  //     // Add 2-3 random obstacles (tree, low-rock, or snowman)
-  //     const numObstacles = Math.floor(Math.random() * 2) + 1; // 2 or 3 obstacles
-  //     const obstacleTypes = ["tree", "low-rock", "snowman", "bonfire"];
-
-  //     for (let i = 0; i < numObstacles; i++) {
-  //       // Find a valid position (not on entry lane, not on last two positions)
-  //       let validPosition = false;
-  //       let x: number = 0;
-  //       let z: number = 0;
-
-  //       while (!validPosition) {
-  //         x = lanes[Math.floor(Math.random() * lanes.length)];
-  //         z = Math.floor(Math.random() * (length - 2)) * obstacleSpacing;
-
-  //         // Check if position is valid (not on entry lane and not on last two positions)
-  //         if (x !== lanes[entryLane] && z < (length - 2) * obstacleSpacing && z > 0 * obstacleSpacing) {
-  //           // Check if position is not already occupied
-  //           const isOccupied = obstacles.some(obs =>
-  //             obs.position[0] === x && obs.position[2] === z
-  //           );
-  //           if (!isOccupied) {
-  //             validPosition = true;
-  //           }
-  //         }
-  //       }
-
-  //       // Add the random obstacle
-  //       obstacles.push({
-  //         position: [x, 0, z] as [number, number, number],
-  //         type: obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)] as "tree" | "low-rock" | "snowman",
-  //       });
-  //     }
-
-  //     // Add fish, fishing-net, and multiplier to empty spots
-  //     for (let i = 0; i < length - 2; i++) { // Don't add to last two positions
-  //       for (let j = 0; j < lanes.length; j++) {
-  //         const x = lanes[j];
-  //         const z = i * obstacleSpacing;
-
-  //         // Skip entry lane and positions with existing obstacles
-  //         if (x !== lanes[entryLane] && !obstacles.some(obs =>
-  //           obs.position[0] === x && obs.position[2] === z
-  //         )) {
-  //           const random = Math.random();
-  //           if (random < 0.1) { // 10% chance for fishing net
-  //             obstacles.push({
-  //               position: [x, 0, z] as [number, number, number],
-  //               type: "fishing-net",
-  //             });
-  //           } else if (random < 0.2) { // 10% chance for fish multiplier
-  //             obstacles.push({
-  //               position: [x, 0, z] as [number, number, number],
-  //               type: "fish-multiplier",
-  //             });
-  //           } else if (random < 0.6) { // 40% chance for fish
-  //             obstacles.push({
-  //               position: [x, 0, z] as [number, number, number],
-  //               type: "fish",
-  //             });
-  //           }
-  //         }
-  //       }
-  //     }
-
-  //     return obstacles;
-  //   },
-  // },
   {
     name: "lying_tree",
     length: 5,
@@ -128,7 +42,7 @@ const chunks: IChunk[] = [
         }
       }
 
-      const obstacleTypes = ["tree", "low-rock", "snowman", "bonfire"];
+      const obstacleTypes = ["tree", "low-rock", "snowman", "bonfire", "winter-well", "gift"];
 
       for (let i = 0; i < length; i++) {
         for (let j = 0; j < lanes.length; j++) {
@@ -144,7 +58,7 @@ const chunks: IChunk[] = [
             if (shouldSpawnObstacle) {
               obstacles.push({
                 position: [x, 0, z] as [number, number, number],
-                type: obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)] as "tree" | "low-rock" | "snowman"
+                type: obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)] as "tree" | "low-rock" | "snowman" | "bonfire" | "winter-well" | "gift"
               });
             }
           } else {
@@ -267,7 +181,7 @@ const chunks: IChunk[] = [
               obstacles.push({
                 position: [x, 0, z] as [number, number, number],
                 type:
-                  random < -0.3 ? "tree" : random < 0.3 ? "snowman" : random < 0.6 ? "bonfire" : "low-rock",
+                  random < -0.3 ? "tree" : random < 0.3 ? "snowman" : random < 0.6 ? "bonfire" : random < 0.7 ? "gift" : "low-rock",
               });
             }
           } else if (isEntryLane) {
@@ -394,7 +308,7 @@ const chunks: IChunk[] = [
             obstacles.push({
               position: [x, 0, z] as [number, number, number],
               type:
-                random < -0.3 ? "tree" : random < 0.3 ? "snowman" : random < 0.6 ? "bonfire" : "low-rock",
+                random < -0.3 ? "tree" : random < 0.3 ? "snowman" : random < 0.6 ? "bonfire" : random < 0.7 ? "gift" : "low-rock",
             });
           } else {
             if (i === length - 1 && ((i === entryLane && firstRampHasObstacle) || (i === secondRampLane && secondRampHasRock))) {
@@ -502,15 +416,20 @@ const chunks: IChunk[] = [
                   position: [x, 0, z] as [number, number, number],
                   type: "tree",
                 });
-              } else if (random < 0.8) {
+              } else if (random < 0.7) {
                 obstacles.push({
                   position: [x, 0, z] as [number, number, number],
                   type: "snowman",
                 });
-              } else {
+              } else if (random < 0.9) {
                 obstacles.push({
                   position: [x, 0, z] as [number, number, number],
                   type: "bonfire",
+                });
+              } else {
+                obstacles.push({
+                  position: [x, 0, z] as [number, number, number],
+                  type: "winter-well",
                 });
               }
             }
@@ -573,6 +492,7 @@ const chunks: IChunk[] = [
       difficulty: "easy" | "medium" | "hard"
     ) => {
       const obstacles: IObstacle[] = [];
+      const carPositions: number[] = []; // Track positions where cars are spawned
 
       // Determine additional entry lane based on difficulty
       let additionalEntryLane: laneType | null = null;
@@ -596,20 +516,45 @@ const chunks: IChunk[] = [
           const isEntryLane = j === entryLane || (additionalEntryLane !== null && j === additionalEntryLane);
 
           if (!isEntryLane) {
+            // Skip if this position is after a car
+            if (carPositions.includes(i - 1)) continue;
+
             // For easy difficulty, reduce obstacle spawn chance by 50%
             const shouldSpawnObstacle = difficulty === "easy" ? Math.random() < 0.5 : true;
             if (shouldSpawnObstacle) {
-              const random = noise2D(j + i, entropy);
-              if (random < -0.5) {
-                obstacles.push({
-                  position: [x, 0, z] as [number, number, number],
-                  type: "low-rock",
-                });
+              const random = Math.random();
+              if (i === length - 1) {
+                // At last position, 50-50 chance between low-rock and tree
+                if (random < 0.5) {
+                  obstacles.push({
+                    position: [x, 0, z] as [number, number, number],
+                    type: "low-rock",
+                  });
+                } else {
+                  obstacles.push({
+                    position: [x, 0, z] as [number, number, number],
+                    type: "tree",
+                  });
+                }
               } else {
-                obstacles.push({
-                  position: [x, 0, z] as [number, number, number],
-                  type: "tree",
-                });
+                // Normal probabilities for other positions
+                if (random < 0.4) {
+                  obstacles.push({
+                    position: [x, 0, z] as [number, number, number],
+                    type: "low-rock",
+                  });
+                } else if (random < 0.85) {
+                  obstacles.push({
+                    position: [x, 0, z] as [number, number, number],
+                    type: "tree",
+                  });
+                } else {
+                  obstacles.push({
+                    position: [x, 0, z] as [number, number, number],
+                    type: "car",
+                  });
+                  carPositions.push(i); // Track this car position
+                }
               }
             }
           } else {
@@ -660,10 +605,10 @@ const chunks: IChunk[] = [
     },
   },
   {
-    name: "fence_chunk",
+    name: "fence_at_the_end",
     length: 5,
     obstacleSpacing: 2,
-    possibleDifficulties: ["easy"],
+    possibleDifficulties: ["easy", "medium", "hard"],
     get: (
       { length, obstacleSpacing }: IChunk,
       entryLane: laneType,
@@ -672,6 +617,19 @@ const chunks: IChunk[] = [
     ) => {
       const obstacles: IObstacle[] = [];
       const CLOSER_OFFSET = 1; // How much closer to move obstacles to the fence
+
+      // Determine additional entry lane based on difficulty
+      let additionalEntryLane: laneType | null = null;
+      if (difficulty === "easy" || difficulty === "medium") {
+        // For easy and medium, add an additional entry lane
+        if (entryLane === 0) {
+          additionalEntryLane = 1; // If left lane is entry, add middle as additional
+        } else if (entryLane === 2) {
+          additionalEntryLane = 1; // If right lane is entry, add middle as additional
+        } else {
+          additionalEntryLane = Math.random() < 0.5 ? 0 : 2; // If middle is entry, randomly add left or right
+        }
+      }
 
       // Add fence at length - 2 in entry lane
       obstacles.push({
@@ -692,14 +650,18 @@ const chunks: IChunk[] = [
         ];
       }
 
-      const obstacleTypes = ["big-tree", "snowman"];
+      const obstacleTypes = ["big-tree", "snowman", "winter-well"];
 
       // Add obstacles to available lanes with offset
       for (const { lane, offset } of availableLanes) {
-        obstacles.push({
-          position: [lane + offset, 0, (length - 2) * obstacleSpacing] as [number, number, number],
-          type: obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)] as "big-tree" | "snowman",
-        });
+        // For easy difficulty, reduce obstacle spawn chance by 50%
+        const shouldSpawnObstacle = difficulty === "easy" ? Math.random() < 0.5 : true;
+        if (shouldSpawnObstacle) {
+          obstacles.push({
+            position: [lane + offset, 0, (length - 2) * obstacleSpacing] as [number, number, number],
+            type: obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)] as "big-tree" | "snowman",
+          });
+        }
       }
 
       // Add fish, fishing-net, and multiplier to empty spots
@@ -708,32 +670,170 @@ const chunks: IChunk[] = [
           const x = lanes[j];
           const z = i * obstacleSpacing;
 
-          // Skip entry lane and positions with existing obstacles
-          if (x !== lanes[entryLane] && !obstacles.some(obs =>
-            obs.position[0] === x && obs.position[2] === z
-          )) {
-            const random = Math.random();
-            if (random < 0.1) { // 10% chance for fishing net
-              obstacles.push({
-                position: [x, 0, z] as [number, number, number],
-                type: "fishing-net",
-              });
-            } else if (random < 0.2) { // 10% chance for fish multiplier
-              obstacles.push({
-                position: [x, 0, z] as [number, number, number],
-                type: "fish-multiplier",
-              });
-            } else if (random < 0.6) { // 40% chance for fish
-              obstacles.push({
-                position: [x, 0, z] as [number, number, number],
-                type: "fish",
-              });
+          // Skip both entry lanes if they exist
+          const isEntryLane = j === entryLane || (additionalEntryLane !== null && j === additionalEntryLane);
+
+          // Skip positions with existing obstacles
+          if (!obstacles.some(obs => obs.position[0] === x && obs.position[2] === z)) {
+            if (isEntryLane) {
+              // Check for fishing net placement at start or end
+              if (i === 0 || i === length - 3) {
+                const hasPowerUp = Math.random() < 0.2;
+                if (hasPowerUp) {
+                  // If placing at start, don't place at end
+                  if (i === 0) {
+                    obstacles.push({
+                      position: [x, 0, z] as [number, number, number],
+                      type: Math.random() < 0.5 ? "fishing-net" : "fish-multiplier",
+                    });
+                  } else if (i === length - 3) {
+                    // Only place at end if there's no fishing net at start
+                    const hasPowerUpAtStart = obstacles.some(
+                      obs => (obs.type === "fishing-net" || obs.type === "fish-multiplier") && obs.position[2] === 0
+                    );
+                    if (!hasPowerUpAtStart) {
+                      obstacles.push({
+                        position: [x, 0, z] as [number, number, number],
+                        type: Math.random() < 0.5 ? "fishing-net" : "fish-multiplier",
+                      });
+                    }
+                  }
+                } else {
+                  // If no fishing net, can place fish with 70% chance
+                  if (Math.random() < 0.7) {
+                    obstacles.push({
+                      position: [x, 0, z] as [number, number, number],
+                      type: "fish",
+                    });
+                  }
+                }
+              } else {
+                // Regular fish placement for non-start/end positions with 70% chance
+                if (Math.random() < 0.7) {
+                  obstacles.push({
+                    position: [x, 0, z] as [number, number, number],
+                    type: "fish",
+                  });
+                }
+              }
+            } else {
+              // For easy difficulty, reduce obstacle spawn chance by 50%
+              const shouldSpawnObstacle = difficulty === "easy" ? Math.random() < 0.5 : true;
+              if (shouldSpawnObstacle) {
+                const random = noise2D(j + i, entropy);
+                obstacles.push({
+                  position: [x, 0, z] as [number, number, number],
+                  type: random < -0.3 ? "tree" : random < 0.3 ? "snowman" : random < 0.6 ? "bonfire" : "low-rock",
+                });
+              }
             }
           }
         }
       }
 
       return obstacles;
+    },
+  },
+  {
+    name: "big_obstacle_at_the_end",
+    length: 5,
+    obstacleSpacing: 2,
+    possibleDifficulties: ["easy", "medium", "hard"],
+    get: (
+      { length, obstacleSpacing }: IChunk,
+      entryLane: laneType,
+      entropy: number,
+      difficulty: "easy" | "medium" | "hard"
+    ) => {
+      const obstacles: IObstacle[] = [];
+
+      let escapeLane: laneType | undefined = undefined;
+      // For easy and medium, add an additional entry lane
+      if (entryLane === 0) {
+        escapeLane = 1; // If left lane is entry, add middle as additional
+      } else if (entryLane === 2) {
+        escapeLane = 1; // If right lane is entry, add middle as additional
+      } else {
+        escapeLane = Math.random() < 0.5 ? 0 : 2; // If middle is entry, randomly add left or right
+      }
+
+      let additionalEntryLane: laneType | null = difficulty === "easy" || difficulty === "medium" ? escapeLane : null;
+
+
+      const obstacleTypes = ["tree", "low-rock", "snowman", "bonfire"];
+
+      for (let i = 0; i < length; i++) {
+        for (let j = 0; j < lanes.length; j++) {
+          const x = lanes[j];
+          const z = i * obstacleSpacing;
+
+          // Skip both entry lanes if they exist
+          const isEntryLane = j === entryLane || (additionalEntryLane !== null && j === additionalEntryLane);
+
+          if (!isEntryLane) {
+            if (j === escapeLane && i === length - 1 || i === length - 2) {
+              continue;
+            }
+            // For easy difficulty, reduce obstacle spawn chance by 50%
+            const shouldSpawnObstacle = difficulty === "easy" ? Math.random() < 0.5 : true;
+            if (shouldSpawnObstacle) {
+              obstacles.push({
+                position: [x, 0, z] as [number, number, number],
+                type: obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)] as "tree" | "low-rock" | "snowman"
+              });
+            }
+          } else {
+            // Check for fishing net placement at start or end
+            if (i === 0 || i === length - 2) {
+              const hasPowerUp = Math.random() < 0.2;
+              if (hasPowerUp) {
+                // If placing at start, don't place at end
+                if (i === 0) {
+                  obstacles.push({
+                    position: [x, 0, z] as [number, number, number],
+                    type: Math.random() < 0.5 ? "fishing-net" : "fish-multiplier",
+                  });
+                } else if (i === length - 1) {
+                  // Only place at end if there's no fishing net at start
+                  const hasPowerUpAtStart = obstacles.some(
+                    obs => (obs.type === "fishing-net" || obs.type === "fish-multiplier") && obs.position[2] === 0
+                  );
+                  if (!hasPowerUpAtStart) {
+                    obstacles.push({
+                      position: [x, 0, z] as [number, number, number],
+                      type: Math.random() < 0.5 ? "fishing-net" : "fish-multiplier",
+                    });
+                  }
+                }
+              } else {
+                // If no fishing net, can place fish with 70% chance
+                if (Math.random() < 0.7) {
+                  obstacles.push({
+                    position: [x, 0, z] as [number, number, number],
+                    type: "fish",
+                  });
+                }
+              }
+            } else {
+              // Regular fish placement for non-start/end positions with 70% chance
+              if (Math.random() < 0.7) {
+                obstacles.push({
+                  position: [x, 0, z] as [number, number, number],
+                  type: "fish",
+                });
+              }
+            }
+          }
+        }
+      }
+
+      return [
+        ...obstacles,
+        {
+          position: [lanes[entryLane], 0.2, (length - 1) * obstacleSpacing] as [number, number, number],
+          type: ["winter-well", "snowman", "big-tree"][Math.floor(Math.random() * 3)] as "winter-well" | "snowman" | "big-tree",
+        }
+      ];
     },
   },
 ];
@@ -987,11 +1087,14 @@ const TexturedObstacle = ({ x, y, z, obstacle, objectName, gltf, scale = 1, rota
 
   // Calculate model bounds for stone objects
   const isStone = objectName.toLowerCase().includes('stone');
+  const isGift = objectName.toLowerCase().includes('gift');
+  const isCar = objectName.toLowerCase().includes('car');
+
   let modelHeight = 0;
   let modelWidth = 0;
   let modelDepth = 0;
 
-  if (isStone) {
+  if (isStone || isCar || isGift) {
     const box = new THREE.Box3().setFromObject(model);
     modelHeight = box.max.y - box.min.y;
     modelWidth = box.max.x - box.min.x;
@@ -1009,15 +1112,29 @@ const TexturedObstacle = ({ x, y, z, obstacle, objectName, gltf, scale = 1, rota
       >
         <primitive object={clone(model)} />
       </RigidBody>
-      {isStone && (
+      {(isStone || isGift) && (
         <RigidBody
           type="fixed"
           name="obstacle-fixed"
-          position={[x, z + 0.05, y + modelHeight]}
+          position={[x, z + 0.02, y + modelHeight]}
           rotation={rotation}
         >
           <mesh>
             <boxGeometry args={[modelWidth - 0.1, 0.1, modelDepth - 0.1]} />
+            <meshBasicMaterial visible={false} />
+          </mesh>
+        </RigidBody>
+      )}
+      {isCar && (
+        <RigidBody
+          type="fixed"
+          name="obstacle-fixed"
+          position={[x, z + 0.02, y + modelHeight]}
+          rotation={rotation}
+        >
+          <mesh>
+            {/* car front window to fix */}
+            <boxGeometry args={[modelWidth - 0.1, 0.1, modelDepth - 0.8]} />
             <meshBasicMaterial visible={false} />
           </mesh>
         </RigidBody>
@@ -1259,6 +1376,28 @@ export const Obstacle = memo(
         return <TexturedObstacle x={x} y={y + 0.1} z={z} obstacle={obstacle} objectName="country_fence" gltf={modelsGltf} scale={0.006} />
       case "bonfire":
         return <TexturedObstacle x={x} y={y + 0.1} z={z} obstacle={obstacle} objectName="bonfire" gltf={modelsGltf} scale={0.015} />
+      case "car":
+        const carNames = [
+          "car_SUV_large_body",
+          "car_SUV_large_body_1",
+          "universal_car_body",
+        ];
+
+        const randomCarObjectName = carNames[Math.floor(Math.random() * carNames.length)];
+        return <TexturedObstacle x={x} y={y + 0.1} z={z + 1} obstacle={obstacle} objectName={randomCarObjectName} gltf={modelsGltf} scale={0.008} rotation={[Math.PI / 2, -Math.PI / 2, 0]} />
+      case "information-plate":
+        return <TexturedObstacle x={x} y={y + 0.1} z={z} obstacle={obstacle} objectName="information_plate_winter001" gltf={modelsGltf} scale={0.004} rotation={[Math.PI / 2, -Math.PI / 2, 0]} />
+      case "gift":
+        const giftNames = [
+          "square_gift_box_red",
+          "rhombus_gift_box_white",
+          "oval_gift_box_blue__1_001",
+        ];
+
+        const randomGiftObjectName = giftNames[Math.floor(Math.random() * giftNames.length)];
+        return <TexturedObstacle x={x} y={y + 0.1} z={z} obstacle={obstacle} objectName={randomGiftObjectName} gltf={modelsGltf} scale={0.025} />
+      case "winter-well":
+        return <TexturedObstacle x={x} y={y + 0.1} z={z} obstacle={obstacle} objectName="winter_well" gltf={modelsGltf} scale={0.009} rotation={[Math.PI / 2, -Math.PI / 2, 0]} />
       case "ramp":
         const hasRock = obstacle.rampConfig?.hasRock ?? false;
         const hasSnowman = obstacle.rampConfig?.hasSnowman ?? false;
@@ -1352,7 +1491,8 @@ export const Obstacle = memo(
               //   obstacle={obstacle}
               // />
 
-              <TexturedObstacle x={x} y={y + RAMP_LENGTH / 2} z={z + RUNWAY_LENGTH} obstacle={obstacle} objectName={randomRockObjectName} gltf={modelsGltf} scale={0.003} />
+              //<TexturedObstacle x={x} y={y + RAMP_LENGTH / 2} z={z + RUNWAY_LENGTH} obstacle={obstacle} objectName={randomRockObjectName} gltf={modelsGltf} scale={0.003} />
+              <Obstacle obstacle={{ ...obstacle, type: Math.random() < 0.7 ? "low-rock" : "gift", position: [x, y + RAMP_LENGTH / 2, z + RUNWAY_LENGTH] }} snowColorMap={snowColorMap} snowNormalMap={snowNormalMap} fishGltf={fishGltf} modelsGltf={modelsGltf} />
             )}
 
             {hasSnowman && (
@@ -1363,7 +1503,9 @@ export const Obstacle = memo(
               //   snowColorMap={snowColorMap}
               //   snowNormalMap={snowNormalMap}
               // />
-              <TexturedObstacle x={x} y={y + RAMP_LENGTH / 2} z={z + RUNWAY_LENGTH} obstacle={obstacle} objectName="snowman" gltf={modelsGltf} scale={0.015} rotation={[Math.PI / 2, 0, 0]} />
+              // <TexturedObstacle x={x} y={y + RAMP_LENGTH / 2} z={z + RUNWAY_LENGTH} obstacle={obstacle} objectName="snowman" gltf={modelsGltf} scale={0.015} rotation={[Math.PI / 2, 0, 0]} />
+              <Obstacle obstacle={{ ...obstacle, type: Math.random() < 0.7 ? "snowman" : "big-tree", position: [x, y + RAMP_LENGTH / 2, z + RUNWAY_LENGTH] }} snowColorMap={snowColorMap} snowNormalMap={snowNormalMap} fishGltf={fishGltf} modelsGltf={modelsGltf} />
+
             )}
           </>
         );

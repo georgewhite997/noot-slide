@@ -14,7 +14,7 @@ export const SLOPE_ANGLE = -0.2;
 
 export interface IObstacle {
     position: [number, number, number];
-    type: "low-rock" | "tree" | "snowman" | "ramp" | "lying-tree-long" | "fish" | "fishing-net" | "fish-multiplier" | "fence" | "bonfire" | "big-tree";
+    type: "low-rock" | "tree" | "snowman" | "ramp" | "lying-tree-long" | "fish" | "fishing-net" | "fish-multiplier" | "fence" | "bonfire" | "big-tree" | 'car' | 'information-plate' | 'winter-well' | 'gift';
     rampConfig?: {
         hasRock?: boolean;
         hasSnowman?: boolean;
