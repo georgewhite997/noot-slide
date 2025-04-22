@@ -265,6 +265,7 @@ export const Ground = memo(function Ground() {
 const SegmentObstacles = memo(function SegmentObstacles({ segment, colorMap, normalMap }: { segment: ISegment, colorMap: THREE.Texture, normalMap: THREE.Texture }) {
   const fishGltf = useLoader(GLTFLoader, '/fish.glb')
   const modelsGltf = useLoader(GLTFLoader, '/models.glb')
+  const store_assets_gltf = useLoader(GLTFLoader, '/store_assets.glb')
 
   //print all modelsGltf.scene.children.name
   // useEffect(() => {
@@ -288,6 +289,7 @@ const SegmentObstacles = memo(function SegmentObstacles({ segment, colorMap, nor
                   {...{ obstacle }}
                   fishGltf={fishGltf}
                   modelsGltf={modelsGltf}
+                  store_assets_gltf={store_assets_gltf}
                 />
               ))}
             </group>
