@@ -112,14 +112,14 @@ export const Ground = memo(function Ground() {
 
       // Determine allowed difficulties based on score
       let allowedDifficulties: ("easy" | "medium" | "hard")[];
-      if (score < 600) {
-        allowedDifficulties = ["easy", "medium"];
-      } else if (score > 800) {
-        allowedDifficulties = ["medium"];
+      if (score > 2500) {
+        allowedDifficulties = ["hard"]
       } else if (score > 1200) {
         allowedDifficulties = ["medium", "hard"];
-      } else if (score > 2500) {
-        allowedDifficulties = ["hard"]
+      } else if (score > 800) {
+        allowedDifficulties = ["medium"];
+      } else if (score > 400) {
+        allowedDifficulties = ["easy", "medium"];
       } else {
         allowedDifficulties = ["easy"];
       }
