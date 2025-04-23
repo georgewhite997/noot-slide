@@ -41,7 +41,7 @@ export const createAndStoreSession = async (
   userAddress: Address,
   createSessionAsync: (params: {
     session: SessionConfig;
-  }) => Promise<{ transactionHash?: `0x${string}`; session: SessionConfig }>
+  }) => Promise<{ transactionHash?: `0x${string}`; session: SessionConfig }>,
 ): Promise<SessionData> => {
   console.log("Creating session for address:", userAddress);
   if (!userAddress) return null;
@@ -49,7 +49,6 @@ export const createAndStoreSession = async (
   try {
     const sessionPrivateKey = generatePrivateKey();
     const sessionSigner = privateKeyToAccount(sessionPrivateKey);
-
     const { session } = await createSessionAsync({
       session: {
         signer: sessionSigner.address,
@@ -62,7 +61,9 @@ export const createAndStoreSession = async (
         callPolicies: [
           {
             target: powerupsContractAddress,
-            selector: toFunctionSelector("usePowerup(uint16,uint256)"),
+            selector: toFunctionSelector(
+              "function usePowerup(uint16,uint256) public",
+            ),
             valueLimit: {
               limitType: LimitType.Unlimited,
               limit: BigInt(0),
@@ -77,18 +78,20 @@ export const createAndStoreSession = async (
     });
 
     const sessionData = { session, privateKey: sessionPrivateKey };
+
     const key = await getEncryptionKey(userAddress);
     const encryptedData = await encrypt(
       JSON.stringify(sessionData, (_, value) =>
-        typeof value === "bigint" ? value.toString() : value
+        typeof value === "bigint" ? value.toString() : value,
       ),
-      key
+      key,
     );
 
     localStorage.setItem(
       `${LOCAL_STORAGE_KEY_PREFIX}${userAddress}`,
-      encryptedData
+      encryptedData,
     );
+
     return { session, sessionSigner };
   } catch (error) {
     console.error("Failed to create session:", error);

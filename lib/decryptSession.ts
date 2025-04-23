@@ -19,13 +19,13 @@
  */
 export const decrypt = async (
   encryptedData: string,
-  key: CryptoKey
+  key: CryptoKey,
 ): Promise<string> => {
   const { iv, data } = JSON.parse(encryptedData);
   const decrypted = await crypto.subtle.decrypt(
     { name: "AES-GCM", iv: Buffer.from(iv, "hex") },
     key,
-    Buffer.from(data, "hex")
+    Buffer.from(data, "hex"),
   );
 
   return new TextDecoder().decode(decrypted);

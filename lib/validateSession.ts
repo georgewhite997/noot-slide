@@ -34,9 +34,8 @@ export const validateSession = async (
   chain: SupportedChain,
   createSessionAsync: (params: {
     session: SessionConfig;
-  }) => Promise<{ transactionHash?: `0x${string}`; session: SessionConfig }>
+  }) => Promise<{ transactionHash?: `0x${string}`; session: SessionConfig }>,
 ): Promise<boolean> => {
-
   try {
     const status = await abstractClient.getSessionStatus(sessionHash);
 

@@ -72,54 +72,25 @@ export const Gui = memo(function Gui() {
 
   const [isRegistered, setIsRegistered] = useState(false);
 
-  const fetchWallet = async (session: SessionData) => {
-    console.log("1213ASDASD9819991299123993699")
-    if (!publicClient || !address || !session || !abstractClient) return;
+  const fetchWallet = async (session?: SessionData) => {
+    if (!publicClient || !address || !abstractClient) return;
 
+    // for (let i = 0; i < powerupsMeta.length; i++) {
+    //   console.log(i)
+    //   const powerup = powerupsMeta[i];
+    //   const price = parseEther(powerup.price.toString())
+    //   const tx = await abstractClient.writeContract({
+    //     address: powerupsContractAddress,
+    //     abi: powerupsAbi,
+    //     functionName: "setPowerupPrice",
+    //     args: [powerup.id, price],
+    //   })
+    //   console.log("tx", tx)
+    // }
 
-    // return;
-    // const { session, sessionSigner } = abstractSession;
-    // console.log("adasd", s?.session, s?.sessionSigner)
-    const sessionClient = abstractClient.toSessionClient(session.sessionSigner, session.session);
-
-    const x = await sessionClient.writeContract({
-      address: powerupsContractAddress,
-      abi: parseAbi(['function usePowerup(uint16 _powerupId, uint256 _quantity) public']),
-      functionName: "usePowerup",
-      account: sessionClient.account.address,
-      chain,
-      args: [3, BigInt(1)],
-    })
-    console.log(x)
-
-    // return;
-    // const tx = await sessionClient.writeContract({
-    //   address: powerupsContractAddress,
-    //   abi: powerupsAbi,
-    //   functionName: "usePowerup",
-    //   account: sessionClient.account.address,
-    //   chain,
-    //   args: [3, BigInt(1)]
-    // })
-    // console.log(tx)
-    // const tx = await abstractClient.writeContract({
-    //   address: powerupsContractAddress,
-    //   abi: powerupsAbi,
-    //   functionName: "usePowerup",
-
-    //   // account: sessionClient.account,
-    //   // chain,
-    //   // abi: parseAbi(['function usePowerup(uint16,uint256) public']),
-    //   // functionName: 'usePowerup',
-    //   args: [3, BigInt(1)]
-    // })
-    // console.log(tx)
-
-
-    // return
     const ids = powerupsMeta.map((p) => p.id);
 
-    console.log(registryContractAddress, powerupsContractAddress)
+    // console.log(registryContractAddress, powerupsContractAddress)
     const [registeredRes, ownedRes] = await publicClient.multicall({
       contracts: [
         {
@@ -136,7 +107,8 @@ export const Gui = memo(function Gui() {
     });
 
     const registered = registeredRes.result as boolean;
-    const owned = ownedRes.result as number[] || new Array(powerupsMeta.length).fill(0);
+    const owned =
+      (ownedRes.result as number[]) || new Array(powerupsMeta.length).fill(0);
     const disabledIds = JSON.parse(
       localStorage.getItem("disabledPowerups") || "[]",
     ) as number[];
@@ -148,11 +120,10 @@ export const Gui = memo(function Gui() {
         const hasDisabledIndex = disabledIds.indexOf(meta.id);
         const quantity = Number(qty);
 
-
         if (meta.name === "Abstract Halo") {
           const x = hasDisabledIndex == -1 ? quantity : 0;
           setHaloQuantity(x);
-          console.log("halo", meta.id)
+          console.log("halo", meta.id);
         }
 
         if (meta.name === "Speedy Start") {
@@ -170,7 +141,6 @@ export const Gui = memo(function Gui() {
         return { ...meta, quantity, isDisabled: hasDisabledIndex !== -1 };
       }),
     );
-
 
     if (!session && owned.some((qty) => qty > 0)) {
       await handleCreateSession();
@@ -230,7 +200,7 @@ export const Gui = memo(function Gui() {
   const handlePurchase = async (item: PowerUps[number], quantity = 1) => {
     if (!abstractClient || !publicClient) return;
 
-    console.log("ASDSD133712399")
+    console.log("ASDSD133712399123");
     // set prices
     // for (let i = 0; i < powerupsMeta.length; i++) {
     //   const powerup = powerupsMeta[i];
@@ -318,20 +288,20 @@ export const Gui = memo(function Gui() {
   useEffect(() => {
     (async () => {
       if (isConnected) {
-        setIsLoadingWalletData(true)
+        setIsLoadingWalletData(true);
         if (abstractClient?.account) {
           const s = await checkForExistingSession();
-          fetchWallet(s)
-          setIsLoadingWalletData(false)
+          fetchWallet(s);
+          setIsLoadingWalletData(false);
         } else {
           setSession(null);
         }
       }
-    })()
+    })();
   }, [address, isConnected, abstractClient?.account]);
 
   const checkForExistingSession = async () => {
-    let session = null
+    let session = null;
     try {
       session = await getStoredSession(powerupsContractAddress);
       if (session) {
@@ -343,7 +313,7 @@ export const Gui = memo(function Gui() {
       console.error("Error checking for session:", error);
     }
 
-    return session
+    return session;
   };
 
   const handleCreateSession = async () => {
@@ -351,8 +321,8 @@ export const Gui = memo(function Gui() {
       return;
     }
 
-    const s = await checkForExistingSession()
-    if (s?.session) return
+    const s = await checkForExistingSession();
+    if (s?.session) return;
 
     toast.loading("Approve session creation");
     try {
@@ -370,10 +340,7 @@ export const Gui = memo(function Gui() {
     }
   };
 
-
   const overlay = gameState === "game-over" || gameState === "in-menu";
-
-
 
   return (
     <>
@@ -514,21 +481,30 @@ const GameOver = ({
 
     <button
       className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
-      onClick={() => setMenuState(MenuStates.videoSettings)}
+      onClick={() => {
+        setGameState("in-menu");
+        setMenuState(MenuStates.videoSettings);
+      }}
     >
       Change Video Settings
     </button>
 
     <button
       className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
-      onClick={() => setMenuState(MenuStates.powerups)}
+      onClick={() => {
+        setGameState("in-menu");
+        setMenuState(MenuStates.powerups);
+      }}
     >
       Change Powerups
     </button>
 
     <button
       className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
-      onClick={() => setMenuState(MenuStates.skins)}
+      onClick={() => {
+        setGameState("in-menu");
+        setMenuState(MenuStates.skins);
+      }}
     >
       Change Skins
     </button>
@@ -645,69 +621,69 @@ const Powerups = ({
       <h2 className="text-2xl font-bold">Your powerups</h2>
       {powerUps.length > 0
         ? powerUps.map((item) => {
-          const [quantity, setQuantity] = useState(1);
+            const [quantity, setQuantity] = useState(1);
 
-          return (
-            <div
-              key={item.id}
-              className="flex w-full rounded border border-gray-300 p-4"
-            >
-              <div className="w-1/5">{/* placeholder for img */}</div>
-              <div className="w-4/5 text-sm">
-                <p className="mb-1 text-center text-base font-semibold">
-                  {item.name}
-                </p>
-                <p>{item.description}</p>
+            return (
+              <div
+                key={item.id}
+                className="flex w-full rounded border border-gray-300 p-4"
+              >
+                <div className="w-1/5">{/* placeholder for img */}</div>
+                <div className="w-4/5 text-sm">
+                  <p className="mb-1 text-center text-base font-semibold">
+                    {item.name}
+                  </p>
+                  <p>{item.description}</p>
 
-                {item.type === "one-time" ? (
-                  <>
-                    <p>Owned: {item.quantity}</p>
-                    <div className="flex gap-2">
-                      <button
-                        className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
-                        onClick={() => handlePurchase(item, quantity)}
-                      >
-                        Buy for {item.price} ETH
-                      </button>
-                      <input
-                        className="rounded bg-gray-200 px-2 py-1 text-center text-black"
-                        type="number"
-                        value={quantity}
-                        onChange={(e) => setQuantity(Number(e.target.value))}
-                        min={1}
-                        max={100}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <p>Permanent upgrade</p>
-                    {item.quantity > 0 ? (
-                      <div className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-center text-white">
-                        Owned
+                  {item.type === "one-time" ? (
+                    <>
+                      <p>Owned: {item.quantity}</p>
+                      <div className="flex gap-2">
+                        <button
+                          className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
+                          onClick={() => handlePurchase(item, quantity)}
+                        >
+                          Buy for {item.price} ETH
+                        </button>
+                        <input
+                          className="rounded bg-gray-200 px-2 py-1 text-center text-black"
+                          type="number"
+                          value={quantity}
+                          onChange={(e) => setQuantity(Number(e.target.value))}
+                          min={1}
+                          max={100}
+                        />
                       </div>
-                    ) : (
-                      <button
-                        className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
-                        onClick={() => handlePurchase(item)}
-                      >
-                        Buy for {item.price} ETH
-                      </button>
-                    )}
-                  </>
+                    </>
+                  ) : (
+                    <>
+                      <p>Permanent upgrade</p>
+                      {item.quantity > 0 ? (
+                        <div className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-center text-white">
+                          Owned
+                        </div>
+                      ) : (
+                        <button
+                          className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
+                          onClick={() => handlePurchase(item)}
+                        >
+                          Buy for {item.price} ETH
+                        </button>
+                      )}
+                    </>
+                  )}
+                </div>
+                {item.quantity > 0 && (
+                  <button
+                    className="mt-2 max-w-min max-h-min rounded bg-blue-500 px-2 py-1 text-white"
+                    onClick={() => onToggle(item)}
+                  >
+                    {item.isDisabled ? "Enable" : "Disable"}
+                  </button>
                 )}
               </div>
-              {item.quantity > 0 && (
-                <button
-                  className="mt-2 max-w-min max-h-min rounded bg-blue-500 px-2 py-1 text-white"
-                  onClick={() => onToggle(item)}
-                >
-                  {item.isDisabled ? "Enable" : "Disable"}
-                </button>
-              )}
-            </div>
-          );
-        })
+            );
+          })
         : null}
     </div>
   );

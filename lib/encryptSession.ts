@@ -17,14 +17,14 @@
  */
 export const encrypt = async (
   data: string,
-  key: CryptoKey
+  key: CryptoKey,
 ): Promise<string> => {
   console.log("Encrypting data:", data);
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const encrypted = await crypto.subtle.encrypt(
     { name: "AES-GCM", iv },
     key,
-    new TextEncoder().encode(data)
+    new TextEncoder().encode(data),
   );
 
   return JSON.stringify({

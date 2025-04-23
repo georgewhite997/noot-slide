@@ -7,9 +7,9 @@ const owner = "0x1Ed3aB46773Dd5789eC5553A7D4b4E2f34d7c7c6";
 const paymentToken = null// "0x0000000000000000000000000000000000000000";
 
 async function main(CONTRACT_NAME: string) {
-  const filepath = `artifacts-zk/contracts/${CONTRACT_NAME}.sol/${CONTRACT_NAME}-address.json`;
+  const filepath = `addresses/${CONTRACT_NAME}.json`;
 
-  const args = []//[owner];
+  const args = [owner];
 
   if (CONTRACT_NAME === "Skins") {
     if (!paymentToken) {
@@ -45,9 +45,9 @@ async function main(CONTRACT_NAME: string) {
 }
 
 (async () => {
-  await main("Powerups_test");
-  // await main("Registry");
-  // await main("Skins");
+  await main("Powerups");
+  await main("Registry");
+  await main("Skins");
 
   process.exit(0);
 })();

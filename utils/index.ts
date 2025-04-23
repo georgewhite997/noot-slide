@@ -5,9 +5,9 @@ import { eip712WalletActions } from "viem/zksync";
 import Registry from "../artifacts-zk/contracts/Registry.sol/Registry.json";
 import Powerups from "../artifacts-zk/contracts/Powerups.sol/Powerups.json";
 // import Skins from "../artifacts-zk/contracts/Skins.sol/Skins.json";
-import registryAddress from "../artifacts-zk/contracts/Registry.sol/Registry-address.json";
-import powerupsAddress from "../artifacts-zk/contracts/Powerups.sol/Powerups-address.json";
-// import { address as SkinsAddress } from "../artifacts-zk/contracts/Skins.sol/Skins-address.json";
+import registryAddress from "../addresses/Registry.json";
+import powerupsAddress from "../addresses/Powerups.json";
+// import { address as SkinsAddress } from "../addresses/Skins.json";
 import { createNoise2D } from "simplex-noise";
 
 const dockerizedNode = defineChain({

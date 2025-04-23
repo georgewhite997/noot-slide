@@ -298,26 +298,15 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       const { session, sessionSigner } = abstractSession;
       const sessionClient = agwClient.toSessionClient(sessionSigner, session);
 
-      console.log("19UTILIZING", {
-        session, sessionSigner,
-        account: sessionClient.account,
-        powerupsContractAddress,
-        args: [powerups.findIndex(p => p.name === 'Abstract Halo'), 1]
-      })
-
-      const tx = await sessionClient.writeContract({
-        address: powerupsContractAddress,
-        abi: powerupsAbi,
-        functionName: "usePowerup",
+      const hash = await sessionClient?.writeContract({
         account: sessionClient.account,
         chain,
-        // abi: parseAbi(['function usePowerup(uint16,uint256) public']),
-        // functionName: 'usePowerup',
-        // address: powerupsContractAddress,
-        args: [powerups.find(p => p.name === 'Abstract Halo')!.id, BigInt(1)]
-      })
-
-      console.log({ tx })
+        abi: parseAbi(["function usePowerup(uint16,uint256) public"]),
+        address: powerupsContractAddress,
+        functionName: "usePowerup",
+        args: [powerups.find(p => p.name === 'Abstract Halo')!.id, BigInt(1)],
+      });
+      console.log("hash", hash)
     } catch (e) {
       console.log(e)
       endGame();

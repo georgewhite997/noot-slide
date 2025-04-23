@@ -19,10 +19,10 @@ import type { Address } from "viem";
  *                              used with the Web Crypto API for encryption and decryption
  */
 export const getEncryptionKey = async (
-  userAddress: Address
+  userAddress: Address,
 ): Promise<CryptoKey> => {
   const storedKey = localStorage.getItem(
-    `${ENCRYPTION_KEY_PREFIX}${userAddress}`
+    `${ENCRYPTION_KEY_PREFIX}${userAddress}`,
   );
 
   if (storedKey) {
@@ -31,20 +31,20 @@ export const getEncryptionKey = async (
       Buffer.from(storedKey, "hex"),
       { name: "AES-GCM" },
       false,
-      ["encrypt", "decrypt"]
+      ["encrypt", "decrypt"],
     );
   }
 
   const key = await crypto.subtle.generateKey(
     { name: "AES-GCM", length: 256 },
     true,
-    ["encrypt", "decrypt"]
+    ["encrypt", "decrypt"],
   );
 
   const exportedKey = await crypto.subtle.exportKey("raw", key);
   localStorage.setItem(
     `${ENCRYPTION_KEY_PREFIX}${userAddress}`,
-    Buffer.from(exportedKey).toString("hex")
+    Buffer.from(exportedKey).toString("hex"),
   );
 
   return key;

@@ -9,7 +9,7 @@ import { decrypt } from "./decryptSession";
 import { validateSession } from "./validateSession";
 import { SupportedChain } from "@/utils";
 import type { Address } from "viem";
-import { privateKeyToAccount } from "viem/accounts"
+import { privateKeyToAccount } from "viem/accounts";
 import { SessionData } from "@/atoms";
 
 /**
@@ -45,12 +45,12 @@ export const getStoredSession = async (
   chain: SupportedChain,
   createSessionAsync: (params: {
     session: SessionConfig;
-  }) => Promise<{ transactionHash?: `0x${string}`; session: SessionConfig }>
+  }) => Promise<{ transactionHash?: `0x${string}`; session: SessionConfig }>,
 ): Promise<SessionData> => {
   if (!address) return null;
 
   const encryptedData = localStorage.getItem(
-    `${LOCAL_STORAGE_KEY_PREFIX}${address}`
+    `${LOCAL_STORAGE_KEY_PREFIX}${address}`,
   );
 
   if (!encryptedData) return null;
@@ -59,14 +59,24 @@ export const getStoredSession = async (
     const key = await getEncryptionKey(address);
     const decryptedData = await decrypt(encryptedData, key);
     const parsedData = JSON.parse(decryptedData);
-    if (!parsedData.session.callPolicies.some((policy: any) => policy.target.toLowerCase() === targetAddress.toLowerCase())) {
-      return null
+    if (
+      !parsedData.session.callPolicies.some(
+        (policy: any) =>
+          policy.target.toLowerCase() === targetAddress.toLowerCase(),
+      )
+    ) {
+      return null;
     }
 
     const sessionHash = getSessionHash(parsedData.session);
-    await validateSession(abstractClient, address, sessionHash, chain, createSessionAsync);
+    await validateSession(
+      abstractClient,
+      address,
+      sessionHash,
+      chain,
+      createSessionAsync,
+    );
     const sessionSigner = privateKeyToAccount(parsedData.privateKey);
-
 
     return { session: parsedData.session, sessionSigner };
   } catch (error) {
