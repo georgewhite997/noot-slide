@@ -57,9 +57,9 @@ export const Ground = memo(function Ground() {
       const zOffset = -i * (SEGMENT_LENGTH * Math.cos(SLOPE_ANGLE));
       const yOffset = i * (SEGMENT_LENGTH * Math.sin(SLOPE_ANGLE));
 
-      const isRoad = Math.random() < 0.1;
+      const isRoad = Math.random() < 0.1 && i !== 0;
 
-      const obstacles = i === 0 ? [] : getObstacles(["hard"], isRoad);
+      const obstacles = i === 0 ? [] : getObstacles(["easy"], isRoad);
 
       const object = scene.getObjectByName(`segment-snow-${i}`) as THREE.Mesh;
       if (object && object.geometry) {
