@@ -22,16 +22,30 @@ const chunks: IChunk[] = [
     length: 5,
     obstacleSpacing: 2,
     possibleDifficulties: ["easy", "medium", "hard"],
+    canBeRoad: true,
     get: (
       { length, obstacleSpacing }: IChunk,
       entryLane: laneType,
       entropy: number,
-      difficulty: "easy" | "medium" | "hard"
+      difficulty: "easy" | "medium" | "hard",
+      isRoad: boolean = false
     ) => {
       const obstacles: IObstacle[] = [];
       const longObstaclesPositions: { i: number; j: number }[] = [];
 
-      const obstacleTypes: IObstacleTypeWithChance[] = [
+      const obstacleTypes: IObstacleTypeWithChance[] = isRoad ? [
+        { type: "tree", chance: 0.1 },
+        { type: "low-rock", chance: 0.1 },
+        { type: "dumpster", chance: 0.05 },
+        { type: "lamp-winter", chance: 0.15 },
+        { type: "lamp", chance: 0.15 },
+        { type: "sleigh", chance: 0.1 },
+        { type: "car", chance: 0.05 },
+        { type: "snow-shovel", chance: 0.05 },
+        { type: "gift", chance: 0.1 },
+        { type: "information-plate", chance: 0.15 },
+        { type: "winter-information-plate", chance: 0.1 },
+      ] : [
         { type: "tree", chance: 0.43 },
         { type: "low-rock", chance: 0.05 },
         { type: "snowman", chance: 0.1 },
@@ -78,7 +92,7 @@ const chunks: IChunk[] = [
                 type: obstacleType,
               });
 
-              if (obstacleType === "sleigh" || obstacleType === "reindeer") {
+              if (obstacleType === "sleigh" || obstacleType === "reindeer" || obstacleType === "car") {
                 longObstaclesPositions.push({ i, j });
               }
             }
@@ -141,11 +155,13 @@ const chunks: IChunk[] = [
     length: 5,
     obstacleSpacing: 2,
     possibleDifficulties: ["easy", "medium", "hard"],
+    canBeRoad: false,
     get: (
       { length, obstacleSpacing }: IChunk,
       entryLane: laneType,
       entropy: number,
-      difficulty: "easy" | "medium" | "hard"
+      difficulty: "easy" | "medium" | "hard",
+      isRoad: boolean = false
     ) => {
       const obstacles: IObstacle[] = [];
       const longObstaclesPositions: { i: number; j: number }[] = [];
@@ -309,11 +325,13 @@ const chunks: IChunk[] = [
     length: 4,
     obstacleSpacing: 2,
     possibleDifficulties: ["medium", "hard"],
+    canBeRoad: false,
     get: (
       { length, obstacleSpacing }: IChunk,
       entryLane: laneType,
       entropy: number,
-      difficulty: "easy" | "medium" | "hard"
+      difficulty: "easy" | "medium" | "hard",
+      isRoad: boolean = false
     ) => {
       const obstacles: IObstacle[] = [];
       const longObstaclesPositions: { i: number; j: number }[] = [];
@@ -443,15 +461,24 @@ const chunks: IChunk[] = [
     length: 4,
     obstacleSpacing: 2,
     possibleDifficulties: ["easy", "medium", "hard"],
+    canBeRoad: true,
     get: (
       { length, obstacleSpacing }: IChunk,
       entryLane: laneType,
       entropy: number,
-      difficulty: "easy" | "medium" | "hard"
+      difficulty: "easy" | "medium" | "hard",
+      isRoad: boolean = false
     ) => {
       const obstacles: IObstacle[] = [];
 
-      const obstacleTypes: IObstacleTypeWithChance[] = [
+      const obstacleTypes: IObstacleTypeWithChance[] = isRoad ? [
+        { type: "tree", chance: 0.2 },
+        { type: "lamp-winter", chance: 0.25 },
+        { type: "lamp", chance: 0.2 },
+        { type: "snow-shovel", chance: 0.05 },
+        { type: "information-plate", chance: 0.15 },
+        { type: "winter-information-plate", chance: 0.15 },
+      ] : [
         { type: "big-tree", chance: 0.6 },
         { type: "snowman", chance: 0.2 },
         { type: "cane", chance: 0.05 },
@@ -572,11 +599,13 @@ const chunks: IChunk[] = [
     length: 5,
     obstacleSpacing: 2,
     possibleDifficulties: ["easy", "medium", "hard"],
+    canBeRoad: false,
     get: (
       { length, obstacleSpacing }: IChunk,
       entryLane: laneType,
       entropy: number,
-      difficulty: "easy" | "medium" | "hard"
+      difficulty: "easy" | "medium" | "hard",
+      isRoad: boolean = false
     ) => {
       const obstacles: IObstacle[] = [];
       const longObstaclesPositions: { i: number; j: number }[] = []; // Track positions where cars are spawned
@@ -688,18 +717,32 @@ const chunks: IChunk[] = [
     length: 5,
     obstacleSpacing: 2,
     possibleDifficulties: ["easy", "medium", "hard"],
+    canBeRoad: true,
     get: (
       { length, obstacleSpacing }: IChunk,
       entryLane: laneType,
       entropy: number,
-      difficulty: "easy" | "medium" | "hard"
+      difficulty: "easy" | "medium" | "hard",
+      isRoad: boolean = false
     ) => {
       const obstacles: IObstacle[] = [];
       const CLOSER_OFFSET = 1; // How much closer to move obstacles to the fence
 
       const longObstaclesPositions: { i: number; j: number }[] = [];
 
-      const obstacleTypes: IObstacleTypeWithChance[] = [
+      const obstacleTypes: IObstacleTypeWithChance[] = isRoad ? [
+        { type: "tree", chance: 0.1 },
+        { type: "low-rock", chance: 0.1 },
+        { type: "dumpster", chance: 0.05 },
+        { type: "lamp-winter", chance: 0.15 },
+        { type: "lamp", chance: 0.15 },
+        { type: "sleigh", chance: 0.1 },
+        { type: "car", chance: 0.05 },
+        { type: "snow-shovel", chance: 0.05 },
+        { type: "gift", chance: 0.1 },
+        { type: "information-plate", chance: 0.15 },
+        { type: "winter-information-plate", chance: 0.1 },
+      ] : [
         { type: "tree", chance: 0.43 },
         { type: "low-rock", chance: 0.05 },
         { type: "snowman", chance: 0.1 },
@@ -714,7 +757,13 @@ const chunks: IChunk[] = [
         { type: "gift", chance: 0.02 },
       ]
 
-      const nextToFenceObstacleTypes: IObstacleTypeWithChance[] = [
+      const nextToFenceObstacleTypes: IObstacleTypeWithChance[] = isRoad ? [
+        { type: "big-tree", chance: 0.5 },
+        { type: "lamp-winter", chance: 0.18 },
+        { type: "lamp", chance: 0.2 },
+        { type: "winter-information-plate", chance: 0.15 },
+        { type: "information-plate", chance: 0.15 },
+      ] : [
         { type: "big-tree", chance: 0.5 },
         { type: "snowman", chance: 0.3 },
         { type: "lamp-winter", chance: 0.18 },
@@ -847,15 +896,29 @@ const chunks: IChunk[] = [
     length: 5,
     obstacleSpacing: 2,
     possibleDifficulties: ["easy", "medium", "hard"],
+    canBeRoad: true,
     get: (
       { length, obstacleSpacing }: IChunk,
       entryLane: laneType,
       entropy: number,
-      difficulty: "easy" | "medium" | "hard"
+      difficulty: "easy" | "medium" | "hard",
+      isRoad: boolean = false
     ) => {
       const obstacles: IObstacle[] = [];
 
-      const obstacleTypes: IObstacleTypeWithChance[] = [
+      const obstacleTypes: IObstacleTypeWithChance[] = isRoad ? [
+        { type: "tree", chance: 0.1 },
+        { type: "low-rock", chance: 0.1 },
+        { type: "dumpster", chance: 0.05 },
+        { type: "lamp-winter", chance: 0.15 },
+        { type: "lamp", chance: 0.15 },
+        { type: "sleigh", chance: 0.1 },
+        { type: "car", chance: 0.05 },
+        { type: "snow-shovel", chance: 0.05 },
+        { type: "gift", chance: 0.1 },
+        { type: "information-plate", chance: 0.15 },
+        { type: "winter-information-plate", chance: 0.1 },
+      ] : [
         { type: "tree", chance: 0.43 },
         { type: "low-rock", chance: 0.05 },
         { type: "snowman", chance: 0.1 },
@@ -870,7 +933,13 @@ const chunks: IChunk[] = [
         { type: "gift", chance: 0.02 },
       ]
 
-      const bigObstacleTypes: IObstacleTypeWithChance[] = [
+      const bigObstacleTypes: IObstacleTypeWithChance[] = isRoad ? [
+        { type: "big-tree", chance: 0.5 },
+        { type: "lamp-winter", chance: 0.18 },
+        { type: "lamp", chance: 0.2 },
+        { type: "winter-information-plate", chance: 0.15 },
+        { type: "information-plate", chance: 0.15 },
+      ] : [
         { type: "tree", chance: 0.5 },
         { type: "snowman", chance: 0.16 },
         { type: "lamp-winter", chance: 0.02 },
@@ -971,7 +1040,7 @@ const chunks: IChunk[] = [
 let previousEntryLane: laneType | null = null;
 let previousChunkType: string | null = null;
 
-export const getObstacles = (allowedDifficulties: ("easy" | "medium" | "hard")[] = ["easy", "medium", "hard"]) => {
+export const getObstacles = (allowedDifficulties: ("easy" | "medium" | "hard")[] = ["easy", "medium", "hard"], isRoad: boolean = false) => {
   const obstacles: IObstacle[][] = [];
   const initialZoffset = -SEGMENT_LENGTH / 2 + 0.25;
   const endOfSegment = SEGMENT_LENGTH / 2;
@@ -982,7 +1051,7 @@ export const getObstacles = (allowedDifficulties: ("easy" | "medium" | "hard")[]
   while (true) {
     // Filter chunks based on allowed difficulties
     const availableChunks = chunks.filter(chunk =>
-      chunk.possibleDifficulties.some(difficulty => allowedDifficulties.includes(difficulty))
+      chunk.possibleDifficulties.some(difficulty => allowedDifficulties.includes(difficulty)) && chunk.canBeRoad === isRoad
     );
     let chunk = availableChunks[Math.floor(Math.random() * availableChunks.length)];
 
@@ -1002,7 +1071,7 @@ export const getObstacles = (allowedDifficulties: ("easy" | "medium" | "hard")[]
 
     previousEntryLane = entryLaneIndex;
 
-    const chunkObstacles = chunk.get(chunk, entryLaneIndex, i, selectedDifficulty);
+    const chunkObstacles = chunk.get(chunk, entryLaneIndex, i, selectedDifficulty, isRoad);
     let furthestZ = 0;
     for (const obstacle of chunkObstacles) {
       if (obstacle.position[2] > furthestZ) {
@@ -1227,7 +1296,7 @@ const TexturedObstacle = ({ x, y, z, obstacle, objectName, gltf, scale = 1, rota
   let modelWidth = 0;
   let modelDepth = 0;
 
-  if (isStone || isCar || isGift || isHydrant || isCane || isSled) {
+  if (isStone || isCar || isGift || isHydrant || isCane || isSled || isDumpster) {
     const box = new THREE.Box3().setFromObject(model);
     modelHeight = box.max.y - box.min.y;
     modelWidth = box.max.x - box.min.x;
@@ -1245,7 +1314,7 @@ const TexturedObstacle = ({ x, y, z, obstacle, objectName, gltf, scale = 1, rota
       >
         <primitive object={clone(model)} />
       </RigidBody>
-      {(isStone || isGift || isHydrant || isCane || isSled) && (
+      {(isStone || isGift || isHydrant || isCane || isSled || isDumpster) && (
         <RigidBody
           type="fixed"
           name="obstacle-fixed"

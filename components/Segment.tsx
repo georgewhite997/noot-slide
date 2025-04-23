@@ -1,7 +1,7 @@
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { RigidBody } from "@react-three/rapier";
-import { Instance, Instances } from "@react-three/drei";
+import { Instance, Instances, useGLTF } from "@react-three/drei";
 import { getSnowBumps } from "@/utils";
 import {
     SEGMENT_LENGTH,
@@ -11,6 +11,8 @@ import {
     ISegment,
 } from "./shared";
 import { Obstacle } from "./Obstacles";
+import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
+import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 const sideHeight = 0.4;
 const sideWidth = 1.2;
@@ -177,10 +179,14 @@ export const Segment = memo(
         segment,
         colorMap,
         normalMap,
+        modelsGltf,
+        isRoad,
     }: {
         segment: ISegment;
         colorMap: THREE.Texture;
         normalMap: THREE.Texture;
+        modelsGltf: GLTF;
+        isRoad: boolean;
     }) {
         const lightRef = useRef<THREE.DirectionalLight>(null);
         const targetRef = useRef<THREE.Object3D>(null);
@@ -189,6 +195,24 @@ export const Segment = memo(
             segment.yOffset,
             segment.zOffset - SEGMENT_LENGTH / 2,
         );
+        // const { nodes } = ;
+        const roadModel = useMemo(() => {
+            const object = modelsGltf.scene.getObjectByName("road");
+            if (!object) return null;
+
+            // Reset position of all meshes in the tree
+            object.traverse((child) => {
+                if (child instanceof THREE.Mesh) {
+                    child.position.set(0, 0, 0);
+                    child.updateMatrix();
+                }
+            });
+
+            object.scale.set(0.013, 0.025, 0.001);
+            return object;  
+        }, [modelsGltf.scene]);
+
+        if (!roadModel) return null;
 
         useEffect(() => {
             if (lightRef.current && targetRef.current) {
@@ -230,18 +254,26 @@ export const Segment = memo(
                     rotation={[-Math.PI / 2 + SLOPE_ANGLE, 0, 0]}
                     receiveShadow
                 >
-                    <mesh name={`segment-snow-${segment.index}`} receiveShadow>
-                        <GroundGeometry yOffset={segment.index * SEGMENT_LENGTH} />
-                        <meshStandardMaterial
-                            map={colorMap} // Base color of the snow
-                            normalMap={normalMap} // Surface detail
-                            normalScale={new THREE.Vector2(1, 1)} // Adjust normal map strength
-                            roughness={0.9} // Base roughness (snow is rough)
-                            metalness={0} // Snow isn't metallic
-                            side={THREE.DoubleSide}
+                    {isRoad ? (
+                        <primitive
+                            object={clone(roadModel)}
+                            scale={[0.013, 0.025, 0.001]}
+                            position={[0, 0, 0]}
+                            rotation={[0, 0, 0]}
                         />
-                    </mesh>
-
+                    ) : (
+                        <mesh name={`segment-snow-${segment.index}`} receiveShadow>
+                            <GroundGeometry yOffset={segment.index * SEGMENT_LENGTH} />
+                            <meshStandardMaterial
+                                map={colorMap}
+                                normalMap={normalMap}
+                                normalScale={new THREE.Vector2(1, 1)}
+                                roughness={0.9}
+                                metalness={0}
+                                side={THREE.DoubleSide}
+                            />
+                        </mesh>
+                    )}
                     <SideSlope isRight={false} {...{ colorMap, normalMap }} />
                     <SideSlope isRight={true} {...{ colorMap, normalMap }} />
                 </mesh>

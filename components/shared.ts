@@ -54,6 +54,7 @@ export interface ISegment {
     zOffset: number;
     yOffset: number;
     index: number;
+    isRoad: boolean;
     chunks: { obstacles: IObstacle[], name: string }[];
 }
 
@@ -64,7 +65,8 @@ export interface IChunk {
     length: number;
     obstacleSpacing: number;
     possibleDifficulties: ("easy" | "medium" | "hard")[];
-    get: (chunk: IChunk, entryLane: laneType, entropy: number, difficulty: "easy" | "medium" | "hard") => IObstacle[];
+    canBeRoad: boolean;
+    get: (chunk: IChunk, entryLane: laneType, entropy: number, difficulty: "easy" | "medium" | "hard", isRoad: boolean) => IObstacle[];
 }
 
 export interface IObstacleTypeWithChance {

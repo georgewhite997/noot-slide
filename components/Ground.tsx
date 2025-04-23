@@ -46,6 +46,8 @@ export const Ground = memo(function Ground() {
     (textures) => textures.forEach(onTextureLoaded),
   );
 
+  const modelsGltf = useLoader(GLTFLoader, '/models.glb');
+
   const { scene } = useThree();
 
   const getInitialSegments = () => {
@@ -55,7 +57,9 @@ export const Ground = memo(function Ground() {
       const zOffset = -i * (SEGMENT_LENGTH * Math.cos(SLOPE_ANGLE));
       const yOffset = i * (SEGMENT_LENGTH * Math.sin(SLOPE_ANGLE));
 
-      const obstacles = i === 0 ? [] : getObstacles(["easy"]);
+      const isRoad = Math.random() < 0.1;
+
+      const obstacles = i === 0 ? [] : getObstacles(["hard"], isRoad);
 
       const object = scene.getObjectByName(`segment-snow-${i}`) as THREE.Mesh;
       if (object && object.geometry) {
@@ -77,6 +81,7 @@ export const Ground = memo(function Ground() {
         yOffset,
         index: i,
         chunks: obstacles.map((obstacles, j) => ({ obstacles, name: `chunk-${j}-segment-${i}` })),
+        isRoad
       });
     }
     lastPushedIndex.current = initialSegments[initialSegments.length - 1].index;
@@ -124,7 +129,9 @@ export const Ground = memo(function Ground() {
         allowedDifficulties = ["easy"];
       }
 
-      const obstacles = getObstacles(allowedDifficulties);
+      const isRoad = Math.random() < 0.1;
+
+      const obstacles = getObstacles(allowedDifficulties, isRoad);
 
       setSegments((prevSegments) => {
         const newSegments = [
@@ -133,6 +140,7 @@ export const Ground = memo(function Ground() {
             zOffset: newZ,
             yOffset: newY,
             index: newIndex,
+            isRoad,
             chunks: obstacles.map((obstacles, j) => ({ obstacles, name: `chunk-${j}-segment-${newIndex}` })),
           },
         ];
@@ -244,6 +252,8 @@ export const Ground = memo(function Ground() {
             segment={segment}
             colorMap={colorMap}
             normalMap={normalMap}
+            modelsGltf={modelsGltf}
+            isRoad={segment.isRoad}
           />
           <mesh
             position={[0, segment.yOffset, segment.zOffset]}
