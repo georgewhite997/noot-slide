@@ -14,7 +14,7 @@ import { Obstacle } from "./Obstacles";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 
-const sideHeight = 0.4;
+const sideHeight = 0.2;
 const sideWidth = 1.2;
 const flagpoleSeparation = 5;
 const flagpoleHeight = 1;
@@ -110,7 +110,7 @@ export const SideSlope = memo(
                         map={colorMap} // Base color of the snow
                         normalMap={normalMap} // Surface detail
                         normalScale={new THREE.Vector2(1, 1)} // Adjust normal map strength
-                        roughness={0.9} // Base roughness (snow is rough)
+                        roughness={0} // No roughness for completely smooth snow
                         metalness={0} // Snow isn't metallic
                         side={THREE.DoubleSide}
                     />
@@ -127,11 +127,31 @@ export const SideSlope = memo(
                     <Instance
                         position={[
                             isRight ? SEGMENT_WIDTH / 2 : -SEGMENT_WIDTH / 2,
-                            sideHeight,
-                            sideHeight,
+                            sideHeight * 2,
+                            sideHeight * 2,
                         ]}
                         rotation={[0, isRight ? Math.PI / 2 : -Math.PI / 2, 0]}
                     />
+                    {/* Large snow platform on top of wall that doesnt go to middle just outside of wall */}
+                    {/* <Instance
+                        position={[
+                            isRight ? SEGMENT_WIDTH / 2 + sideWidth * 5 : -SEGMENT_WIDTH / 2 - sideWidth * 5,
+                            sideHeight * 4,
+                            sideHeight * 4,
+                        ]}
+                        rotation={[0, 0, 0]}
+                        scale={[10, 1, 0.5]}
+                    />
+                    <Instance
+                        position={[
+                            isRight ? SEGMENT_WIDTH / 2 + sideWidth * 5 : -SEGMENT_WIDTH / 2 - sideWidth * 5,
+                            sideHeight * 4 + 0.1,
+                            sideHeight * 4,
+                        ]}
+                        rotation={[Math.PI / 2, -Math.PI / 2, 0]}
+                        scale={[SEGMENT_LENGTH, 0.2, 2]}
+                        color={new THREE.Color(Math.random(), Math.random(), Math.random())}
+                    /> */}
                 </Instances>
             </>
         );
@@ -209,7 +229,7 @@ export const Segment = memo(
             });
 
             object.scale.set(0.013, 0.025, 0.001);
-            return object;  
+            return object;
         }, [modelsGltf.scene]);
 
         if (!roadModel) return null;

@@ -1040,7 +1040,7 @@ const chunks: IChunk[] = [
 let previousEntryLane: laneType | null = null;
 let previousChunkType: string | null = null;
 
-export const getObstacles = (allowedDifficulties: ("easy" | "medium" | "hard")[] = ["easy", "medium", "hard"], isRoad: boolean = false) => {
+export const getObstacles = (allowedDifficulties: ("easy" | "medium" | "hard")[] = ["easy", "medium", "hard"], isRoad: boolean) => {
   const obstacles: IObstacle[][] = [];
   const initialZoffset = -SEGMENT_LENGTH / 2 + 0.25;
   const endOfSegment = SEGMENT_LENGTH / 2;
@@ -1051,7 +1051,7 @@ export const getObstacles = (allowedDifficulties: ("easy" | "medium" | "hard")[]
   while (true) {
     // Filter chunks based on allowed difficulties
     const availableChunks = chunks.filter(chunk =>
-      chunk.possibleDifficulties.some(difficulty => allowedDifficulties.includes(difficulty)) && chunk.canBeRoad === isRoad
+      chunk.possibleDifficulties.some(difficulty => allowedDifficulties.includes(difficulty)) && (!isRoad || chunk.canBeRoad === isRoad)
     );
     let chunk = availableChunks[Math.floor(Math.random() * availableChunks.length)];
 
@@ -1331,15 +1331,29 @@ const TexturedObstacle = ({ x, y, z, obstacle, objectName, gltf, scale = 1, rota
         <RigidBody
           type="fixed"
           name="obstacle-fixed"
-          position={[x, z + 0.02, y + modelHeight]}
           rotation={rotation}
+          position={[x + 0.05, z + 0.5, y + modelHeight]}
         >
           <mesh>
             {/* car front window to fix */}
-            <boxGeometry args={[modelWidth - 0.1, 0.1, modelDepth - 0.8]} />
+            <boxGeometry args={[modelWidth - 1, 0.1, modelDepth - 0.8]} />
             <meshBasicMaterial visible={false} />
           </mesh>
         </RigidBody>
+
+        /* <RigidBody
+          type="fixed"
+          name="obstacle-fixed"
+          rotation={[-Math.PI / 4, 0, 0]}
+          position={[x, z - 1, y + modelHeight - 0.5]}
+        >
+          <mesh>
+            <boxGeometry args={[1, 0.1, modelDepth - 0.8]} />
+            <meshBasicMaterial visible={false} />
+          </mesh>
+        </RigidBody>
+         */
+
       )}
       {isDumpster && (
         <RigidBody
