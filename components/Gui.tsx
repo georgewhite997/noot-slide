@@ -31,6 +31,7 @@ import {
   GameState,
   abstractSessionAtom,
   SessionData,
+  reviveCountAtom,
 } from "@/atoms";
 import { toast, Toaster } from "react-hot-toast";
 import ConnectButton from "./ConnectButton";
@@ -122,7 +123,6 @@ export const Gui = memo(function Gui() {
 
         if (meta.name === "Abstract Halo") {
           const x = hasDisabledIndex == -1 ? quantity : 0;
-          setHaloQuantity(x);
           console.log("halo", meta.id);
         }
 
@@ -200,7 +200,6 @@ export const Gui = memo(function Gui() {
   const handlePurchase = async (item: PowerUps[number], quantity = 1) => {
     if (!abstractClient || !publicClient) return;
 
-    console.log("ASDSD133712399123");
     // set prices
     // for (let i = 0; i < powerupsMeta.length; i++) {
     //   const powerup = powerupsMeta[i];
@@ -290,15 +289,16 @@ export const Gui = memo(function Gui() {
       if (isConnected) {
         setIsLoadingWalletData(true);
         if (abstractClient?.account) {
-          const s = await checkForExistingSession();
+          const s = (await checkForExistingSession()) as SessionData;
           fetchWallet(s);
           setIsLoadingWalletData(false);
+          setSession(s);
         } else {
           setSession(null);
         }
       }
     })();
-  }, [address, isConnected, abstractClient?.account]);
+  }, [address, isConnected, abstractClient?.account?.address]);
 
   const checkForExistingSession = async () => {
     let session = null;
@@ -340,7 +340,10 @@ export const Gui = memo(function Gui() {
     }
   };
 
-  const overlay = gameState === "game-over" || gameState === "in-menu";
+  const overlay =
+    gameState === "game-over" ||
+    gameState === "in-menu" ||
+    gameState === "reviving";
 
   return (
     <>
@@ -364,6 +367,8 @@ export const Gui = memo(function Gui() {
               setScore={setScore}
               setMenuState={setMenuState}
             />
+          ) : gameState === "reviving" ? (
+            <Reviving setGameState={setGameState} />
           ) : (
             <>
               {menuState === MenuStates.videoSettings && (
@@ -424,8 +429,8 @@ const Skins = ({ onClose, address }: SkinsProps) => {
   if (!address) return null;
 
   return (
-    <div>
-      <div className="relative w-full">
+    <div className="mx-auto mt-10 flex w-full flex-col items-center gap-4 md:max-w-[500px] h-[80vh]">
+      <div className="relative w-full w-[80%]">
         <button
           className="mt-4 rounded bg-blue-500 px-4 py-2 text-white absolute top-0 right-0"
           onClick={onClose}
@@ -434,7 +439,9 @@ const Skins = ({ onClose, address }: SkinsProps) => {
         </button>
       </div>
 
-      <h1>Skins</h1>
+      <h2 className="text-2xl font-bold">Your skins</h2>
+
+      <p>Coming soon</p>
     </div>
   );
 };
@@ -496,7 +503,7 @@ const GameOver = ({
         setMenuState(MenuStates.powerups);
       }}
     >
-      Change Powerups
+      Buy Powerups
     </button>
 
     <button
@@ -506,7 +513,7 @@ const GameOver = ({
         setMenuState(MenuStates.skins);
       }}
     >
-      Change Skins
+      Buy Skins
     </button>
   </>
 );
@@ -577,14 +584,14 @@ const LandingPage = ({
             className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
             onClick={() => setMenuState(MenuStates.powerups)}
           >
-            Change Powerups
+            Buy Powerups
           </button>
 
           <button
             className="mt-4 rounded bg-blue-500 px-4 py-2 text-white"
             onClick={() => setMenuState(MenuStates.skins)}
           >
-            Change Skins
+            Buy Skins
           </button>
         </div>
       </div>
@@ -621,69 +628,74 @@ const Powerups = ({
       <h2 className="text-2xl font-bold">Your powerups</h2>
       {powerUps.length > 0
         ? powerUps.map((item) => {
-            const [quantity, setQuantity] = useState(1);
+          const [quantity, setQuantity] = useState(1);
 
-            return (
-              <div
-                key={item.id}
-                className="flex w-full rounded border border-gray-300 p-4"
-              >
-                <div className="w-1/5">{/* placeholder for img */}</div>
-                <div className="w-4/5 text-sm">
-                  <p className="mb-1 text-center text-base font-semibold">
-                    {item.name}
-                  </p>
-                  <p>{item.description}</p>
+          return (
+            <div
+              key={item.id}
+              className="flex w-full rounded border border-gray-300 p-4 justify-around"
+            >
+              <div className="w-1/5 flex items-center justify-center ">
+                <img
+                  src={`/${item.name.toLowerCase().replace(" ", "")}.jpeg`}
+                  alt={item.name}
+                />
+              </div>
+              <div className="w-3/5 text-sm">
+                <p className="mb-1 text-center text-base font-semibold">
+                  {item.name}
+                </p>
+                <p>{item.description}</p>
 
-                  {item.type === "one-time" ? (
-                    <>
-                      <p>Owned: {item.quantity}</p>
-                      <div className="flex gap-2">
-                        <button
-                          className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
-                          onClick={() => handlePurchase(item, quantity)}
-                        >
-                          Buy for {item.price} ETH
-                        </button>
-                        <input
-                          className="rounded bg-gray-200 px-2 py-1 text-center text-black"
-                          type="number"
-                          value={quantity}
-                          onChange={(e) => setQuantity(Number(e.target.value))}
-                          min={1}
-                          max={100}
-                        />
+                {item.type === "one-time" ? (
+                  <>
+                    <p>Owned: {item.quantity}</p>
+                    <div className="flex gap-2">
+                      <button
+                        className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
+                        onClick={() => handlePurchase(item, quantity)}
+                      >
+                        Buy for {item.price} ETH
+                      </button>
+                      <input
+                        className="rounded bg-gray-200 px-2 py-1 text-center text-black"
+                        type="number"
+                        value={quantity}
+                        onChange={(e) => setQuantity(Number(e.target.value))}
+                        min={1}
+                        max={100}
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p>Permanent upgrade</p>
+                    {item.quantity > 0 ? (
+                      <div className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-center text-white">
+                        Owned
                       </div>
-                    </>
-                  ) : (
-                    <>
-                      <p>Permanent upgrade</p>
-                      {item.quantity > 0 ? (
-                        <div className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-center text-white">
-                          Owned
-                        </div>
-                      ) : (
-                        <button
-                          className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
-                          onClick={() => handlePurchase(item)}
-                        >
-                          Buy for {item.price} ETH
-                        </button>
-                      )}
-                    </>
-                  )}
-                </div>
-                {item.quantity > 0 && (
-                  <button
-                    className="mt-2 max-w-min max-h-min rounded bg-blue-500 px-2 py-1 text-white"
-                    onClick={() => onToggle(item)}
-                  >
-                    {item.isDisabled ? "Enable" : "Disable"}
-                  </button>
+                    ) : (
+                      <button
+                        className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
+                        onClick={() => handlePurchase(item)}
+                      >
+                        Buy for {item.price} ETH
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
-            );
-          })
+              {item.quantity > 0 && (
+                <button
+                  className="mt-2 max-w-min max-h-min rounded bg-blue-500 px-2 py-1 text-white"
+                  onClick={() => onToggle(item)}
+                >
+                  {item.isDisabled ? "Enable" : "Disable"}
+                </button>
+              )}
+            </div>
+          );
+        })
         : null}
     </div>
   );
@@ -759,6 +771,63 @@ const VideoSettings = ({ onClose }: { onClose: () => void }) => {
       >
         Back to game
       </button>
+    </div>
+  );
+};
+
+type RevivingProps = {
+  setGameState: (gs: GameState) => void;
+};
+
+const revivePrices = [50, 169, 420]
+
+const Reviving = ({ setGameState }: RevivingProps) => {
+  const [timer, setTimer] = useState(0);
+  const [reviveCount, setReviveCount] = useAtom(reviveCountAtom)
+
+  useEffect(() => {
+    const i = setInterval(() => {
+      setTimer((t) => {
+        const newTime = t + 1
+        if (newTime === 60) {
+          setGameState("game-over")
+        }
+        return newTime
+      });
+    }, 1000);
+
+    return () => {
+      clearInterval(i);
+    };
+  }, []);
+
+  const handleRevive = () => {
+    setGameState("playing")
+  };
+
+  const handleSkip = () => {
+    setGameState("game-over");
+    setReviveCount(0)
+  }
+
+  return (
+    <div className="mx-auto mt-10 flex w-full flex-col items-center gap-4 md:max-w-[500px]">
+      <div className="relative w-full">
+        <button
+          className="rounded bg-blue-500 px-2 py-1 text-white absolute top-0 right-0 text-sm"
+          onClick={handleSkip}
+        >
+          Skip revive
+        </button>
+      </div>
+
+      <h2 className="text-2xl font-bold">Revive?</h2>
+      <p>Available {3 - reviveCount + 1}/3</p>
+      <p>Price: {revivePrices[reviveCount - 1]} $NOOT</p>
+      <p>Time left: {60 - timer}</p>
+      <p>Buy more noot <a href="uniswap.com" target="_blank">here</a></p>
+
+      <button onClick={handleRevive} className="bg-green-500 rounded-md px-4 py-2 rounded-md">Revive</button>
     </div>
   );
 };

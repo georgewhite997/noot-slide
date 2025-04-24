@@ -4,7 +4,7 @@ import { atom } from "jotai";
 import { SessionConfig } from "@abstract-foundation/agw-client/sessions";
 import { Account } from "viem";
 
-export type GameState = "playing" | "game-over" | "in-menu";
+export type GameState = "playing" | "game-over" | "in-menu" | "reviving"
 export type VideoSettings = {
     antialiasing: boolean;
     shadows: boolean;
@@ -13,8 +13,8 @@ export type VideoSettings = {
 
 // Define the atom with a type
 export const gameStateAtom = atom<GameState>(
-    "in-menu",
-    // process.env.NODE_ENV === "development" ? "playing" : "in-menu",
+    // "in-menu",
+    process.env.NODE_ENV === "development" ? "playing" : "in-menu",
 );
 
 export const videoSettingsAtom = atom<VideoSettings>({
@@ -36,3 +36,4 @@ export const speedyStartQuantityAtom = atom<number>(0);
 export const hasSlowSkisAtom = atom<boolean>(false);
 export const hasLuckyCharmAtom = atom<boolean>(false);
 export const abstractSessionAtom = atom<SessionData | null>(null);
+export const reviveCountAtom = atom<number>(0);

@@ -10,7 +10,7 @@ import {
 } from "@react-three/rapier";
 import { SLOPE_ANGLE, lanes } from "./shared";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, hasFishingNetAtom, scoreAtom } from "@/atoms";
+import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, hasFishingNetAtom, reviveCountAtom, scoreAtom } from "@/atoms";
 import { useAbstractClient } from "@abstract-foundation/agw-react";
 import { chain, powerups, powerupsAbi, powerupsContractAddress } from "@/utils";
 import { parseAbi } from "viem";
@@ -19,12 +19,14 @@ const LANE_TRANSITION_SPEED = 2.5;
 const CAMERA_POSITION_SMOOTHING = 3; // Lower = smoother but slower
 const CAMERA_LOOKAT_SMOOTHING = 5; // Lower = smoother but slower
 const SWAY_AMPLITUDE = 0.035;
+const MAX_REVIVE_COUNT = 3;
 
 const PLAYER_START_POSITION = new THREE.Vector3(0, 10, -20);
 
 export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved: (chunkName: string) => void }) {
   const [score, setScore] = useAtom(scoreAtom);
   const ref = useRef<RapierRigidBody>(null);
+  const lastCollided = useRef('')
   const cameraTargetRef = useRef(new THREE.Vector3(0, 0, 0));
   const cameraLookAtRef = useRef(new THREE.Vector3(0, 0, 0));
   const initialZPosition = useRef<number | null>(null);
@@ -39,8 +41,9 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const deathAction = useRef<THREE.AnimationAction | null>(null);
   const rightTurnAction = useRef<THREE.AnimationAction | null>(null);
   const leftTurnAction = useRef<THREE.AnimationAction | null>(null);
-  const lastRemovedName = useRef<string | null>(null);
+  const lastRemovedName = useRef<string>('');
   const hasHalo = useRef(false);
+  const [reviveCount, setReviveCount] = useAtom(reviveCountAtom);
 
 
   const magnetCollectedAt = useRef<number>(0);
@@ -68,12 +71,19 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const gltf = useLoader(GLTFLoader, "/animations.glb");
 
   const endGame = () => {
-    lastTakenFishes.current = new Set<string>();
-    // stop moving
-    ref.current?.setLinvel({ x: 0, y: 0, z: 0 }, true);
-    // freeze the player
-    ref.current?.lockTranslations(true, true);
-    setGameState("game-over");
+    if (reviveCount < MAX_REVIVE_COUNT) {
+      if (gameState !== 'reviving') {
+        setReviveCount((r) => r + 1);
+        setGameState("reviving");
+      }
+    } else {
+      setGameState("game-over");
+      playDeathAnimation()
+      lastTakenFishes.current = new Set<string>();
+      ref.current?.setLinvel({ x: 0, y: 0, z: 0 }, true);
+      ref.current?.lockTranslations(true, true);
+
+    }
   };
 
 
@@ -162,7 +172,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   }
 
   useEffect(() => {
-    if (gameState === "playing") {
+    if (gameState === "playing" && reviveCount === 0) {
       ref.current?.setTranslation(PLAYER_START_POSITION, true);
       ref.current?.setLinvel({ x: 0, y: 0, z: -0.5 }, true);
       ref.current?.lockTranslations(false, false);
@@ -170,6 +180,13 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       lane.current = 1;
       isJumping.current = false;
     }
+
+    if (reviveCount > 0 && gameState === "playing") {
+      onChunkRemoved(lastCollided.current)
+      lastCollided.current = ''
+    }
+
+
   }, [gameState]);
 
   const playDeathAnimation = () => {
@@ -329,7 +346,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
   const slide = () => {
     //tutaj to wiecej warunkow powinno byc ale czekam az bedzie ten slide rzeczywiscie dzialac
-    if (gameState === "game-over") return;
+    if (gameState === "game-over" || gameState === "reviving") return;
 
     if (!isOnGround.current) {
       ref.current?.applyImpulse({ x: 0, y: -6, z: 0 }, true);
@@ -442,8 +459,12 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
             lastRemovedName.current = chunk.name;
           }
         } else if (!(chunk?.name) ? true : chunk?.name !== lastRemovedName.current) {
-          endGame();
-          playDeathAnimation();
+          if (chunk) {
+            if (lastCollided.current !== chunk.name) {
+              lastCollided.current = chunk.name
+              endGame();
+            }
+          }
         }
       }
     }
@@ -631,10 +652,12 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     if (gameState === "game-over" || gameState === "in-menu") {
       ref.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
 
+      setReviveCount(0)
       setHasFishingNet(false);
       setHasMultiplier(false);
       hasHalo.current = haloQuantity > 0;
-      lastRemovedName.current = null;
+      lastRemovedName.current = '';
+      lastCollided.current = ''
       targetZVelocity.current = -3;
     } else {
       if (
@@ -701,6 +724,14 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       }
     }
 
+    if (gameState === 'reviving') {
+      ref.current.setLinvel(
+        { x: 0, y: 0, z: 0 },
+        true,
+      );
+
+    }
+
     idealCameraPosition.set(currentPosition.x, currentPosition.y + 3, currentPosition.z + 3);
     cameraTargetRef.current.lerp(
       idealCameraPosition,
@@ -720,6 +751,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   return (
     <RigidBody
       name="player"
+      // lockTranslations={gameState === "reviving" ? true : false}
       enabledRotations={[false, false, false]}
       ref={ref}
       position={PLAYER_START_POSITION}
