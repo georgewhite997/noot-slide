@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Fragment, memo, useEffect, useRef, useState } from "react";
+import { Fragment, memo, useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useThree, useLoader } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import {
@@ -57,7 +57,7 @@ export const Ground = memo(function Ground() {
       const zOffset = -i * (SEGMENT_LENGTH * Math.cos(SLOPE_ANGLE));
       const yOffset = i * (SEGMENT_LENGTH * Math.sin(SLOPE_ANGLE));
 
-      const isRoad = Math.random() < 0.1 && i !== 0;
+      const isRoad = Math.random() < 0.2 && i !== 0;
 
       const obstacles = i === 0 ? [] : getObstacles(["easy"], isRoad);
 
@@ -129,7 +129,7 @@ export const Ground = memo(function Ground() {
         allowedDifficulties = ["easy"];
       }
 
-      const isRoad = Math.random() < 0.1;
+      const isRoad = Math.random() < 0.2;
 
       const obstacles = getObstacles(allowedDifficulties, isRoad);
 
@@ -273,16 +273,9 @@ export const Ground = memo(function Ground() {
 
 
 const SegmentObstacles = memo(function SegmentObstacles({ segment, colorMap, normalMap }: { segment: ISegment, colorMap: THREE.Texture, normalMap: THREE.Texture }) {
-  const fishGltf = useLoader(GLTFLoader, '/fish.glb')
-  const modelsGltf = useLoader(GLTFLoader, '/models.glb')
-  const store_assets_gltf = useLoader(GLTFLoader, '/store_assets.glb')
-
-  //print all modelsGltf.scene.children.name
-  // useEffect(() => {
-  //   modelsGltf.scene.children.forEach((child) => {
-  //     console.log(child.name);
-  //   });
-  // }, [modelsGltf]);
+  const fishGltf = useMemo(() => useLoader(GLTFLoader, '/fish.glb'), [])
+  const modelsGltf = useMemo(() => useLoader(GLTFLoader, '/models.glb'), [])
+  const store_assets_gltf = useMemo(() => useLoader(GLTFLoader, '/store_assets.glb'), [])
 
   return (
     <>

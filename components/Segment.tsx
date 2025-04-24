@@ -12,7 +12,9 @@ import {
 } from "./shared";
 import { Obstacle } from "./Obstacles";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
-import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { useLoader } from "@react-three/fiber";
+import React from "react";
 
 const sideHeight = 0.2;
 const sideWidth = 1.2;
@@ -69,6 +71,134 @@ export const SnowPlane = ({
     );
 };
 
+interface IEnvironmentSegment {
+    name: string;
+    GetEnvironment: (isRight: boolean) => React.ReactElement;
+}
+
+
+function getModel(name: string, scale: number) {
+    const modelsGltf = useMemo(() => useLoader(GLTFLoader, '/models.glb'), []);
+    const model = useMemo(() => {
+        const object = modelsGltf.scene.getObjectByName(name);
+        if (!object) return null;
+
+        // Reset position of all meshes in the tree
+        object.traverse((child) => {
+            if (child instanceof THREE.Mesh) {
+                child.position.set(0, 0, 0);
+                child.updateMatrix();
+            }
+        });
+
+        object.scale.set(scale, scale, scale);
+        return object;
+    }, [modelsGltf]);
+
+    return model;
+}
+
+const OBSTACLE_MODELS = new Set([
+    { name: "fir_tree_winter_large_2__5_", scale: 0.0045 },
+    { name: "fir_tree_winter_small_2__2_001", scale: 0.0045 },
+    { name: "fir_tree_winter_tilted_4", scale: 0.0045 },
+    { name: "fir_tree_winter_large_2__1_", scale: 0.0045 },
+    { name: "fir_tree_winter_small_3__2_001", scale: 0.0045 },
+    { name: "fir_tree_winter_tilted_3001", scale: 0.0045 },
+    { name: "fir_tree_winter_small_3__2_005", scale: 0.0045 },
+    { name: "fir_tree_winter_tilted_2__1_", scale: 0.0045 },
+    { name: "dry_tree_winter", scale: 0.0045 },
+    { name: "stone_winter_small_8__2_002", scale: 0.02 },
+    { name: "stone_winter_small_8__5_004", scale: 0.02 },
+    { name: "stone_winter_small_8__5_005", scale: 0.02 },
+    { name: "country_fence", scale: 0.006 },
+    { name: "bonfire", scale: 0.015 },
+    { name: "reindeer", scale: 0.008 },
+    { name: "lamppost_3__3_", scale: 0.008 },
+    { name: "lamppost_4__5_001", scale: 0.012 },
+    { name: "caramel_cane__4__1003", scale: 0.03 },
+    { name: "caramel_cane__4__1001", scale: 0.08 },
+    { name: "dumpster_green_winter", scale: 0.008 },
+    { name: "igloo_house", scale: 0.006 },
+    { name: "snow_shovel_yellow__1_", scale: 0.02 },
+    { name: "ski_flag_red__1_", scale: 0.012 },
+    { name: "sled_green", scale: 0.012 },
+    { name: "sled_green001", scale: 0.012 },
+    { name: "santa_claus_sleigh", scale: 0.008 },
+    { name: "information_plate001", scale: 0.01 },
+    { name: "information_plate_winter001", scale: 0.004 },
+    { name: "square_gift_box_red", scale: 0.025 },
+    { name: "rhombus_gift_box_white", scale: 0.025 },
+    { name: "oval_gift_box_blue__1_001", scale: 0.025 },
+    { name: "winter_well", scale: 0.009 },
+    { name: "snowman", scale: 0.015 },
+    { name: "fairground_christmas_house_3", scale: 0.006 },
+    { name: "fairground_christmas_house_4", scale: 0.006 },
+    { name: "winter_house_7", scale: 0.006 },
+    { name: "winter_house_8", scale: 0.006 },
+    { name: "wooden_winter_house_3", scale: 0.006 },
+    { name: "wooden_winter_house", scale: 0.006 },
+    { name: "winter_house_6", scale: 0.006 },
+    { name: "christmas_house_4", scale: 0.006 },
+    { name: "christmas_house001", scale: 0.006 },
+    { name: "christmas_house_2", scale: 0.006 },
+    { name: "christmas_house", scale: 0.006 },
+    { name: "christmas_house_3", scale: 0.006 },
+]);
+
+function getRandomObstacleModel() {
+    const modelsArray = Array.from(OBSTACLE_MODELS);
+    const randomModel = modelsArray[Math.floor(Math.random() * modelsArray.length)];
+    return getModel(randomModel.name, randomModel.scale);
+}
+
+const environmentSegments: IEnvironmentSegment[] = [
+    {
+        name: "stones",
+        GetEnvironment: (isRight: boolean) => {
+            const model1 = getModel("stone_winter_large_2001", 0.03);
+            const model2 = getModel("stone_winter_large_2014", 0.03);
+            const model3 = getModel("stone_winter_large_2003", 0.03);
+
+            if (!model1 || !model2 || !model3) return <></>;
+
+            // Generate array of 20 random obstacles
+            const obstacles = Array.from({ length: 20 }, () => {
+                let obstacle;
+                do {
+                    obstacle = getRandomObstacleModel();
+                } while (obstacle?.name.includes("house") && Math.random() < 0.8);
+                return obstacle;
+            });
+
+            return (
+                <>
+                    <primitive object={clone(model1)} />
+                    <primitive object={clone(model2)} position={[-20, 0, 0]} />
+                    <primitive object={clone(model3)} position={[-40, 0, 0]} />
+                    <primitive object={clone(model1)} position={[-40, 0, 0]} />
+                    <primitive object={clone(model2)} position={[-60, 0, 0]} />
+                    <primitive object={clone(model3)} position={[-80, 0, 0]} />
+                    <primitive object={clone(model1)} position={[-80, 0, 0]} />
+                    <primitive object={clone(model2)} position={[-90, 0, 0]} />
+
+                    {obstacles.map((obstacle, index) =>
+                        (obstacle) && (
+                            <primitive
+                                key={index}
+                                object={clone(obstacle)}
+                                {...(isRight ? { rotation: [Math.PI / 2, 0, 0] } : {})}
+                                position={[-5 - (index * 5), obstacle.name.includes("cane") ? 2 : 0, isRight ? (Math.random() < 0.5 ? 7 : 6) : (Math.random() < 0.5 ? -7 : -6)]}
+                            />
+                        )
+                    )}
+                </>
+            )
+        }
+    },
+]
+
+
 export const SideSlope = memo(
     function SideSlope({
         isRight,
@@ -79,42 +209,25 @@ export const SideSlope = memo(
         colorMap: THREE.Texture;
         normalMap: THREE.Texture;
     }) {
-        // const meshRef = useRef<THREE.Mesh>(null);
+        const model1 = getModel("stone_winter_large_2001", 0.03);
+        const model2 = getModel("stone_winter_large_2014", 0.03);
+        const model3 = getModel("stone_winter_large_2003", 0.03);
+
+        if (!model1 || !model2 || !model3) return null;
+
         return (
             <>
-                {/* flagpoles every 10 meters */}
-                {/*
-            {new Array(Math.floor(SEGMENT_LENGTH / flagpoleSeparation))
-                .fill(0)
-                .map((_, i) => (
-                    <mesh
-                        key={i}
-                        position={[
-                            isRight
-                                ? SEGMENT_WIDTH / 2 + sideWidth / 2
-                                : -SEGMENT_WIDTH / 2 - sideWidth / 2,
-                            sideHeight + flagpoleHeight / 2,
-                            0,
-                        ]}
-                        rotation={[SLOPE_ANGLE, 0, 0]}
-                    >
-                        <cylinderGeometry args={[0.01, 0.01, flagpoleHeight]} />
-                        <meshStandardMaterial color="#FF5C00" />
-                    </mesh>
-                ))}
-            */}
-
                 <Instances limit={8}>
                     <SnowPlane width={sideWidth} length={SEGMENT_LENGTH} isSide={false} />
                     <meshStandardMaterial
-                        map={colorMap} // Base color of the snow
-                        normalMap={normalMap} // Surface detail
-                        normalScale={new THREE.Vector2(1, 1)} // Adjust normal map strength
-                        roughness={0} // No roughness for completely smooth snow
-                        metalness={0} // Snow isn't metallic
+                        map={colorMap}
+                        normalMap={normalMap}
+                        normalScale={new THREE.Vector2(1, 1)}
+                        roughness={0}
+                        metalness={0}
                         side={THREE.DoubleSide}
                     />
-                    <Instance
+                    {/* <Instance
                         position={[
                             isRight
                                 ? SEGMENT_WIDTH / 2 + sideWidth / 2
@@ -123,36 +236,37 @@ export const SideSlope = memo(
                             sideHeight * 2,
                         ]}
                         rotation={[0, 0, 0]}
-                    />
+                    /> */}
                     <Instance
                         position={[
                             isRight ? SEGMENT_WIDTH / 2 : -SEGMENT_WIDTH / 2,
                             sideHeight * 2,
-                            sideHeight * 2,
+                            sideHeight * 1,
                         ]}
                         rotation={[0, isRight ? Math.PI / 2 : -Math.PI / 2, 0]}
                     />
-                    {/* Large snow platform on top of wall that doesnt go to middle just outside of wall */}
-                    {/* <Instance
+                    <Instance
                         position={[
-                            isRight ? SEGMENT_WIDTH / 2 + sideWidth * 5 : -SEGMENT_WIDTH / 2 - sideWidth * 5,
+                            isRight ? SEGMENT_WIDTH / 2 + sideWidth * 3.5 : -SEGMENT_WIDTH / 2 - sideWidth * 3.5,
                             sideHeight * 4,
                             sideHeight * 4,
                         ]}
                         rotation={[0, 0, 0]}
-                        scale={[10, 1, 0.5]}
+                        scale={[7, 1, 0.5]}
                     />
-                    <Instance
-                        position={[
-                            isRight ? SEGMENT_WIDTH / 2 + sideWidth * 5 : -SEGMENT_WIDTH / 2 - sideWidth * 5,
-                            sideHeight * 4 + 0.1,
-                            sideHeight * 4,
-                        ]}
-                        rotation={[Math.PI / 2, -Math.PI / 2, 0]}
-                        scale={[SEGMENT_LENGTH, 0.2, 2]}
-                        color={new THREE.Color(Math.random(), Math.random(), Math.random())}
-                    /> */}
                 </Instances>
+
+
+
+                {<group position={[
+                    isRight ? SEGMENT_WIDTH / 2 + sideWidth * 8 : -SEGMENT_WIDTH / 2 - sideWidth * 8,
+                    -SEGMENT_LENGTH / 2,
+                    sideHeight * 4
+                ]}
+                    rotation={[Math.PI / 2, -Math.PI / 2, 0]}>
+                    {/* {<environmentSegments[0].GetEnvironment/>} */}
+                    {environmentSegments[0].GetEnvironment(isRight)}
+                </group>}
             </>
         );
     },

@@ -98,7 +98,7 @@ const Scene = () => {
           // paused={gameState === "in-menu"}
           gravity={[0, -9.81, 0]}
           timeStep="vary"
-          //debug
+          // debug
         >
           <Ground />
         </Physics>

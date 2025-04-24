@@ -58,6 +58,7 @@ const chunks: IChunk[] = [
         { type: "sled", chance: 0.03 },
         { type: "snow-shovel", chance: 0.02 },
         { type: "gift", chance: 0.02 },
+        { type: 'car', chance: 1 }
       ]
 
       let additionalEntryLane: laneType | null = null;
@@ -1040,7 +1041,7 @@ const chunks: IChunk[] = [
 let previousEntryLane: laneType | null = null;
 let previousChunkType: string | null = null;
 
-export const getObstacles = (allowedDifficulties: ("easy" | "medium" | "hard")[] = ["easy", "medium", "hard"], isRoad: boolean) => {
+export const getObstacles = (allowedDifficulties: ("easy" | "medium" | "hard")[] = ["easy", "medium", "hard"], isRoad: boolean = false) => {
   const obstacles: IObstacle[][] = [];
   const initialZoffset = -SEGMENT_LENGTH / 2 + 0.25;
   const endOfSegment = SEGMENT_LENGTH / 2;
@@ -1284,24 +1285,13 @@ const TexturedObstacle = ({ x, y, z, obstacle, objectName, gltf, scale = 1, rota
   if (!model) return null;
 
   // Calculate model bounds for stone objects
-  const isStone = objectName.toLowerCase().includes('stone');
-  const isCane = objectName.toLowerCase().includes('cane');
-  const isHydrant = objectName.toLowerCase().includes('hydrant');
-  const isGift = objectName.toLowerCase().includes('gift');
-  const isCar = objectName.toLowerCase().includes('car');
-  const isSled = objectName.toLowerCase().includes('sled');
-  const isDumpster = objectName.toLowerCase().includes('dumpster');
-
-  let modelHeight = 0;
-  let modelWidth = 0;
-  let modelDepth = 0;
-
-  if (isStone || isCar || isGift || isHydrant || isCane || isSled || isDumpster) {
-    const box = new THREE.Box3().setFromObject(model);
-    modelHeight = box.max.y - box.min.y;
-    modelWidth = box.max.x - box.min.x;
-    modelDepth = box.max.z - box.min.z;
-  }
+  const isFixed = objectName.toLowerCase().includes('stone') ||
+    objectName.toLowerCase().includes('cane') ||
+    objectName.toLowerCase().includes('hydrant') ||
+    objectName.toLowerCase().includes('gift') ||
+    objectName.toLowerCase().includes('car') ||
+    objectName.toLowerCase().includes('sled') ||
+    objectName.toLowerCase().includes('dumpster');
 
   return (
     <>
@@ -1314,59 +1304,41 @@ const TexturedObstacle = ({ x, y, z, obstacle, objectName, gltf, scale = 1, rota
       >
         <primitive object={clone(model)} />
       </RigidBody>
-      {(isStone || isGift || isHydrant || isCane || isSled || isDumpster) && (
-        <RigidBody
-          type="fixed"
-          name="obstacle-fixed"
-          position={[x, z + 0.02, y + modelHeight]}
-          rotation={rotation}
-        >
-          <mesh>
-            <boxGeometry args={[modelWidth - 0.1, 0.1, modelDepth - 0.1]} />
-            <meshBasicMaterial visible={false} />
-          </mesh>
-        </RigidBody>
-      )}
-      {isCar && (
-        <RigidBody
-          type="fixed"
-          name="obstacle-fixed"
-          rotation={rotation}
-          position={[x + 0.05, z + 0.5, y + modelHeight]}
-        >
-          <mesh>
-            {/* car front window to fix */}
-            <boxGeometry args={[modelWidth - 1, 0.1, modelDepth - 0.8]} />
-            <meshBasicMaterial visible={false} />
-          </mesh>
-        </RigidBody>
 
-        /* <RigidBody
-          type="fixed"
-          name="obstacle-fixed"
-          rotation={[-Math.PI / 4, 0, 0]}
-          position={[x, z - 1, y + modelHeight - 0.5]}
-        >
-          <mesh>
-            <boxGeometry args={[1, 0.1, modelDepth - 0.8]} />
-            <meshBasicMaterial visible={false} />
-          </mesh>
-        </RigidBody>
-         */
-
-      )}
-      {isDumpster && (
+      {isFixed && (
         <RigidBody
           type="fixed"
-          name="obstacle-fixed"
-          position={[x, z + 0.02, y + modelHeight]}
+          name={"obstacle-fixed"}
+          position={[x, z, y + 0.1]}
           rotation={rotation}
+          colliders="hull"
         >
-          <mesh>
-            {/* car front window to fix */}
-            <boxGeometry args={[modelWidth - 0.1, 0.1, modelDepth - 0.8]} />
-            <meshBasicMaterial visible={false} />
-          </mesh>
+          <primitive
+            object={(() => {
+              const obj = clone(model);
+
+              obj.traverse((child) => {
+                if (child instanceof THREE.Mesh) {
+                  // Deep clone the material(s)
+                  if (Array.isArray(child.material)) {
+                    child.material = child.material.map((mat) => {
+                      const clonedMat = mat.clone();
+                      clonedMat.transparent = true;
+                      clonedMat.opacity = 0;
+                      return clonedMat;
+                    });
+                  } else {
+                    const clonedMat = child.material.clone();
+                    clonedMat.transparent = true;
+                    clonedMat.opacity = 0;
+                    child.material = clonedMat;
+                  }
+                }
+              });
+
+              return obj;
+            })()}
+          />
         </RigidBody>
       )}
     </>
