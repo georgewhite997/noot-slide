@@ -2,9 +2,10 @@
 import hardhat from "hardhat";
 const { ethers, network } = hardhat;
 import fs from "fs";
+import NootToken from '../addresses/Noot.json'
 
 const owner = "0x1Ed3aB46773Dd5789eC5553A7D4b4E2f34d7c7c6";
-const paymentToken = null// "0x0000000000000000000000000000000000000000";
+const paymentToken = NootToken.address;
 
 async function main(CONTRACT_NAME: string) {
   const filepath = `addresses/${CONTRACT_NAME}.json`;

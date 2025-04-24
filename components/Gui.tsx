@@ -15,6 +15,7 @@ import {
   powerups as powerupsMeta,
   IPowerUp,
   chain,
+  nootTreasury
 } from "@/utils";
 import { useEffect, useState, memo } from "react";
 import { formatEther, parseAbi, parseEther } from "viem";
@@ -35,6 +36,9 @@ import {
 } from "@/atoms";
 import { toast, Toaster } from "react-hot-toast";
 import ConnectButton from "./ConnectButton";
+import NootToken from '../addresses/Noot.json'
+import { AbstractClient } from "@abstract-foundation/agw-client";
+
 
 type PowerUps = Array<IPowerUp & { quantity: number; isDisabled: boolean }>;
 
@@ -368,7 +372,9 @@ export const Gui = memo(function Gui() {
               setMenuState={setMenuState}
             />
           ) : gameState === "reviving" ? (
-            <Reviving setGameState={setGameState} />
+            <Reviving setGameState={setGameState}
+              abstractClient={abstractClient}
+            />
           ) : (
             <>
               {menuState === MenuStates.videoSettings && (
@@ -777,11 +783,12 @@ const VideoSettings = ({ onClose }: { onClose: () => void }) => {
 
 type RevivingProps = {
   setGameState: (gs: GameState) => void;
+  abstractClient: AbstractClient
 };
 
 const revivePrices = [50, 169, 420]
 
-const Reviving = ({ setGameState }: RevivingProps) => {
+const Reviving = ({ setGameState, abstractClient }: RevivingProps) => {
   const [timer, setTimer] = useState(0);
   const [reviveCount, setReviveCount] = useAtom(reviveCountAtom)
 
@@ -801,8 +808,23 @@ const Reviving = ({ setGameState }: RevivingProps) => {
     };
   }, []);
 
+  const currentPrice = revivePrices[reviveCount - 1]
+
   const handleRevive = () => {
-    setGameState("playing")
+    try {
+      const tx = abstractClient.writeContract({
+        abi: parseAbi(['function transfer(address to, uint256 value) external returns (bool)']),
+        address: NootToken.address as `0x${string}`,
+        functionName: "transfer",
+        args: [nootTreasury, parseEther(currentPrice + '')]
+      })
+      console.log(tx)
+
+      setGameState("playing")
+    } catch (e) {
+      console.log(e)
+      setGameState("game-over")
+    }
   };
 
   const handleSkip = () => {
@@ -823,7 +845,7 @@ const Reviving = ({ setGameState }: RevivingProps) => {
 
       <h2 className="text-2xl font-bold">Revive?</h2>
       <p>Available {3 - reviveCount + 1}/3</p>
-      <p>Price: {revivePrices[reviveCount - 1]} $NOOT</p>
+      <p>Price: {currentPrice} $NOOT</p>
       <p>Time left: {60 - timer}</p>
       <p>Buy more noot <a href="uniswap.com" target="_blank">here</a></p>
 

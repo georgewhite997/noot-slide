@@ -664,7 +664,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
         mixer.current &&
         isOnGround.current &&
         !leftTurnAction.current?.isRunning() &&
-        !rightTurnAction.current?.isRunning()
+        !rightTurnAction.current?.isRunning() && gameState != 'reviving'
       ) {
         ref.current.setTranslation(
           {

@@ -23,7 +23,8 @@ const dockerizedNode = defineChain({
   },
 });
 
-export const chain = abstractTestnet; //abstract; // Change to abstractTestnet or dockerizedNode if needed
+export const chain = abstractTestnet; //abstract; /
+export const nootTreasury = '0x1Ed3aB46773Dd5789eC5553A7D4b4E2f34d7c7c6'
 
 export type SupportedChain = typeof chain;
 
