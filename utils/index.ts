@@ -2,7 +2,12 @@ import { createPublicClient, defineChain, http, PublicClient } from "viem";
 import { abstract, abstractTestnet } from "viem/chains";
 import { useEffect, useState } from "react";
 import { eip712WalletActions } from "viem/zksync";
-import Greeter from "../artifacts-zk/contracts/Greeter.sol/Greeter.json";
+import Registry from "../artifacts-zk/contracts/Registry.sol/Registry.json";
+import Powerups from "../artifacts-zk/contracts/Powerups.sol/Powerups.json";
+// import Skins from "../artifacts-zk/contracts/Skins.sol/Skins.json";
+import registryAddress from "../addresses/Registry.json";
+import powerupsAddress from "../addresses/Powerups.json";
+// import { address as SkinsAddress } from "../addresses/Skins.json";
 import { createNoise2D } from "simplex-noise";
 
 const dockerizedNode = defineChain({
@@ -18,7 +23,10 @@ const dockerizedNode = defineChain({
   },
 });
 
-export const chain = abstract; // Change to abstractTestnet or dockerizedNode if needed
+export const chain = abstractTestnet; //abstract; /
+export const nootTreasury = '0x1Ed3aB46773Dd5789eC5553A7D4b4E2f34d7c7c6'
+
+export type SupportedChain = typeof chain;
 
 export function usePublicClient(): PublicClient | null {
   const [publicClient, setPublicClient] = useState(null);
@@ -36,8 +44,14 @@ export function usePublicClient(): PublicClient | null {
   return publicClient;
 }
 
-export const abi = [...Greeter.abi] as const;
-export const contractAddress = (Greeter as any).address as `0x${string}`;
+export const registryAbi = [...Registry.abi] as const;
+export const registryContractAddress = registryAddress.address as `0x${string}`;
+
+export const powerupsAbi = [...Powerups.abi] as const;
+export const powerupsContractAddress = powerupsAddress.address as `0x${string}`;
+
+// export const skinsAbi = [...Skins.abi] as const;
+// export const skinsContractAddress = skinsAddress as `0x${string}`;
 
 // MADE BY GROK
 // function to generate snow on the ground
@@ -73,36 +87,43 @@ export const getSnowBumps = (
   return z;
 };
 
+export interface IPowerUp {
+  id: number;
+  name: string;
+  description: string;
+  type: "permanent" | "one-time";
+  price: number;
+}
 
-
-export const equipmentMock = [
+export const powerups: IPowerUp[] = [
   {
+    id: 1,
     name: "Slow Skis",
     description: "Decreases the speed of the entire game by 15%.",
     type: "permanent",
-    quantity: 1,
-    price: 0.01,
+    price: 0.0022,
   },
   {
+    id: 2,
     name: "Lucky charm",
     description: "Increases the amount of in-game pickups.",
     type: "permanent",
-    quantity: 1,
-    price: 0.01,
+    price: 0.0022,
   },
   {
+    id: 3,
     name: "Abstract Halo",
     description: "Grants extra life on your first crash.",
     type: "one-time",
-    quantity: 1,
-    price: 0.01,
+    price: 0.0005,
   },
   {
+    id: 4,
     name: "Speedy start",
     description: "Grants 1,000 distance points to your score from the start.",
     type: "one-time",
-    quantity: 1,
-    price: 0.01,
+    price: 0.0005,
   },
+];
 
-]
+
