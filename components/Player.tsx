@@ -448,7 +448,17 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       }
 
       if (name.startsWith("deadly-obstacle")) {
-        const chunk = event.other.rigidBodyObject.parent?.name.startsWith('chunk-') ? event.other.rigidBodyObject.parent : event.other.rigidBodyObject.parent?.parent?.name.startsWith('chunk-') ? event.other.rigidBodyObject.parent?.parent : event.other.rigidBodyObject.parent?.parent?.parent?.name.startsWith('chunk-') ? event.other.rigidBodyObject.parent?.parent?.parent : event.other.rigidBodyObject.parent?.parent?.parent?.parent?.name.startsWith('chunk-') ? event.other.rigidBodyObject.parent?.parent?.parent.parent : null
+
+        let current = event.other.rigidBodyObject.parent;
+        let chunk = null;
+        for (let i = 0; i < 6 && current; i++) {
+          if (current.name?.startsWith('chunk-')) {
+            chunk = current;
+            break;
+          }
+          current = current.parent;
+        }
+
         if (hasHalo.current) {
           setHaloQuantity(prev => prev - 1);
           utilizeHalo();
