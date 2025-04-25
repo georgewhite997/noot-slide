@@ -830,9 +830,9 @@ const Reviving = ({ setGameState, abstractClient }: RevivingProps) => {
 
   const currentPrice = revivePrices[reviveCount - 1];
 
-  const handleRevive = () => {
+  const handleRevive = async () => {
     try {
-      const tx = abstractClient!.writeContract({
+      const tx = await abstractClient!.writeContract({
         abi: parseAbi([
           "function transfer(address to, uint256 value) external returns (bool)",
         ]),

@@ -1587,6 +1587,20 @@ const getRandomObstacleType = (obstacleTypes: IObstacleTypeWithChance[]) => {
   // Fallback to last type (should never happen if chances are properly normalized)
   return normalizedTypes[normalizedTypes.length - 1].type;
 }
+const carNames = [
+  "car_SUV_large_body",
+  "car_SUV_large_body_1",
+  "universal_car_body",
+];
+
+const rockNames = [
+  // "stones_group_winter_2",
+  // "stone_winter_small_5001",
+  // "stone_winter_small_5002",
+  "stone_winter_small_8__2_002",
+  "stone_winter_small_8__5_004",
+  "stone_winter_small_8__5_005",
+]
 
 // each obstacle should have deadly planes and the object itself should be non-deadly - to minimze the collision detection complexity
 // deadly planes have name={"obstacle-" + obstacle.type}>
@@ -1608,22 +1622,11 @@ export const Obstacle = memo(
   }) {
     const [x, y, z] = obstacle.position;
 
-    const rockNames = [
-      // "stones_group_winter_2",
-      // "stone_winter_small_5001",
-      // "stone_winter_small_5002",
-      "stone_winter_small_8__2_002",
-      "stone_winter_small_8__5_004",
-      "stone_winter_small_8__5_005",
-    ];
     const randomRockObjectName = rockNames[Math.floor(Math.random() * rockNames.length)];
 
     switch (obstacle.type) {
       case "low-rock":
-
-        // return <LowRock x={x} y={y} z={z} obstacle={obstacle} />;
         return <TexturedObstacle x={x} y={y} z={z} obstacle={obstacle} objectName={randomRockObjectName} gltf={modelsGltf} scale={randomRockObjectName === "stones_group_winter_2" ? 0.003 : 0.02} />
-      // return <TexturedObstacle x={x} y={y} z={z} obstacle={obstacle} objectName="stones_group_winter_2" gltf={modelsGltf} scale={2} />;
       case "lying-tree-long":
         return <TexturedObstacle x={x - 2} y={y} z={z} obstacle={obstacle} objectName="fir_tree_winter_tilted_3" rotation={[0, Math.PI / 2, 0]} gltf={modelsGltf} scale={0.004} />
       case "tree-trunk-winter":
@@ -1640,12 +1643,6 @@ export const Obstacle = memo(
       case "bonfire":
         return <TexturedObstacle x={x} y={y} z={z} obstacle={obstacle} objectName="bonfire" gltf={modelsGltf} scale={0.015} />
       case "car":
-        const carNames = [
-          "car_SUV_large_body",
-          "car_SUV_large_body_1",
-          "universal_car_body",
-        ];
-
         const randomCarObjectName = carNames[Math.floor(Math.random() * carNames.length)];
         return <TexturedObstacle x={x} y={y} z={z + 1} obstacle={obstacle} objectName={randomCarObjectName} gltf={modelsGltf} scale={0.008} rotation={[Math.PI / 2, -Math.PI / 2, 0]} />
       case "reindeer":
