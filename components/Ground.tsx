@@ -16,7 +16,7 @@ import {
 import { useAtom, useAtomValue } from "jotai";
 import { fishMeshesAtom, gameStateAtom, modelsGltfAtom, scoreAtom, storeAssetsGltfAtom } from "@/atoms";
 import { getSnowBumps } from "@/utils";
-import { getObstacles, Obstacle } from "./Obstacles";
+import { Fish, getObstacles, Obstacle } from "./Obstacles";
 import { Segment } from "./Segment";
 import { Player } from "./Player";
 import { ISegment } from "./shared";
@@ -39,7 +39,6 @@ export const Ground = memo(function Ground() {
   const gameState = useAtomValue(gameStateAtom);
   const score = useAtomValue(scoreAtom);
   const modelsGltf = useAtomValue(modelsGltfAtom)
-  const fishMeshes = useAtomValue(fishMeshesAtom);
 
   const [segments, setSegments] = useState<ISegment[]>([]);
   const lastPushedIndex = useRef<number | null>(null);
@@ -250,69 +249,68 @@ export const Ground = memo(function Ground() {
   return (
     <>
       <Player onChunkRemoved={onChunkRemoved} />
-      <Merged meshes={fishMeshes}>
-        {(model) => {
-          return segments.map((segment) => (
-            <Fragment key={`${segment.index}-${segment.zOffset}`}>
-              <Segment
+      <group>
+        {segments.map((segment) => (
+          <group key={`${segment.index}-${segment.zOffset}`}>
+            <Segment
+              segment={segment}
+              colorMap={colorMap}
+              normalMap={normalMap}
+              modelsGltf={modelsGltf}
+              isRoad={segment.isRoad}
+            />
+            <mesh
+              position={[0, segment.yOffset, segment.zOffset]}
+              rotation={[-Math.PI / 2 + SLOPE_ANGLE, 0, 0]}
+            >
+              <SegmentObstacles
                 segment={segment}
                 colorMap={colorMap}
                 normalMap={normalMap}
-                modelsGltf={modelsGltf}
-                isRoad={segment.isRoad}
               />
-              <mesh
-                position={[0, segment.yOffset, segment.zOffset]}
-                rotation={[-Math.PI / 2 + SLOPE_ANGLE, 0, 0]}
-              >
-                <SegmentObstacles
-                  segment={segment}
-                  colorMap={colorMap}
-                  normalMap={normalMap}
-                  FishModel={model}
-                />
-              </mesh>
-            </Fragment >
-          ))
-        }}
-      </Merged>
+            </mesh>
+          </group>
+        ))}
+      </group>
     </>
   )
-}, (prevProps, nextProps) => {
-
-  return true
 })
 
 
-const SegmentObstacles = memo(function SegmentObstacles({ segment, colorMap, normalMap, FishModel }: { segment: ISegment, colorMap: THREE.Texture, normalMap: THREE.Texture, FishModel: any }) {
+const SegmentObstacles = memo(function SegmentObstacles({ segment, colorMap, normalMap }: { segment: ISegment, colorMap: THREE.Texture, normalMap: THREE.Texture }) {
   const modelsGltf = useAtomValue(modelsGltfAtom);
   const store_assets_gltf = useAtomValue(storeAssetsGltfAtom);
+  const fishMeshes = useAtomValue(fishMeshesAtom);
 
   if (!modelsGltf || !store_assets_gltf) return null;
 
   return segment.chunks.length > 0 ? (
     segment.chunks.map((chunk) => {
       if (chunk.obstacles.length === 0) return null
-
+      const chunkKey = chunk.name + segment.index + segment.yOffset
       return (
-        <group key={chunk.name} name={chunk.name}>
-          {chunk.obstacles.map((obstacle, obstacleIndex) => (
-            <Obstacle
-              key={`obstacle-${obstacle.type}-${obstacle.position[0]}-${obstacle.position[1]}-${obstacle.position[2]}-${segment.index}-${obstacleIndex}`}
-              snowColorMap={colorMap}
-              snowNormalMap={normalMap}
-              obstacle={obstacle}
-              FishModel={FishModel.KoiFish_low}
-              modelsGltf={modelsGltf}
-              store_assets_gltf={store_assets_gltf}
-            />
-          ))}
-        </group>
+        <group key={chunkKey} name={chunk.name}>
+          <Merged meshes={fishMeshes} limit={20}>
+            {(model) =>
+              <group>
+                {chunk.obstacles.map((obstacle, obstacleIndex) =>
+                  <Obstacle
+                    key={`${chunkKey}-obstacle-${obstacle.type}-${obstacle.position.join('-')}-${segment.index}-${obstacleIndex}`}
+                    snowColorMap={colorMap}
+                    snowNormalMap={normalMap}
+                    obstacle={obstacle}
+                    FishModel={model.KoiFish_low}
+                    modelsGltf={modelsGltf}
+                    store_assets_gltf={store_assets_gltf}
+                  />
+                )}
+              </group>
+            }
+          </Merged >
+        </group >
       )
     })
   ) : null
-
-
 }, (prevProps, nextProps) => {
   const prevSegment = prevProps.segment as ISegment;
   const nextSegment = nextProps.segment as ISegment;

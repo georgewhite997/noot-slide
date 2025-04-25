@@ -1343,22 +1343,20 @@ const TexturedObstacle = ({ x, y, z, obstacle, objectName, gltf, scale = 1, rota
   );
 };
 
-const Fish = ({ x, y, z, Model }: { x: number; y: number; z: number, Model: any }) => {
+export const Fish = ({ x, y, z, Model }: { x: number; y: number; z: number, Model: any }) => {
   const [hasFishingNet] = useAtom(hasFishingNetAtom);
-  const groupRef = useRef<THREE.Group & { wasHit: boolean; opacity: number; zOffset: number } | null>(null)
+  const groupRef = useRef<THREE.Group & { wasHit: boolean; opacity: number; } | null>(null)
   const fishId = useMemo(() => THREE.MathUtils.generateUUID(), [])
 
   useFrame((state, delta) => {
     if (groupRef.current?.wasHit) {
-      groupRef.current.zOffset += delta * 3
+      const z = delta * 3
+      const y = delta * 2
 
-      groupRef.current.position.z = groupRef.current.zOffset
-      if (groupRef.current.opacity <= 0) {
-        groupRef.current.visible = false
-      }
+      groupRef.current.position.z += z
+      groupRef.current.position.y -= y
     }
   })
-
 
   return (
     <group ref={groupRef}>
@@ -1371,7 +1369,6 @@ const Fish = ({ x, y, z, Model }: { x: number; y: number; z: number, Model: any 
         onIntersectionEnter={({ other }) => {
           if (other.rigidBodyObject?.name === 'player' && groupRef.current && !groupRef.current.wasHit) {
             groupRef.current.wasHit = true
-            groupRef.current.zOffset = 0
           }
         }}
       >
@@ -1395,8 +1392,6 @@ const Fish = ({ x, y, z, Model }: { x: number; y: number; z: number, Model: any 
           if (!hasFishingNet) return;
           if (other.rigidBodyObject?.name === 'player' && groupRef.current && !groupRef.current.wasHit) {
             groupRef.current.wasHit = true
-            groupRef.current.opacity = 1
-            groupRef.current.zOffset = 0
           }
         }}
       >

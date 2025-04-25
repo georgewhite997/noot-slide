@@ -14,6 +14,7 @@ export type VideoSettings = {
     dpr: number;
 }
 
+//
 // Define the atom with a type
 export const gameStateAtom = atom<GameState>(
     // "in-menu",

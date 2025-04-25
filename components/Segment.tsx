@@ -10,7 +10,6 @@ import {
     SLOPE_ANGLE,
     ISegment,
 } from "./shared";
-import { Obstacle } from "./Obstacles";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { ObjectMap, useLoader } from "@react-three/fiber";
