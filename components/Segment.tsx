@@ -13,13 +13,16 @@ import {
 import { Obstacle } from "./Obstacles";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
 import { GLTF, GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { useLoader } from "@react-three/fiber";
+import { ObjectMap, useLoader } from "@react-three/fiber";
 import React from "react";
+import { useAtomValue } from "jotai";
+import { modelsGltfAtom } from "@/atoms";
 
 const sideHeight = 0.2;
 const sideWidth = 1.2;
 const flagpoleSeparation = 5;
 const flagpoleHeight = 1;
+
 
 export const SnowPlane = ({
     width,
@@ -73,29 +76,26 @@ export const SnowPlane = ({
 
 interface IEnvironmentSegment {
     name: string;
-    GetEnvironment: (isRight: boolean) => React.ReactElement;
+    GetEnvironment: (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => React.ReactElement;
 }
 
 
-function getModel(name: string, scale: number) {
-    const modelsGltf = useMemo(() => useLoader(GLTFLoader, '/models.glb'), []);
-    const model = useMemo(() => {
-        const object = modelsGltf.scene.getObjectByName(name);
-        if (!object) return null;
+function getModel(name: string, scale: number, modelsGltf: GLTF & ObjectMap | null) {
+    // const modelsGltf = useLoader(GLTFLoader, '/models.glb');
+    if (!modelsGltf?.scene) return null;
+    const object = modelsGltf.scene.getObjectByName(name);
+    if (!object) return null;
 
-        // Reset position of all meshes in the tree
-        object.traverse((child) => {
-            if (child instanceof THREE.Mesh) {
-                child.position.set(0, 0, 0);
-                child.updateMatrix();
-            }
-        });
+    // Reset position of all meshes in the tree
+    object.traverse((child: THREE.Object3D) => {
+        if (child instanceof THREE.Mesh) {
+            child.position.set(0, 0, 0);
+            child.updateMatrix();
+        }
+    });
 
-        object.scale.set(scale, scale, scale);
-        return object;
-    }, [modelsGltf]);
-
-    return model;
+    object.scale.set(scale, scale, scale);
+    return object;
 }
 
 const OBSTACLE_MODELS = new Set([
@@ -146,19 +146,20 @@ const OBSTACLE_MODELS = new Set([
     { name: "christmas_house_3", scale: 0.006 },
 ]);
 
-function getRandomObstacleModel() {
+function getRandomObstacleModel(modelsGltf: GLTF & ObjectMap | null) {
+    if (!modelsGltf) return;
     const modelsArray = Array.from(OBSTACLE_MODELS);
     const randomModel = modelsArray[Math.floor(Math.random() * modelsArray.length)];
-    return getModel(randomModel.name, randomModel.scale);
+    return getModel(randomModel.name, randomModel.scale, modelsGltf);
 }
 
 const environmentSegments: IEnvironmentSegment[] = [
     {
         name: "stones",
-        GetEnvironment: (isRight: boolean) => {
-            const model1 = getModel("stone_winter_large_2001", 0.03);
-            const model2 = getModel("stone_winter_large_2014", 0.03);
-            const model3 = getModel("stone_winter_large_2003", 0.03);
+        GetEnvironment: (isRight, modelsGltf) => {
+            const model1 = useMemo(() => getModel("stone_winter_large_2001", 0.03, modelsGltf), []);
+            const model2 = useMemo(() => getModel("stone_winter_large_2014", 0.03, modelsGltf), []);
+            const model3 = useMemo(() => getModel("stone_winter_large_2003", 0.03, modelsGltf), []);
 
             if (!model1 || !model2 || !model3) return <></>;
 
@@ -166,7 +167,7 @@ const environmentSegments: IEnvironmentSegment[] = [
             const obstacles = Array.from({ length: 20 }, () => {
                 let obstacle;
                 do {
-                    obstacle = getRandomObstacleModel();
+                    obstacle = getRandomObstacleModel(modelsGltf);
                 } while (obstacle?.name.includes("house") && Math.random() < 0.8);
                 return obstacle;
             });
@@ -209,9 +210,10 @@ export const SideSlope = memo(
         colorMap: THREE.Texture;
         normalMap: THREE.Texture;
     }) {
-        const model1 = getModel("stone_winter_large_2001", 0.03);
-        const model2 = getModel("stone_winter_large_2014", 0.03);
-        const model3 = getModel("stone_winter_large_2003", 0.03);
+        const modelsGltf = useAtomValue(modelsGltfAtom);
+        const model1 = getModel("stone_winter_large_2001", 0.03, modelsGltf);
+        const model2 = getModel("stone_winter_large_2014", 0.03, modelsGltf);
+        const model3 = getModel("stone_winter_large_2003", 0.03, modelsGltf);
 
         if (!model1 || !model2 || !model3) return null;
 
@@ -265,7 +267,7 @@ export const SideSlope = memo(
                 ]}
                     rotation={[Math.PI / 2, -Math.PI / 2, 0]}>
                     {/* {<environmentSegments[0].GetEnvironment/>} */}
-                    {environmentSegments[0].GetEnvironment(isRight)}
+                    {environmentSegments[0].GetEnvironment(isRight, modelsGltf)}
                 </group>}
             </>
         );
@@ -346,13 +348,14 @@ export const Segment = memo(
             return object;
         }, [modelsGltf.scene]);
 
-        if (!roadModel) return null;
 
         useEffect(() => {
             if (lightRef.current && targetRef.current) {
                 lightRef.current.target = targetRef.current;
             }
         }, []);
+
+        if (!roadModel) return null;
 
         return (
             <>

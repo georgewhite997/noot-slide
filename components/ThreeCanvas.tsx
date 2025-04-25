@@ -1,6 +1,6 @@
 "use client";
 
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { Physics } from "@react-three/rapier";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Ground } from "./Ground";
@@ -8,11 +8,34 @@ import {
   OrbitControls,
   PerformanceMonitor,
   PerspectiveCamera,
-} from "@react-three/drei"; // Import OrbitControls
+} from "@react-three/drei";
 import * as THREE from "three";
-import { Player } from "./Player";
 import { useAtomValue } from "jotai";
-import { gameStateAtom, videoSettingsAtom } from "@/atoms";
+import { fishGltfAtom, gameStateAtom, storeAssetsGltfAtom, videoSettingsAtom } from "@/atoms";
+import { useGLTF } from '@react-three/drei';
+import { useSetAtom } from 'jotai';
+import { modelsGltfAtom } from '../atoms';
+
+export const ModelLoader = () => {
+  const modelsGltf = useGLTF('/models.glb');
+  const storeAssetsGltf = useGLTF('/store_assets.glb');
+  const fishGltf = useGLTF('/fish.glb');
+  const setModelsGltf = useSetAtom(modelsGltfAtom);
+  const setStoreAssetsGltf = useSetAtom(storeAssetsGltfAtom);
+  const setFishGltf = useSetAtom(fishGltfAtom);
+
+  useEffect(() => {
+    // @ts-expect-error idk why this is throwing an error
+    setModelsGltf(modelsGltf);
+    // @ts-expect-error idk why this is throwing an error
+    setStoreAssetsGltf(storeAssetsGltf);
+    // @ts-expect-error idk why this is throwing an error
+    setFishGltf(fishGltf);
+  }, []);
+
+  return null;
+};
+
 
 export const ThreeCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -61,6 +84,7 @@ export const ThreeCanvas = () => {
                   console.log("FPS:", api.fps);
                 }}
               />
+              <ModelLoader />
               <Scene />
             </Canvas>
           </>
@@ -98,7 +122,7 @@ const Scene = () => {
           // paused={gameState === "in-menu"}
           gravity={[0, -9.81, 0]}
           timeStep="vary"
-          // debug
+        // debug
         >
           <Ground />
         </Physics>

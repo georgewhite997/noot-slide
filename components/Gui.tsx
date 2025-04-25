@@ -15,7 +15,7 @@ import {
   powerups as powerupsMeta,
   IPowerUp,
   chain,
-  nootTreasury
+  nootTreasury,
 } from "@/utils";
 import { useEffect, useState, memo } from "react";
 import { formatEther, parseAbi, parseEther } from "viem";
@@ -36,9 +36,8 @@ import {
 } from "@/atoms";
 import { toast, Toaster } from "react-hot-toast";
 import ConnectButton from "./ConnectButton";
-import NootToken from '../addresses/Noot.json'
+import NootToken from "../addresses/Noot.json";
 import { AbstractClient } from "@abstract-foundation/agw-client";
-
 
 type PowerUps = Array<IPowerUp & { quantity: number; isDisabled: boolean }>;
 
@@ -126,8 +125,7 @@ export const Gui = memo(function Gui() {
         const quantity = Number(qty);
 
         if (meta.name === "Abstract Halo") {
-          const x = hasDisabledIndex == -1 ? quantity : 0;
-          console.log("halo", meta.id);
+          setHaloQuantity(hasDisabledIndex == -1 ? quantity : 0);
         }
 
         if (meta.name === "Speedy Start") {
@@ -372,7 +370,8 @@ export const Gui = memo(function Gui() {
               setMenuState={setMenuState}
             />
           ) : gameState === "reviving" ? (
-            <Reviving setGameState={setGameState}
+            <Reviving
+              setGameState={setGameState}
               abstractClient={abstractClient}
             />
           ) : (
@@ -633,76 +632,97 @@ const Powerups = ({
 
       <h2 className="text-2xl font-bold">Your powerups</h2>
       {powerUps.length > 0
-        ? powerUps.map((item) => {
-          const [quantity, setQuantity] = useState(1);
-
-          return (
-            <div
-              key={item.id}
-              className="flex w-full rounded border border-gray-300 p-4 justify-around"
-            >
-              <div className="w-1/5 flex items-center justify-center ">
-                <img
-                  src={`/${item.name.toLowerCase().replace(" ", "")}.jpeg`}
-                  alt={item.name}
-                />
-              </div>
-              <div className="w-3/5 text-sm">
-                <p className="mb-1 text-center text-base font-semibold">
-                  {item.name}
-                </p>
-                <p>{item.description}</p>
-
-                {item.type === "one-time" ? (
-                  <>
-                    <p>Owned: {item.quantity}</p>
-                    <div className="flex gap-2">
-                      <button
-                        className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
-                        onClick={() => handlePurchase(item, quantity)}
-                      >
-                        Buy for {item.price} ETH
-                      </button>
-                      <input
-                        className="rounded bg-gray-200 px-2 py-1 text-center text-black"
-                        type="number"
-                        value={quantity}
-                        onChange={(e) => setQuantity(Number(e.target.value))}
-                        min={1}
-                        max={100}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <p>Permanent upgrade</p>
-                    {item.quantity > 0 ? (
-                      <div className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-center text-white">
-                        Owned
-                      </div>
-                    ) : (
-                      <button
-                        className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
-                        onClick={() => handlePurchase(item)}
-                      >
-                        Buy for {item.price} ETH
-                      </button>
-                    )}
-                  </>
-                )}
-              </div>
-              {item.quantity > 0 && (
-                <button
-                  className="mt-2 max-w-min max-h-min rounded bg-blue-500 px-2 py-1 text-white"
-                  onClick={() => onToggle(item)}
-                >
-                  {item.isDisabled ? "Enable" : "Disable"}
-                </button>
-              )}
-            </div>
-          );
-        })
+        ? powerUps.map((item) => (
+          <PowerupItem
+            key={item.id}
+            powerup={item}
+            handlePurchase={handlePurchase}
+            onToggle={onToggle}
+          />
+        ))
         : null}
+    </div>
+  );
+};
+
+const PowerupItem = ({
+  powerup,
+  handlePurchase,
+  onToggle,
+}: {
+  powerup: PowerUps[number];
+  handlePurchase: (p: PowerUps[number], quantity?: number) => void;
+  onToggle: (p: PowerUps[number]) => void;
+}) => {
+  const [quantity, setQuantity] = useState(1);
+
+  const isDisabled = powerup.name !== "Abstract Halo";
+
+  return (
+    <div className="flex w-full rounded border border-gray-300 p-4 justify-around relative">
+      {isDisabled && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+          <p className="text-white">Coming soon...</p>
+        </div>
+      )}
+      <div className="w-1/5 flex items-center justify-center ">
+        <img
+          src={`/${powerup.name.toLowerCase().replace(" ", "")}.jpeg`}
+          alt={powerup.name}
+        />
+      </div>
+      <div className="w-3/5 text-sm">
+        <p className="mb-1 text-center text-base font-semibold">
+          {powerup.name}
+        </p>
+        <p>{powerup.description}</p>
+
+        {powerup.type === "one-time" ? (
+          <>
+            <p>Owned: {powerup.quantity}</p>
+            <div className="flex gap-2">
+              <button
+                className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
+                onClick={() => handlePurchase(powerup, quantity)}
+              >
+                Buy for {powerup.price} ETH
+              </button>
+              <input
+                className="rounded bg-gray-200 px-2 py-1 text-center text-black"
+                type="number"
+                value={quantity}
+                onChange={(e) => setQuantity(Number(e.target.value))}
+                min={1}
+                max={100}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <p>Permanent upgrade</p>
+            {powerup.quantity > 0 ? (
+              <div className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-center text-white">
+                Owned
+              </div>
+            ) : (
+              <button
+                className="mt-2 w-full rounded bg-green-500 px-2 py-1 text-white"
+                onClick={() => handlePurchase(powerup)}
+              >
+                Buy for {powerup.price} ETH
+              </button>
+            )}
+          </>
+        )}
+      </div>
+      {powerup.quantity > 0 && (
+        <button
+          className="mt-2 max-w-min max-h-min rounded bg-blue-500 px-2 py-1 text-white"
+          onClick={() => onToggle(powerup)}
+        >
+          {powerup.isDisabled ? "Enable" : "Disable"}
+        </button>
+      )}
     </div>
   );
 };
@@ -783,23 +803,23 @@ const VideoSettings = ({ onClose }: { onClose: () => void }) => {
 
 type RevivingProps = {
   setGameState: (gs: GameState) => void;
-  abstractClient: AbstractClient
+  abstractClient: AbstractClient | undefined;
 };
 
-const revivePrices = [50, 169, 420]
+const revivePrices = [50, 169, 420];
 
 const Reviving = ({ setGameState, abstractClient }: RevivingProps) => {
   const [timer, setTimer] = useState(0);
-  const [reviveCount, setReviveCount] = useAtom(reviveCountAtom)
+  const [reviveCount, setReviveCount] = useAtom(reviveCountAtom);
 
   useEffect(() => {
     const i = setInterval(() => {
       setTimer((t) => {
-        const newTime = t + 1
+        const newTime = t + 1;
         if (newTime === 60) {
-          setGameState("game-over")
+          setGameState("game-over");
         }
-        return newTime
+        return newTime;
       });
     }, 1000);
 
@@ -808,29 +828,31 @@ const Reviving = ({ setGameState, abstractClient }: RevivingProps) => {
     };
   }, []);
 
-  const currentPrice = revivePrices[reviveCount - 1]
+  const currentPrice = revivePrices[reviveCount - 1];
 
   const handleRevive = () => {
     try {
-      const tx = abstractClient.writeContract({
-        abi: parseAbi(['function transfer(address to, uint256 value) external returns (bool)']),
+      const tx = abstractClient!.writeContract({
+        abi: parseAbi([
+          "function transfer(address to, uint256 value) external returns (bool)",
+        ]),
         address: NootToken.address as `0x${string}`,
         functionName: "transfer",
-        args: [nootTreasury, parseEther(currentPrice + '')]
-      })
-      console.log(tx)
+        args: [nootTreasury, parseEther(currentPrice + "")],
+      });
+      console.log(tx);
 
-      setGameState("playing")
+      setGameState("playing");
     } catch (e) {
-      console.log(e)
-      setGameState("game-over")
+      console.log(e);
+      setGameState("game-over");
     }
   };
 
   const handleSkip = () => {
     setGameState("game-over");
-    setReviveCount(0)
-  }
+    setReviveCount(0);
+  };
 
   return (
     <div className="mx-auto mt-10 flex w-full flex-col items-center gap-4 md:max-w-[500px]">
@@ -847,9 +869,19 @@ const Reviving = ({ setGameState, abstractClient }: RevivingProps) => {
       <p>Available {3 - reviveCount + 1}/3</p>
       <p>Price: {currentPrice} $NOOT</p>
       <p>Time left: {60 - timer}</p>
-      <p>Buy more noot <a href="uniswap.com" target="_blank">here</a></p>
+      <p>
+        Buy more noot{" "}
+        <a href="uniswap.com" target="_blank">
+          here
+        </a>
+      </p>
 
-      <button onClick={handleRevive} className="bg-green-500 rounded-md px-4 py-2 rounded-md">Revive</button>
+      <button
+        onClick={handleRevive}
+        className="bg-green-500 rounded-md px-4 py-2 rounded-md"
+      >
+        Revive
+      </button>
     </div>
   );
 };

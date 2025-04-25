@@ -959,7 +959,7 @@ const chunks: IChunk[] = [
         escapeLane = Math.random() < 0.5 ? 0 : 2; // If middle is entry, randomly add left or right
       }
 
-      let additionalEntryLane: laneType | null = difficulty === "easy" || difficulty === "medium" ? escapeLane : null;
+      const additionalEntryLane: laneType | null = difficulty === "easy" || difficulty === "medium" ? escapeLane : null;
 
       for (let i = 0; i < length; i++) {
         for (let j = 0; j < lanes.length; j++) {
@@ -1039,7 +1039,7 @@ const chunks: IChunk[] = [
 
 
 let previousEntryLane: laneType | null = null;
-let previousChunkType: string | null = null;
+// let previousChunkType: string | null = null;
 
 export const getObstacles = (allowedDifficulties: ("easy" | "medium" | "hard")[] = ["easy", "medium", "hard"], isRoad: boolean = false) => {
   const obstacles: IObstacle[][] = [];
@@ -1054,7 +1054,7 @@ export const getObstacles = (allowedDifficulties: ("easy" | "medium" | "hard")[]
     const availableChunks = chunks.filter(chunk =>
       chunk.possibleDifficulties.some(difficulty => allowedDifficulties.includes(difficulty)) && (!isRoad || chunk.canBeRoad === isRoad)
     );
-    let chunk = availableChunks[Math.floor(Math.random() * availableChunks.length)];
+    const chunk = availableChunks[Math.floor(Math.random() * availableChunks.length)];
 
     // Select a random difficulty from the chunk's possible difficulties that is also in allowedDifficulties
     const possibleDifficulties = chunk.possibleDifficulties.filter(d => allowedDifficulties.includes(d));
@@ -1443,7 +1443,6 @@ const FishingNet = ({ x, y, z, store_assets_gltf }: { x: number; y: number; z: n
   }, [store_assets_gltf.scene]);
 
 
-  if (!model) return null;
 
   useFrame((state, delta) => {
     if (groupRef.current?.wasHit) {
@@ -1465,6 +1464,8 @@ const FishingNet = ({ x, y, z, store_assets_gltf }: { x: number; y: number; z: n
       }
     }
   })
+
+  if (!model) return null;
 
   return (
     <group ref={groupRef}>
@@ -1508,7 +1509,6 @@ const FishMultiplier = ({ x, y, z, store_assets_gltf }: { x: number; y: number; 
   }, [store_assets_gltf.scene]);
 
 
-  if (!model) return null;
 
   useFrame((state, delta) => {
     if (groupRef.current?.wasHit) {
@@ -1530,6 +1530,8 @@ const FishMultiplier = ({ x, y, z, store_assets_gltf }: { x: number; y: number; 
       }
     }
   })
+
+  if (!model) return null;
 
   return (
     <group ref={groupRef}>

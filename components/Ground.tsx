@@ -14,7 +14,7 @@ import {
   IObstacle,
 } from "./shared";
 import { useAtomValue } from "jotai";
-import { gameStateAtom, scoreAtom } from "@/atoms";
+import { fishGltfAtom, gameStateAtom, modelsGltfAtom, scoreAtom, storeAssetsGltfAtom } from "@/atoms";
 import { getSnowBumps } from "@/utils";
 import { getObstacles, Obstacle } from "./Obstacles";
 import { Segment } from "./Segment";
@@ -275,9 +275,11 @@ export const Ground = memo(function Ground() {
 
 
 const SegmentObstacles = memo(function SegmentObstacles({ segment, colorMap, normalMap }: { segment: ISegment, colorMap: THREE.Texture, normalMap: THREE.Texture }) {
-  const fishGltf = useMemo(() => useLoader(GLTFLoader, '/fish.glb'), [])
-  const modelsGltf = useMemo(() => useLoader(GLTFLoader, '/models.glb'), [])
-  const store_assets_gltf = useMemo(() => useLoader(GLTFLoader, '/store_assets.glb'), [])
+  const fishGltf = useAtomValue(fishGltfAtom);
+  const modelsGltf = useAtomValue(modelsGltfAtom);
+  const store_assets_gltf = useAtomValue(storeAssetsGltfAtom);
+
+  if (!fishGltf || !modelsGltf || !store_assets_gltf) return null;
 
   return (
     <>

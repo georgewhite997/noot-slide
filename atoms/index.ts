@@ -3,6 +3,8 @@ import { atom } from "jotai";
 
 import { SessionConfig } from "@abstract-foundation/agw-client/sessions";
 import { Account } from "viem";
+import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { ObjectMap } from "@react-three/fiber";
 
 export type GameState = "playing" | "game-over" | "in-menu" | "reviving"
 export type VideoSettings = {
@@ -37,3 +39,6 @@ export const hasSlowSkisAtom = atom<boolean>(false);
 export const hasLuckyCharmAtom = atom<boolean>(false);
 export const abstractSessionAtom = atom<SessionData | null>(null);
 export const reviveCountAtom = atom<number>(0);
+export const modelsGltfAtom = atom<GLTF & ObjectMap | null>(null);
+export const storeAssetsGltfAtom = atom<(GLTF & ObjectMap) | null>(null);
+export const fishGltfAtom = atom<GLTF & ObjectMap | null>(null);
