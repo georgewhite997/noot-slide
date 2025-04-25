@@ -229,16 +229,6 @@ export const SideSlope = memo(
                         metalness={0}
                         side={THREE.DoubleSide}
                     />
-                    {/* <Instance
-                        position={[
-                            isRight
-                                ? SEGMENT_WIDTH / 2 + sideWidth / 2
-                                : -SEGMENT_WIDTH / 2 - sideWidth / 2,
-                            sideHeight,
-                            sideHeight * 2,
-                        ]}
-                        rotation={[0, 0, 0]}
-                    /> */}
                     <Instance
                         position={[
                             isRight ? SEGMENT_WIDTH / 2 : -SEGMENT_WIDTH / 2,
@@ -258,17 +248,14 @@ export const SideSlope = memo(
                     />
                 </Instances>
 
-
-
-                {<group position={[
+                <group position={[
                     isRight ? SEGMENT_WIDTH / 2 + sideWidth * 8 : -SEGMENT_WIDTH / 2 - sideWidth * 8,
                     -SEGMENT_LENGTH / 2,
                     sideHeight * 4
                 ]}
                     rotation={[Math.PI / 2, -Math.PI / 2, 0]}>
-                    {/* {<environmentSegments[0].GetEnvironment/>} */}
                     {environmentSegments[0].GetEnvironment(isRight, modelsGltf)}
-                </group>}
+                </group>
             </>
         );
     },

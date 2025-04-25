@@ -1263,8 +1263,6 @@ const LowRock = ({
 };
 
 const TexturedObstacle = ({ x, y, z, obstacle, objectName, gltf, scale = 1, rotation = [Math.PI / 2, 0, 0] }: { x: number; y: number; z: number, obstacle: IObstacle, objectName: string, gltf: GLTF, scale?: number, rotation?: [number, number, number] }) => {
-  //todo: rotacja do naprawy
-
   const model = useMemo(() => {
     const object = gltf.scene.getObjectByName(objectName);
     if (!object) return null;
@@ -1345,42 +1343,22 @@ const TexturedObstacle = ({ x, y, z, obstacle, objectName, gltf, scale = 1, rota
   );
 };
 
-const Fish = ({ x, y, z, gltf }: { x: number; y: number; z: number, gltf: GLTF }) => {
+const Fish = ({ x, y, z, Model }: { x: number; y: number; z: number, Model: any }) => {
   const [hasFishingNet] = useAtom(hasFishingNetAtom);
-  const groupRef = useRef<THREE.Group & { wasHit: boolean; opacity: number; yOffset: number } | null>(null)
+  const groupRef = useRef<THREE.Group & { wasHit: boolean; opacity: number; zOffset: number } | null>(null)
   const fishId = useMemo(() => THREE.MathUtils.generateUUID(), [])
-  const clonedScene = useMemo(() => {
-    const scene = clone(gltf.scene)
-    // Clone all materials in the scene
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        child.material = child.material.clone()
-        child.material.transparent = true
-      }
-    })
-    return scene
-  }, [gltf.scene])
 
   useFrame((state, delta) => {
     if (groupRef.current?.wasHit) {
-      // Move up and fade out over 0.5 seconds
-      groupRef.current.yOffset += delta * 2
-      groupRef.current.opacity = Math.max(0, groupRef.current.opacity - delta * 2)
+      groupRef.current.zOffset += delta * 3
 
-      // Update the group's position and opacity
-      groupRef.current.position.y = groupRef.current.yOffset
-      groupRef.current.traverse((child) => {
-        if (child instanceof THREE.Mesh) {
-          child.material.opacity = groupRef.current!.opacity
-        }
-      })
-
-      // Remove the fish after animation completes
+      groupRef.current.position.z = groupRef.current.zOffset
       if (groupRef.current.opacity <= 0) {
         groupRef.current.visible = false
       }
     }
   })
+
 
   return (
     <group ref={groupRef}>
@@ -1393,13 +1371,18 @@ const Fish = ({ x, y, z, gltf }: { x: number; y: number; z: number, gltf: GLTF }
         onIntersectionEnter={({ other }) => {
           if (other.rigidBodyObject?.name === 'player' && groupRef.current && !groupRef.current.wasHit) {
             groupRef.current.wasHit = true
-            groupRef.current.opacity = 1
-            groupRef.current.yOffset = 0
+            groupRef.current.zOffset = 0
           }
         }}
       >
-        <primitive object={clonedScene} />
+        <CuboidCollider args={[0.35, 0.35, 0.35]} />
       </RigidBody>
+      <mesh
+        position={[x, z, y + 0.3]}
+        rotation={[Math.PI / 2, -Math.PI / 2, 0]}
+      >
+        <Model />
+      </mesh>
 
       <RigidBody
         type="fixed"
@@ -1413,7 +1396,7 @@ const Fish = ({ x, y, z, gltf }: { x: number; y: number; z: number, gltf: GLTF }
           if (other.rigidBodyObject?.name === 'player' && groupRef.current && !groupRef.current.wasHit) {
             groupRef.current.wasHit = true
             groupRef.current.opacity = 1
-            groupRef.current.yOffset = 0
+            groupRef.current.zOffset = 0
           }
         }}
       >
@@ -1423,7 +1406,7 @@ const Fish = ({ x, y, z, gltf }: { x: number; y: number; z: number, gltf: GLTF }
   )
 }
 
-const FishingNet = ({ x, y, z, store_assets_gltf }: { x: number; y: number; z: number, store_assets_gltf: GLTF }) => {
+const FishingNet = memo(function FishingNet({ x, y, z, store_assets_gltf }: { x: number; y: number; z: number, store_assets_gltf: GLTF }) {
   const groupRef = useRef<THREE.Group & { wasHit: boolean; opacity: number; yOffset: number } | null>(null)
 
   const model = useMemo(() => {
@@ -1487,7 +1470,11 @@ const FishingNet = ({ x, y, z, store_assets_gltf }: { x: number; y: number; z: n
       </RigidBody>
     </group>
   )
-}
+}, (prevProps, nextProps) => {
+  return prevProps.x === nextProps.x &&
+    prevProps.y === nextProps.y &&
+    prevProps.z === nextProps.z
+})
 
 const FishMultiplier = ({ x, y, z, store_assets_gltf }: { x: number; y: number; z: number, store_assets_gltf: GLTF }) => {
   const groupRef = useRef<THREE.Group & { wasHit: boolean; opacity: number; yOffset: number } | null>(null)
@@ -1609,30 +1596,30 @@ export const Obstacle = memo(
     obstacle,
     snowColorMap,
     snowNormalMap,
-    fishGltf,
     modelsGltf,
     store_assets_gltf,
+    FishModel,
   }: {
     obstacle: IObstacle;
     snowColorMap: THREE.Texture;
     snowNormalMap: THREE.Texture;
-    fishGltf: GLTF;
     modelsGltf: GLTF;
     store_assets_gltf: GLTF;
+    FishModel: any;
   }) {
     const [x, y, z] = obstacle.position;
 
     const randomRockObjectName = rockNames[Math.floor(Math.random() * rockNames.length)];
 
     switch (obstacle.type) {
+      case "fish":
+        return <Fish x={x} y={y} z={z} Model={FishModel} />;
       case "low-rock":
         return <TexturedObstacle x={x} y={y} z={z} obstacle={obstacle} objectName={randomRockObjectName} gltf={modelsGltf} scale={randomRockObjectName === "stones_group_winter_2" ? 0.003 : 0.02} />
       case "lying-tree-long":
         return <TexturedObstacle x={x - 2} y={y} z={z} obstacle={obstacle} objectName="fir_tree_winter_tilted_3" rotation={[0, Math.PI / 2, 0]} gltf={modelsGltf} scale={0.004} />
       case "tree-trunk-winter":
         return <TexturedObstacle x={x} y={y + 0.1} z={z} obstacle={obstacle} objectName="tree_trunk_winter" gltf={modelsGltf} rotation={[0, Math.PI / 1.8, 0]} scale={0.010} />
-      case "fish":
-        return <Fish x={x} y={y} z={z} gltf={fishGltf} />;
       case "fishing-net":
         return <FishingNet x={x} y={y} z={z} store_assets_gltf={store_assets_gltf} />;
       case "fish-multiplier":
@@ -1787,7 +1774,7 @@ export const Obstacle = memo(
               // />
 
               //<TexturedObstacle x={x} y={y + RAMP_LENGTH / 2} z={z + RUNWAY_LENGTH} obstacle={obstacle} objectName={randomRockObjectName} gltf={modelsGltf} scale={0.003} />
-              <Obstacle obstacle={{ ...obstacle, type: getRandomObstacleType(rampSmallObstacleTypes), position: [x, y + RAMP_LENGTH / 2, z + RUNWAY_LENGTH] }} snowColorMap={snowColorMap} snowNormalMap={snowNormalMap} fishGltf={fishGltf} modelsGltf={modelsGltf} store_assets_gltf={store_assets_gltf} />
+              <Obstacle obstacle={{ ...obstacle, type: getRandomObstacleType(rampSmallObstacleTypes), position: [x, y + RAMP_LENGTH / 2, z + RUNWAY_LENGTH] }} snowColorMap={snowColorMap} snowNormalMap={snowNormalMap} FishModel={FishModel} modelsGltf={modelsGltf} store_assets_gltf={store_assets_gltf} />
             )}
 
             {hasBigObstacle && (
@@ -1799,7 +1786,7 @@ export const Obstacle = memo(
               //   snowNormalMap={snowNormalMap}
               // />
               // <TexturedObstacle x={x} y={y + RAMP_LENGTH / 2} z={z + RUNWAY_LENGTH} obstacle={obstacle} objectName="snowman" gltf={modelsGltf} scale={0.015} rotation={[Math.PI / 2, 0, 0]} />
-              <Obstacle obstacle={{ ...obstacle, type: getRandomObstacleType(rampBigObstacleTypes), position: [x, y + RAMP_LENGTH / 2, z + RUNWAY_LENGTH] }} snowColorMap={snowColorMap} snowNormalMap={snowNormalMap} fishGltf={fishGltf} modelsGltf={modelsGltf} store_assets_gltf={store_assets_gltf} />
+              <Obstacle obstacle={{ ...obstacle, type: getRandomObstacleType(rampBigObstacleTypes), position: [x, y + RAMP_LENGTH / 2, z + RUNWAY_LENGTH] }} snowColorMap={snowColorMap} snowNormalMap={snowNormalMap} FishModel={FishModel} modelsGltf={modelsGltf} store_assets_gltf={store_assets_gltf} />
 
             )}
           </>
