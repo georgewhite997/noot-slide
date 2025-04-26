@@ -61,7 +61,7 @@ export const Ground = memo(function Ground() {
 
       const obstacles = i === 0 ? [] : getObstacles(["easy"], isRoad);
 
-      
+
 
       const object = scene.getObjectByName(`segment-snow-${i}`) as THREE.Mesh;
       if (object && object.geometry) {
@@ -248,12 +248,13 @@ export const Ground = memo(function Ground() {
 
   if (!modelsGltf) return
 
+
   return (
     <>
       <Player onChunkRemoved={onChunkRemoved} />
       <group>
         {segments.map((segment) => (
-          <group key={`${segment.index}-${segment.zOffset}`}>
+          <group key={`${segment.index}-${segment.zOffset}-${segment.yOffset}`}>
             <Segment
               segment={segment}
               colorMap={colorMap}

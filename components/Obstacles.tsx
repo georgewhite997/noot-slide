@@ -1354,9 +1354,11 @@ export const Fish = ({ x, y, z, Model }: { x: number; y: number; z: number, Mode
     if (groupRef.current?.wasHit) {
       const z = delta * 3
       const y = delta * 2
+      const opacity = delta * 10
 
       groupRef.current.position.z += z
       groupRef.current.position.y -= y
+      groupRef.current.opacity -= opacity
     }
   })
 
