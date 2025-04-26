@@ -33,6 +33,8 @@ import {
   abstractSessionAtom,
   SessionData,
   reviveCountAtom,
+  hasFishingNetAtom,
+  hasMultiplierAtom,
 } from "@/atoms";
 import { toast, Toaster } from "react-hot-toast";
 import ConnectButton from "./ConnectButton";
@@ -73,6 +75,10 @@ export const Gui = memo(function Gui() {
   const setHasSlowSkis = useSetAtom(hasSlowSkisAtom);
   const setHasLuckyCharm = useSetAtom(hasLuckyCharmAtom);
   const setSpeedyStartQuantity = useSetAtom(speedyStartQuantityAtom);
+  const [hasFishingNet] = useAtom(hasFishingNetAtom);
+  const [hasMultiplier] = useAtom(hasMultiplierAtom);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
 
   const [isRegistered, setIsRegistered] = useState(false);
 
@@ -347,14 +353,40 @@ export const Gui = memo(function Gui() {
     gameState === "in-menu" ||
     gameState === "reviving";
 
+  useEffect(() => {
+    const updateDimensions = () => {
+      const MAX_MOBILE_WIDTH = 500;
+      const MAX_MOBILE_HEIGHT = 1000;
+      const width = Math.min(window.innerWidth, MAX_MOBILE_WIDTH);
+      const height = Math.min(window.innerHeight, MAX_MOBILE_HEIGHT);
+      setDimensions({ width, height });
+    };
+
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
+    return () => window.removeEventListener("resize", updateDimensions);
+  }, []);
+
   return (
     <>
       <Toaster />
 
-      {gameState === "playing" && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 text-black flex flex-col items-center text-xl">
-          <div>Score: {score}</div>
-          <div>Collected fishes: {currentFishes}</div>
+      {(gameState === "playing" && dimensions.width > 0 && dimensions.height > 0) && (
+        <div className="absolute left-1/2 -translate-x-1/2 p-2 z-10 text-md text-white justify-between flex font-bold text-shadow-md" style={{
+          width: dimensions.width,
+          height: dimensions.height,
+        }}>
+          <div>
+            {/* left side */}
+          </div>
+          <div className="flex h-fit flex-col items-end">
+            <div className="bg-[rgba(0,0,0,0.35)] w-fit p-2 rounded-lg flex items-center justify-center">Score: {score}</div>
+            <div className="mt-2 bg-[rgba(0,0,0,0.35)] w-fit p-2 rounded-lg flex items-center justify-center">Fishes: {currentFishes}</div>
+            <div className="flex mt-2 justify-center">
+              {hasFishingNet && <div className="bg-[rgba(0,0,0,0.35)] w-fit p-2 rounded-lg flex items-center justify-center">N</div>}
+              {hasMultiplier && <div className="ml-2 bg-[rgba(0,0,0,0.35)] w-fit p-2 rounded-lg flex items-center justify-center">M</div>}
+            </div>
+          </div>
         </div>
       )}
 

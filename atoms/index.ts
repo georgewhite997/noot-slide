@@ -35,6 +35,7 @@ export type SessionData = {
 export const currentFishesAtom = atom<number>(0);
 export const scoreAtom = atom<number>(0);
 export const hasFishingNetAtom = atom<boolean>(false);
+export const hasMultiplierAtom = atom<boolean>(false);
 export const haloQuantityAtom = atom<number>(0);
 export const speedyStartQuantityAtom = atom<number>(0);
 export const hasSlowSkisAtom = atom<boolean>(false);

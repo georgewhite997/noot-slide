@@ -266,7 +266,7 @@ const chunks: IChunk[] = [
                   );
                   if (!hasPowerUpAtStart) {
                     obstacles.push({
-                      position: [x, fishYPosition, z] as [number, number, number],
+                      position: [x, entryLane ? fishYPosition : 0, z] as [number, number, number],
                       type: Math.random() < 0.5 ? "fishing-net" : "fish-multiplier",
                     });
                   }
@@ -1067,10 +1067,12 @@ export const getObstacles = (allowedDifficulties: ("easy" | "medium" | "hard")[]
       // find index that's not too far from previousEntryLane
       do {
         entryLaneIndex = Math.round(Math.random() * 2) as laneType;
-      } while (Math.abs(entryLaneIndex - previousEntryLane) != 1);
+      } while (entryLaneIndex === previousEntryLane);
     }
 
     previousEntryLane = entryLaneIndex;
+
+    console.log(entryLaneIndex)
 
     const chunkObstacles = chunk.get(chunk, entryLaneIndex, i, selectedDifficulty, isRoad);
     let furthestZ = 0;

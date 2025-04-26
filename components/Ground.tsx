@@ -61,6 +61,8 @@ export const Ground = memo(function Ground() {
 
       const obstacles = i === 0 ? [] : getObstacles(["easy"], isRoad);
 
+      
+
       const object = scene.getObjectByName(`segment-snow-${i}`) as THREE.Mesh;
       if (object && object.geometry) {
         const geometry = object.geometry as THREE.PlaneGeometry;

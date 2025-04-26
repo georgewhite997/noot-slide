@@ -10,7 +10,7 @@ import {
 } from "@react-three/rapier";
 import { SLOPE_ANGLE, lanes } from "./shared";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, hasFishingNetAtom, reviveCountAtom, scoreAtom } from "@/atoms";
+import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, hasFishingNetAtom, hasMultiplierAtom, reviveCountAtom, scoreAtom } from "@/atoms";
 import { useAbstractClient } from "@abstract-foundation/agw-react";
 import { chain, powerups, powerupsAbi, powerupsContractAddress } from "@/utils";
 import { parseAbi } from "viem";
@@ -52,7 +52,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const multiplierCollectedAt = useRef<number>(0);
   const multiplierDuration = useRef<number>(0);
   const [haloQuantity, setHaloQuantity] = useAtom(haloQuantityAtom);
-  const [hasMultiplier, setHasMultiplier] = useState(false);
+  const [hasMultiplier, setHasMultiplier] = useAtom(hasMultiplierAtom);
 
   const touchStartX = useRef<number>(0);
   const touchStartY = useRef<number>(0);
@@ -71,6 +71,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const gltf = useLoader(GLTFLoader, "/animations.glb");
 
   const endGame = () => {
+    playDeathAnimation();
     if (reviveCount < MAX_REVIVE_COUNT) {
       if (gameState !== 'reviving') {
         setReviveCount((r) => r + 1);
@@ -78,7 +79,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       }
     } else {
       setGameState("game-over");
-      playDeathAnimation()
+      // playDeathAnimation()
       lastTakenFishes.current = new Set<string>();
       ref.current?.setLinvel({ x: 0, y: 0, z: 0 }, true);
       ref.current?.lockTranslations(true, true);
@@ -773,12 +774,12 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       ccd={true}
     >
       <Halo />
-      {hasFishingNet && (
+      {/*{hasFishingNet && (
         <FishingNetIndicator />
       )}
       {hasMultiplier && (
         <MultiplierIndicator />
-      )}
+      )}*/}
       <primitive
         object={gltf.scene}
         scale={[10, 10, 10]}
