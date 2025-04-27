@@ -183,8 +183,10 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     }
 
     if (reviveCount > 0 && gameState === "playing") {
+      console.log("12313")
       onChunkRemoved(lastCollided.current)
       lastCollided.current = ''
+      startMovingAnimation();
     }
 
 

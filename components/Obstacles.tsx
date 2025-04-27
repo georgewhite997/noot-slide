@@ -1072,8 +1072,6 @@ export const getObstacles = (allowedDifficulties: ("easy" | "medium" | "hard")[]
 
     previousEntryLane = entryLaneIndex;
 
-    console.log(entryLaneIndex)
-
     const chunkObstacles = chunk.get(chunk, entryLaneIndex, i, selectedDifficulty, isRoad);
     let furthestZ = 0;
     for (const obstacle of chunkObstacles) {
