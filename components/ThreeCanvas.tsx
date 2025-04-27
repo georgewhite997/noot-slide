@@ -15,6 +15,7 @@ import { fishMeshesAtom, storeAssetsGltfAtom, videoSettingsAtom } from "@/atoms"
 import { useGLTF } from '@react-three/drei';
 import { useSetAtom } from 'jotai';
 import { modelsGltfAtom } from '../atoms';
+import { MAX_MOBILE_WIDTH, MAX_MOBILE_HEIGHT } from "@/utils";
 
 export const ModelLoader = () => {
   const modelsGltf = useGLTF('/models.glb');
@@ -61,8 +62,6 @@ export const ThreeCanvas = () => {
 
   useEffect(() => {
     const updateDimensions = () => {
-      const MAX_MOBILE_WIDTH = 500;
-      const MAX_MOBILE_HEIGHT = 1000;
       const width = Math.min(window.innerWidth, MAX_MOBILE_WIDTH);
       const height = Math.min(window.innerHeight, MAX_MOBILE_HEIGHT);
       setDimensions({ width, height });

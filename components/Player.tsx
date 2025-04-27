@@ -12,7 +12,7 @@ import { SLOPE_ANGLE, lanes } from "./shared";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, hasFishingNetAtom, hasMultiplierAtom, reviveCountAtom, scoreAtom } from "@/atoms";
 import { useAbstractClient } from "@abstract-foundation/agw-react";
-import { chain, powerups, powerupsAbi, powerupsContractAddress } from "@/utils";
+import { chain, items, powerupsContractAddress } from "@/utils";
 import { parseAbi } from "viem";
 
 const LANE_TRANSITION_SPEED = 2.5;
@@ -183,7 +183,6 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     }
 
     if (reviveCount > 0 && gameState === "playing") {
-      console.log("12313")
       onChunkRemoved(lastCollided.current)
       lastCollided.current = ''
       startMovingAnimation();
@@ -324,7 +323,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
         abi: parseAbi(["function usePowerup(uint16,uint256) public"]),
         address: powerupsContractAddress,
         functionName: "usePowerup",
-        args: [powerups.find(p => p.name === 'Abstract Halo')!.id, BigInt(1)],
+        args: [items.find(p => p.name === 'Abstract Halo')!.id, BigInt(1)],
       });
       console.log("hash", hash)
     } catch (e) {

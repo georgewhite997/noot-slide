@@ -87,7 +87,7 @@ export const getSnowBumps = (
   return z;
 };
 
-export interface IPowerUp {
+export interface IItem {
   id: number;
   name: string;
   description: string;
@@ -95,7 +95,9 @@ export interface IPowerUp {
   price: number;
 }
 
-export const powerups: IPowerUp[] = [
+export type IUserItem = IItem & { quantity: number; isDisabled: boolean }
+
+export const items: IItem[] = [
   {
     id: 1,
     name: "Slow Skis",
@@ -126,4 +128,7 @@ export const powerups: IPowerUp[] = [
   },
 ];
 
+
+export const MAX_MOBILE_WIDTH = 402;
+export const MAX_MOBILE_HEIGHT = 874;
 

@@ -17,8 +17,8 @@ export type VideoSettings = {
 //
 // Define the atom with a type
 export const gameStateAtom = atom<GameState>(
-    // "in-menu",
-    process.env.NODE_ENV === "development" ? "playing" : "in-menu",
+    "in-menu",
+    // process.env.NODE_ENV === "development" ? "playing" : "in-menu",
 );
 
 export const videoSettingsAtom = atom<VideoSettings>({
