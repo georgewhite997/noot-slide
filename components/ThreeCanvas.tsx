@@ -77,7 +77,7 @@ export const ThreeCanvas = () => {
     <>
       <div
         ref={containerRef}
-        className="w-full flex absolute top-0 left-0 justify-center items-center overflow-hidden bg-black"
+        className="w-full h-full flex absolute left-0 justify-center items-center overflow-hidden bg-black"
       >
         {dimensions.width > 0 && dimensions.height > 0 && (
           <>
