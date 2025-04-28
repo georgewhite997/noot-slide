@@ -19,9 +19,10 @@ import {
   MAX_MOBILE_WIDTH,
   MAX_MOBILE_HEIGHT,
   IUserItem,
+  truncateEther,
 } from "@/utils";
 import { useEffect, useState, memo } from "react";
-import { formatEther, parseAbi, parseEther } from "viem";
+import { formatEther, parseAbi, parseEther, PublicClient } from "viem";
 import { useAtom, useSetAtom } from "jotai";
 import {
   gameStateAtom,
@@ -64,7 +65,8 @@ const powerupsContract = { address: powerupsContractAddress, abi: powerupsAbi };
 // const skinsContract = { address: skinsContractAddress, abi: skinsAbi };
 
 export const Gui = memo(function Gui() {
-  const { address, isConnected } = useAccount();
+  const { address: _address, isConnected } = useAccount();
+  const address = _address as `0x${string}`;
   const { getStoredSession, createAndStoreSession } = useAbstractSession(chain);
   const { data: abstractClient } = useAbstractClient();
   const publicClient = usePublicClient();
@@ -85,6 +87,7 @@ export const Gui = memo(function Gui() {
   const [hasFishingNet] = useAtom(hasFishingNetAtom);
   const [hasMultiplier] = useAtom(hasMultiplierAtom);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [balance, setBalance] = useState<bigint>(BigInt(0));
 
 
   const [isRegistered, setIsRegistered] = useState(false);
@@ -107,21 +110,24 @@ export const Gui = memo(function Gui() {
 
     const ids = itemsMeta.map((p) => p.id);
 
-    // console.log(registryContractAddress, powerupsContractAddress)
-    const [registeredRes, ownedRes] = await publicClient.multicall({
+    const [[registeredRes, ownedRes], balance] = await Promise.all([await publicClient.multicall({
       contracts: [
         {
           ...registryContract,
           functionName: "registeredAddresses",
-          args: [address as `0x${string}`],
+          args: [address],
         },
         {
           ...powerupsContract,
           functionName: "getOwnedPowerups",
-          args: [address as `0x${string}`, ids],
+          args: [address, ids],
         },
       ],
-    });
+    }), publicClient.getBalance({
+      address: address as `0x${string}`,
+    })])
+
+    setBalance(balance);
 
     const registered = registeredRes.result as boolean;
     const owned =
@@ -177,7 +183,7 @@ export const Gui = memo(function Gui() {
         {
           ...registryContract,
           functionName: "registeredAddresses",
-          args: [address as `0x${string}`],
+          args: [address],
         },
       ],
     });
@@ -414,12 +420,15 @@ export const Gui = memo(function Gui() {
             ) : gameState === "reviving" ? (
               <Reviving
                 setGameState={setGameState}
+                address={address}
+                publicClient={publicClient}
                 abstractClient={abstractClient}
               />
             ) : (
               <>
                 {(!isConnected || menuState === MenuStates.landingPage) && (
                   <LandingPage
+                    balance={balance}
                     isLoading={isLoadingWalletData}
                     address={address}
                     isConnected={isConnected}
@@ -441,7 +450,7 @@ export const Gui = memo(function Gui() {
                     {menuState === MenuStates.items && (
                       <ItemShop
                         onClose={() => setMenuState(MenuStates.landingPage)}
-                        address={address as `0x${string}`}
+                        address={address}
                         items={items}
                         handlePurchase={handlePurchase}
                         onToggle={toggleItem}
@@ -451,13 +460,13 @@ export const Gui = memo(function Gui() {
                     {menuState === MenuStates.skins && (
                       <Skins
                         onClose={() => setMenuState(MenuStates.landingPage)}
-                        address={address as `0x${string}`}
+                        address={address}
                       />
                     )}
                     {menuState === MenuStates.upgrades && (
                       <Upgrades
                         onClose={() => setMenuState(MenuStates.landingPage)}
-                        address={address as `0x${string}`}
+                        address={address}
                       />
                     )}
 
@@ -587,6 +596,7 @@ type LandingProps = {
   handlePurchase: (p: Items[number]) => void;
   isLoading: boolean;
   isConnected: boolean;
+  balance: bigint;
 };
 
 
@@ -598,6 +608,7 @@ const LandingPage = ({
   setMenuState,
   isLoading,
   isConnected,
+  balance
 }: LandingProps) => {
   const { logout } = useLoginWithAbstract();
 
@@ -645,6 +656,7 @@ const LandingPage = ({
 
 
 
+
   return (
     <div className="h-full w-full flex flex-col justify-between items-center px-[16px]"
       style={{
@@ -669,17 +681,17 @@ const LandingPage = ({
           >
             <div className="flex items-center justify-center">
               <img src="/fish-icon.png" alt="fish icon" className="w-[24px] h-[24px]" />
-              <span className="mx-1">312</span>
+              <span className="mx-1">0</span>
             </div>
 
             <div className="flex items-center justify-center">
               <img src="/penguin-icon.png" alt="fish icon" className="w-[20px] h-[20px]" />
-              <span className="mx-1">12</span>
+              <span className="mx-1">0</span>
             </div>
 
             <div className="flex items-center justify-center">
               <img src="/eth-icon.png" alt="fish icon" className="w-[24px] h-[24px]" />
-              <span className="">0.234 ETH</span>
+              <span className="">{truncateEther(balance)} ETH</span>
             </div>
           </div>
 
@@ -705,16 +717,16 @@ const LandingPage = ({
               <span className="text-[14px] text-[#A5F0FF]">
                 HIGH SCORE
               </span>
-              <span className="text-[24px] mt-[-9px]">323,232</span>
+              <span className="text-[24px] mt-[-9px]">0</span>
             </div>
           </div>
 
           <div className="flex items-center">
             <div className="flex flex-col justify-center">
               <span className="text-[14px] text-[#A5F0FF]">
-                LEADBOARD
+                LEADRBOARD
               </span>
-              <span className="text-[24px] mt-[-9px] text-right">20</span>
+              <span className="text-[24px] mt-[-9px] text-right">1</span>
             </div>
 
             <div className="relative w-[40px] h-[40px] ml-2">
@@ -883,11 +895,13 @@ const VideoSettings = ({ onClose }: { onClose: () => void }) => {
 type RevivingProps = {
   setGameState: (gs: GameState) => void;
   abstractClient: AbstractClient | undefined;
+  address: `0x${string}`;
+  publicClient: PublicClient | null;
 };
 
 const revivePrices = [50, 169, 420];
 
-const Reviving = ({ setGameState, abstractClient }: RevivingProps) => {
+const Reviving = ({ setGameState, address, publicClient, abstractClient }: RevivingProps) => {
   const [timer, setTimer] = useState(0);
   const [reviveCount, setReviveCount] = useAtom(reviveCountAtom);
 
@@ -911,15 +925,30 @@ const Reviving = ({ setGameState, abstractClient }: RevivingProps) => {
 
   const handleRevive = async () => {
     try {
+      const balance = await publicClient!.readContract({
+        abi: parseAbi([
+          "function balanceOf(address account) view returns (uint256)",
+        ]),
+        address: NootToken.address as `0x${string}`,
+        functionName: "balanceOf",
+        args: [address],
+      });
+
+      const toSend = parseEther(currentPrice + "");
+
+      if (balance < toSend) {
+        toast.error("Not enough $NOOT balance");
+        return;
+      }
+
       const tx = await abstractClient!.writeContract({
         abi: parseAbi([
           "function transfer(address to, uint256 value) external returns (bool)",
         ]),
         address: NootToken.address as `0x${string}`,
         functionName: "transfer",
-        args: [nootTreasury, parseEther(currentPrice + "")],
+        args: [nootTreasury, toSend],
       });
-      console.log(tx);
 
       setGameState("playing");
     } catch (e) {

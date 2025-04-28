@@ -1,4 +1,4 @@
-import { createPublicClient, defineChain, http, PublicClient } from "viem";
+import { createPublicClient, defineChain, formatEther, http, PublicClient } from "viem";
 import { abstract, abstractTestnet } from "viem/chains";
 import { useEffect, useState } from "react";
 import { eip712WalletActions } from "viem/zksync";
@@ -22,6 +22,12 @@ const dockerizedNode = defineChain({
     default: { http: ["http://127.0.0.1:3050"] },
   },
 });
+
+export const truncateEther = (value: bigint) => {
+  const formatted = formatEther(value);
+  const [integer, decimal] = formatted.split('.');
+  return `${integer}.${decimal.slice(0, 4)}`;
+};
 
 export const chain = abstractTestnet; //abstract; /
 export const nootTreasury = '0x1Ed3aB46773Dd5789eC5553A7D4b4E2f34d7c7c6'
