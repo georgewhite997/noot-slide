@@ -28,16 +28,22 @@ const PrimaryButton = ({
     }
 
     return (
+        // <button
+        //     {...props}
+        //     className={`w-[300px] text-white rounded-sm p-[3px] ${containerGradientClassName} border-[#030303] border-2 shadow-[0px_2px_0px_rgba(0,0,0,0.45)] ${className || ''}`}
+        // >
+        //     <div className={`w-full h-full flex justify-center items-center relative rounded-sm ${buttonGradientClassName} p-2`}>
+        //         <div className={`absolute top-0 left-0 w-full h-[15px] p-1 ${shineClassName || ''}`}>
+        //             <div className={`rounded-sm ${shineGradientClassName} w-full h-full`}></div>
+        //         </div>
+        //         <div className="relative z-10">{children}</div>
+        //     </div>
+        // </button>
         <button
             {...props}
-            className={`w-[300px] text-white rounded-sm p-[3px] ${containerGradientClassName} border-[#030303] border-2 shadow-[0px_2px_0px_rgba(0,0,0,0.45)] ${className || ''}`}
+            className={`text-white rounded-sm p-[3px] ${buttonGradientClassName} border-[#030303] border-2 shadow-[0px_2px_0px_rgba(0,0,0,0.45)] ${className || ''}`}
         >
-            <div className={`w-full h-full flex justify-center items-center relative rounded-sm ${buttonGradientClassName} p-2`}>
-                <div className={`absolute top-0 left-0 w-full h-[15px] p-1 ${shineClassName || ''}`}>
-                    <div className={`rounded-sm ${shineGradientClassName} w-full h-full`}></div>
-                </div>
-                <div className="relative z-10">{children}</div>
-            </div>
+            <div>{children}</div>
         </button>
     )
 }
