@@ -6,6 +6,7 @@ import { Account } from "viem";
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { ObjectMap } from "@react-three/fiber";
 import * as THREE from "three";
+import { IUserItem } from "@/utils";
 
 export type GameState = "playing" | "game-over" | "in-menu" | "reviving"
 export type Settings = {
@@ -36,6 +37,7 @@ export type SessionData = {
     sessionSigner: Account;
 } | null;
 
+export const itemsAtom = atom<IUserItem[]>([]);
 export const currentFishesAtom = atom<number>(0);
 export const scoreAtom = atom<number>(0);
 export const hasFishingNetAtom = atom<boolean>(false);
