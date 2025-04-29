@@ -90,7 +90,7 @@ export const Gui = memo(function Gui() {
   const [balance, setBalance] = useState<bigint>(BigInt(0));
 
 
-  const [isRegistered, setIsRegistered] = useState(false);
+  const [isRegistered, setIsRegistered] = useState(true);//
 
   const fetchWallet = async (session?: SessionData) => {
     if (!publicClient || !address || !abstractClient) return;
@@ -110,33 +110,35 @@ export const Gui = memo(function Gui() {
 
     const ids = itemsMeta.map((p) => p.id);
 
-    const [[registeredRes, ownedRes], balance] = await Promise.all([await publicClient.multicall({
-      contracts: [
-        {
-          ...registryContract,
-          functionName: "registeredAddresses",
-          args: [address],
-        },
-        {
-          ...powerupsContract,
-          functionName: "getOwnedPowerups",
-          args: [address, ids],
-        },
-      ],
-    }), publicClient.getBalance({
-      address: address as `0x${string}`,
-    })])
+    const [[
+      //registeredRes, 
+      ownedRes], balance] = await Promise.all([await publicClient.multicall({
+        contracts: [
+          // {
+          //   ...registryContract,
+          //   functionName: "registeredAddresses",
+          //   args: [address],
+          // },
+          {
+            ...powerupsContract,
+            functionName: "getOwnedPowerups",
+            args: [address, ids],
+          },
+        ],
+      }), publicClient.getBalance({
+        address: address as `0x${string}`,
+      })])
 
     setBalance(balance);
 
-    const registered = registeredRes.result as boolean;
+    // const registered = registeredRes.result as boolean;
     const owned =
       (ownedRes.result as number[]) || new Array(itemsMeta.length).fill(0);
     const disabledIds = JSON.parse(
       localStorage.getItem("disabledItems") || "[]",
     ) as number[];
 
-    setIsRegistered(registered);
+    // setIsRegistered(registered);
     setItems(
       owned.map((qty, i) => {
         const meta = itemsMeta[i];
@@ -169,53 +171,53 @@ export const Gui = memo(function Gui() {
   };
 
   const register = async () => {
-    if (!abstractClient || isRegistered || !publicClient) return;
+    // if (!abstractClient || isRegistered || !publicClient) return;
 
-    const bal = await publicClient.getBalance({
-      address: abstractClient.account.address as `0x${string}`,
-    });
+    // const bal = await publicClient.getBalance({
+    //   address: abstractClient.account.address as `0x${string}`,
+    // });
 
-    if (!bal) return toast.error("Error getting balance");
+    // if (!bal) return toast.error("Error getting balance");
 
-    const [feeRes, registeredRes] = await publicClient.multicall({
-      contracts: [
-        { ...registryContract, functionName: "registrationFee" },
-        {
-          ...registryContract,
-          functionName: "registeredAddresses",
-          args: [address],
-        },
-      ],
-    });
+    // const [feeRes, registeredRes] = await publicClient.multicall({
+    //   contracts: [
+    //     { ...registryContract, functionName: "registrationFee" },
+    //     {
+    //       ...registryContract,
+    //       functionName: "registeredAddresses",
+    //       args: [address],
+    //     },
+    //   ],
+    // });
 
-    if (registeredRes.result) {
-      setIsRegistered(true);
-      return toast.error("You are already registered");
-    }
+    // if (registeredRes.result) {
+    //   setIsRegistered(true);
+    //   return toast.error("You are already registered");
+    // }
 
-    const fee = feeRes.result as bigint;
-    if (bal < fee) {
-      return toast.error(
-        `Need ${formatEther(fee)} ETH, you have ${formatEther(bal)}`,
-      );
-    }
+    // const fee = feeRes.result as bigint;
+    // if (bal < fee) {
+    //   return toast.error(
+    //     `Need ${formatEther(fee)} ETH, you have ${formatEther(bal)}`,
+    //   );
+    // }
 
-    try {
-      toast.loading("Registering…");
-      await abstractClient.writeContract({
-        address: registryContractAddress,
-        abi: registryAbi,
-        functionName: "register",
-        value: fee,
-      });
-      setIsRegistered(true);
-      toast.dismiss();
-      toast.success("Registered successfully");
-    } catch (err) {
-      console.error(err);
-      toast.dismiss();
-      toast.error("Failed to register");
-    }
+    // try {
+    //   toast.loading("Registering…");
+    //   await abstractClient.writeContract({
+    //     address: registryContractAddress,
+    //     abi: registryAbi,
+    //     functionName: "register",
+    //     value: fee,
+    //   });
+    //   setIsRegistered(true);
+    //   toast.dismiss();
+    //   toast.success("Registered successfully");
+    // } catch (err) {
+    //   console.error(err);
+    //   toast.dismiss();
+    //   toast.error("Failed to register");
+    // }
   };
 
   const handlePurchase = async (item: IItem, quantity = 1) => {

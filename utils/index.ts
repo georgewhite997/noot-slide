@@ -26,7 +26,10 @@ const dockerizedNode = defineChain({
 export const truncateEther = (value: bigint) => {
   const formatted = formatEther(value);
   const [integer, decimal] = formatted.split('.');
-  return `${integer}.${decimal.slice(0, 4)}`;
+  if (decimal?.length > 4) {
+    return `${integer}.${decimal.slice(0, 4)}`;
+  }
+  return formatted;
 };
 
 export const chain = abstractTestnet; //abstract; /
