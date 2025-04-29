@@ -11,7 +11,7 @@ import {
 } from "@react-three/drei";
 import * as THREE from "three";
 import { useAtomValue } from "jotai";
-import { fishMeshesAtom, storeAssetsGltfAtom, videoSettingsAtom } from "@/atoms";
+import { fishMeshesAtom, storeAssetsGltfAtom, settingsAtom } from "@/atoms";
 import { useGLTF } from '@react-three/drei';
 import { useSetAtom } from 'jotai';
 import { modelsGltfAtom } from '../atoms';
@@ -58,7 +58,7 @@ export const ModelLoader = () => {
 export const ThreeCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const videoSettings = useAtomValue(videoSettingsAtom);
+  const settings = useAtomValue(settingsAtom);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -89,11 +89,11 @@ export const ThreeCanvas = () => {
                 maxHeight: "100%",
               }}
               gl={{
-                antialias: videoSettings.antialiasing,
+                antialias: settings.antialiasing,
                 powerPreference: "high-performance",
               }}
-              dpr={videoSettings.dpr}
-              shadows={videoSettings.shadows}
+              dpr={settings.dpr}
+              shadows={settings.shadows}
             >
               <PerformanceMonitor
                 onChange={(api) => {

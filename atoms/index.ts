@@ -8,10 +8,12 @@ import { ObjectMap } from "@react-three/fiber";
 import * as THREE from "three";
 
 export type GameState = "playing" | "game-over" | "in-menu" | "reviving"
-export type VideoSettings = {
+export type Settings = {
     antialiasing: boolean;
     shadows: boolean;
     dpr: number;
+    music: boolean;
+    sounds: boolean;
 }
 
 //
@@ -21,10 +23,12 @@ export const gameStateAtom = atom<GameState>(
     // process.env.NODE_ENV === "development" ? "playing" : "in-menu",
 );
 
-export const videoSettingsAtom = atom<VideoSettings>({
+export const settingsAtom = atom<Settings>({
     antialiasing: true,
     dpr: typeof window !== 'undefined' ? window.devicePixelRatio : 1,
     shadows: true,
+    music: true,
+    sounds: true,
 });
 
 export type SessionData = {

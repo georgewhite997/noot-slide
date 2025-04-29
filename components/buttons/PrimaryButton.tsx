@@ -23,6 +23,11 @@ const PrimaryButton = ({
             buttonGradientClassName = 'bg-[linear-gradient(to_bottom,_#6060FF_0%,_#3C4DEA_21%,_#3E4DD4_50%,_#2B34DD_100%)]'
             shineGradientClassName = 'bg-[linear-gradient(to_bottom,_rgba(255,255,255,0.31)_0%,_rgba(255,255,255,0.18)_100%)]'
             break;
+        case 'red':
+            containerGradientClassName = 'bg-[linear-gradient(to_bottom,_#AEB2FF_0%,_#4257AC_20%,_#192073_92%)]'
+            buttonGradientClassName = 'bg-[linear-gradient(to_bottom,_#FF0000_0%,_#FF0000_21%,_#FF0000_50%,_#FF0000_100%)]'
+            shineGradientClassName = 'bg-[linear-gradient(to_bottom,_rgba(255,255,255,0.31)_0%,_rgba(255,255,255,0.18)_100%)]'
+            break;
         default:
             return <div className={`text-red-500 bg-black ${className}`}>INVALID BTN COLOR</div>
     }
@@ -41,7 +46,7 @@ const PrimaryButton = ({
         // </button>
         <button
             {...props}
-            className={`text-white rounded-sm p-[3px] ${buttonGradientClassName} border-[#030303] border-2 shadow-[0px_2px_0px_rgba(0,0,0,0.45)] ${className || ''}`}
+            className={`text-white rounded-sm p-[5px] ${buttonGradientClassName} border-[#030303] border-2 shadow-[0px_2px_0px_rgba(0,0,0,0.45)] ${className || ''}`}
         >
             <div>{children}</div>
         </button>

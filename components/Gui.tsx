@@ -26,7 +26,7 @@ import { formatEther, parseAbi, parseEther, PublicClient } from "viem";
 import { useAtom, useSetAtom } from "jotai";
 import {
   gameStateAtom,
-  videoSettingsAtom,
+  settingsAtom,
   currentFishesAtom,
   scoreAtom,
   haloQuantityAtom,
@@ -53,7 +53,7 @@ type Items = Array<IUserItem>;
 const MenuStates = {
   upgrades: "upgrades",
   items: "items",
-  videoSettings: "video-settings",
+  settings: "settings",
   landingPage: "landing-page",
   skins: "skins",
 } as const;
@@ -378,8 +378,11 @@ export const Gui = memo(function Gui() {
     return () => window.removeEventListener("resize", updateDimensions);
   }, []);
 
+
   return (
     <>
+
+
       <Toaster />
 
       {(gameState === "playing" && dimensions.width > 0 && dimensions.height > 0) && (
@@ -442,9 +445,10 @@ export const Gui = memo(function Gui() {
                 )}
                 {isConnected && (
                   <>
-                    {menuState === MenuStates.videoSettings && (
-                      <VideoSettings
+                    {menuState === MenuStates.settings && (
+                      <Settings
                         onClose={() => setMenuState(MenuStates.landingPage)}
+                        inGame={false}
                       />
                     )}
                     {menuState === MenuStates.items && (
@@ -699,7 +703,7 @@ const LandingPage = ({
 
           <button
             className="text-white relative w-[40px] h-[40px]"
-            onClick={() => setMenuState(MenuStates.videoSettings)}
+            onClick={() => setMenuState(MenuStates.settings)}
           >
             <img src="/small-button.png" alt="bg" className="absolute top-0 left-0" />
             <img src="/cog.png" alt="settings" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[10]" />
@@ -835,60 +839,196 @@ const Switch = ({
   </label>
 );
 
-const VideoSettings = ({ onClose }: { onClose: () => void }) => {
-  const [videoSettings, setVideoSettings] = useAtom(videoSettingsAtom);
+const ToggleSetting = ({ label, options, selected, onChange, className }: { label: string, options: [string, string], selected: 0 | 1, onChange: () => void, className?: string }) => {
+  const [first, second] = options;
 
   return (
-    <div>
-      <h1 className="mb-10 text-4xl font-bold">Video Settings</h1>
+    <div className={`flex justify-between items-center ${className || ''}`}>
+      <div>{label}</div>
+      <div className="bg-[#E6FAFF] rounded-sm border-[2px] border-[#030303] p-[2px] w-[110px]">
+        {/* <button>ON</button> */}
+        <button onClick={() => {
+          if (selected == 0) return;
+          onChange();
+        }} className={`${selected == 0 ? 'bg-green-500 border-[#030303] border-[2px]' : null} px-[8px] py-[4px] rounded-sm text-[14px] w-[47%]`}>{first}</button>
+        <button onClick={() => {
+          if (selected == 1) return;
+          onChange();
+        }} className={`${selected == 1 ? 'bg-green-500 border-[#030303] border-[2px]' : null} ml-1 px-[8px] py-[4px] rounded-sm text-[14px] w-[47%]`}>{second}</button>
+      </div>
+    </div>
+  )
+}
 
-      <div className="mb-4 flex gap-4">
-        <p>Antialiasing: {videoSettings.antialiasing ? "On" : "Off"}</p>
-        <Switch
-          checked={videoSettings.antialiasing}
-          onCheckedChange={() =>
-            setVideoSettings((prev) => ({
+const Settings = ({ onClose, inGame = false }: { onClose: () => void, inGame?: boolean }) => {
+  const [settings, setSettings] = useAtom(settingsAtom);
+
+  return (
+    <div className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#C7F4FE] w-[350px] h-fit z-40 p-[24px] rounded-md border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]`}>
+      <h1 className="text-center text-[32px]">Settings</h1>
+
+      <div className="mt-[20px]"></div>
+
+      {!inGame && (
+        <div className="mt-[8px] bg-[#E6FAFF] w-full border-[2px] border-[#030303] rounded-sm p-[8px] flex items-center justify-between shadow-[0px_2px_0px_rgba(0,0,0,0.45)]">
+          <div className="flex items-center">
+            <img src="/wallet-icon.png" alt="" />
+            <div>FT2...Hs1</div>
+          </div>
+          <PrimaryButton className="w-[100px]" color="red">LOG OUT</PrimaryButton>
+        </div>
+      )}
+
+      <div className="py-[16px] pl-[16px] px-[8px] mt-[8px] bg-[#7FCBDC] rounded-sm p-[8px] border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]">
+        <ToggleSetting
+          label="MUSIC"
+          options={['ON', 'OFF']}
+          selected={settings.music ? 0 : 1}
+          onChange={() => {
+            setSettings((prev) => ({
+              ...prev,
+              music: !prev.music,
+            }))
+          }}
+        />
+
+        <ToggleSetting
+          className="mt-[6px]"
+          label="SOUNDS"
+          options={['ON', 'OFF']}
+          selected={settings.sounds ? 0 : 1}
+          onChange={() => {
+            setSettings((prev) => ({
+              ...prev,
+              sounds: !prev.sounds,
+            }))
+          }}
+        />
+
+        <ToggleSetting
+          className="mt-[6px]"
+          label="ANTI ALIASING"
+          options={['ON', 'OFF']}
+          selected={settings.antialiasing ? 0 : 1}
+          onChange={() => {
+            setSettings((prev) => ({
               ...prev,
               antialiasing: !prev.antialiasing,
             }))
-          }
+          }}
         />
-      </div>
 
-      <div className="mb-4 flex gap-4">
-        <p>Shadows: {videoSettings.shadows ? "On" : "Off"}</p>
-        <Switch
-          checked={videoSettings.shadows}
-          onCheckedChange={() =>
-            setVideoSettings((prev) => ({ ...prev, shadows: !prev.shadows }))
-          }
-        />
-      </div>
-
-      <div className="mb-8 flex gap-4">
-        <p>Pixel Ratio: {videoSettings.dpr}</p>
-        <input
-          type="range"
-          min={1}
-          max={2}
-          step={0.1}
-          value={videoSettings.dpr}
-          onChange={(e) =>
-            setVideoSettings((prev) => ({
+        <ToggleSetting
+          className="mt-[6px]"
+          label="SHADOWS"
+          options={['ON', 'OFF']}
+          selected={settings.shadows ? 0 : 1}
+          onChange={() => {
+            setSettings((prev) => ({
               ...prev,
-              dpr: parseFloat(e.target.value),
+              shadows: !prev.shadows,
             }))
-          }
+          }}
+        />
+
+        <ToggleSetting
+          className="mt-[6px]"
+          label="PIXEL RATIO"
+          options={['1x', '2x']}
+          selected={settings.dpr === 1 ? 0 : 1}
+          onChange={() => {
+            setSettings((prev) => {
+              return ({
+                ...prev,
+                dpr: prev.dpr === 1 ? 2 : 1,
+              })
+            })
+          }}
         />
       </div>
 
-      <button
-        className="rounded bg-blue-500 px-4 py-2 text-white"
-        onClick={onClose}
-      >
-        Back to game
-      </button>
-    </div>
+      <div className="flex justify-between w-full mt-[8px]">
+        {inGame ? (
+          <>
+            <PrimaryButton className="w-[49%] h-[44px]" onClick={onClose} color="blue">BACK</PrimaryButton>
+
+            <PrimaryButton className='w-[49%] h-[44px]' color="red"
+              onClick={() => {
+                alert('no end game functionality for now')
+              }}
+            >
+              END GAME
+            </PrimaryButton>
+          </>
+        ) : (
+          <>
+            <PrimaryButton className="w-[49%] h-[44px]" onClick={onClose} color="blue">BACK</PrimaryButton>
+
+            <PrimaryButton className='w-[49%] h-[44px]' color="green"
+              onClick={() => {
+                alert('save doesnt work for now it saves instantly when changing option');
+                // onClose()
+              }}
+            >
+              SAVE
+            </PrimaryButton>
+          </>
+
+        )}
+
+      </div>
+    </div >
+
+    // <div>
+    //   <h1 className="mb-10 text-4xl font-bold">Video Settings</h1>
+
+    //   <div className="mb-4 flex gap-4">
+    //     <p>Antialiasing: {videoSettings.antialiasing ? "On" : "Off"}</p>
+    //     <Switch
+    //       checked={videoSettings.antialiasing}
+    //       onCheckedChange={() =>
+    //         setVideoSettings((prev) => ({
+    //           ...prev,
+    //           antialiasing: !prev.antialiasing,
+    //         }))
+    //       }
+    //     />
+    //   </div>
+
+    //   <div className="mb-4 flex gap-4">
+    //     <p>Shadows: {videoSettings.shadows ? "On" : "Off"}</p>
+    //     <Switch
+    //       checked={videoSettings.shadows}
+    //       onCheckedChange={() =>
+    //         setVideoSettings((prev) => ({ ...prev, shadows: !prev.shadows }))
+    //       }
+    //     />
+    //   </div>
+
+    //   <div className="mb-8 flex gap-4">
+    //     <p>Pixel Ratio: {videoSettings.dpr}</p>
+    //     <input
+    //       type="range"
+    //       min={1}
+    //       max={2}
+    //       step={0.1}
+    //       value={videoSettings.dpr}
+    //       onChange={(e) =>
+    //         setVideoSettings((prev) => ({
+    //           ...prev,
+    //           dpr: parseFloat(e.target.value),
+    //         }))
+    //       }
+    //     />
+    //   </div>
+
+    //   <button
+    //     className="rounded bg-blue-500 px-4 py-2 text-white"
+    //     onClick={onClose}
+    //   >
+    //     Back to game
+    //   </button>
+    // </div>
   );
 };
 
