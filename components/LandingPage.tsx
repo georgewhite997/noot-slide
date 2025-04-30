@@ -61,17 +61,17 @@ const LandingPage = ({
         //return <p>error, try to sign up again</p>
     }
 
-    if (!isConnected || !isRegistered) {
-        return (
-            <AuthPage
-                isRegistered={isRegistered}
-                register={register}
-                isLoading={isLoading}
-                isConnected={isConnected}
-                balance={balance}
-            />
-        );
-    }
+    // if (!isConnected || !isRegistered) {
+    //     return (
+    //         <AuthPage
+    //             isRegistered={isRegistered}
+    //             register={register}
+    //             isLoading={isLoading}
+    //             isConnected={isConnected}
+    //             balance={balance}
+    //         />
+    //     );
+    // }
 
     const onModalClose = () => {
         setActiveModal('none');
@@ -79,7 +79,7 @@ const LandingPage = ({
 
     return (
         <>
-            <div className="h-full w-full flex flex-col justify-between items-center px-[16px]"
+            <div className="h-full w-full flex flex-col justify-between items-center px-[16px] w-[500px]"
                 style={{
                     backgroundImage: "url('/hero2.svg')",
                     backgroundPosition: 'center',
@@ -98,25 +98,25 @@ const LandingPage = ({
                             backgroundPosition: "center",
                             overflow: "hidden"
                         }}
-                            className="w-[80%] h-[46px] px-6 pt-1 pb-2 flex justify-between items-center"
+                            className="w-full h-[46px] px-6 pt-1 pb-2 flex justify-center items-center"
                         >
-                            <div className="flex items-center justify-center">
-                                <img src="/fish-icon.png" alt="fish icon" className="w-[24px] h-[24px]" />
+                            <div className="mx-3 flex items-center justify-center">
+                                <img src="/fish-icon.png" alt="fish icon" className="w-[30px] h-[30px]" />
                                 <span className="mx-1">0</span>
                             </div>
 
-                            <div className="flex items-center justify-center">
+                            <div className="mx-3 flex items-center justify-center">
                                 <img src="/penguin-icon.png" alt="fish icon" className="w-[20px] h-[20px]" />
                                 <span className="mx-1">0</span>
                             </div>
 
-                            <div className="flex items-center justify-center">
+                            <div className="mx-3 flex items-center justify-center">
                                 <img src="/eth-icon.png" alt="fish icon" className="w-[24px] h-[24px]" />
                                 <span className="">{truncateEther(balance)} ETH</span>
                             </div>
                         </div>
 
-                        <div className="mx-1"></div>
+                        {/* <div className="mx-1"></div>
 
                         <button
                             className="text-white relative w-[40px] h-[40px]"
@@ -124,10 +124,10 @@ const LandingPage = ({
                         >
                             <img src="/small-button.png" alt="bg" className="absolute top-0 left-0" />
                             <img src="/cog.png" alt="settings" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[10]" />
-                        </button>
+                        </button> */}
                     </div>
 
-                    <div className="flex justify-between ml-2 mt-5">
+                    {/* <div className="flex justify-between ml-2 mt-5">
                         <div className="flex items-center">
                             <div className="relative w-[40px] h-[40px]">
                                 <img src="/small-button.png" alt="bg" className="absolute top-0 left-0" />
@@ -171,6 +171,74 @@ const LandingPage = ({
                                 <span className="text-[24px] mt-[-9px]">$NOOT</span>
                             </div>
                         </div>
+                    </div> */}
+                    <div className="flex mt-4 justify-between">
+                        <div>
+                            <div className="flex items-center">
+                                <div className="relative w-[40px] h-[40px]">
+                                    <img src="/small-button.png" alt="bg" className="absolute top-0 left-0" />
+                                    <LightingIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                                </div>
+
+                                <div className="ml-4 flex flex-col justify-center">
+                                    <span className="text-[14px] text-[#A5F0FF]">
+                                        HIGH SCORE
+                                    </span>
+                                    <span className="text-[24px] mt-[-9px]">432,432</span>
+                                </div>
+                            </div>
+
+                            <div className="mt-1 flex items-center">
+                                <div className="relative w-[40px] h-[40px]">
+                                    <img src="/small-button.png" alt="bg" className="absolute top-0 left-0" />
+                                    <img width={30} height={30} src="/trophy-icon.png" alt="trophy-icon" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                                </div>
+
+                                <div className="ml-4 flex flex-col justify-center">
+                                    <span className="text-[14px] text-[#A5F0FF]">
+                                        LEADERBOARD
+                                    </span>
+                                    <span className="text-[24px] mt-[-9px]">#542</span>
+                                </div>
+                            </div>
+
+                            <div className="mt-1 flex items-center">
+                                <div className="relative w-[40px] h-[40px]">
+                                    <img src="/small-button.png" alt="bg" className="absolute top-0 left-0" />
+                                    <ChestIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                                </div>
+
+                                <div className="ml-4 flex flex-col justify-center">
+                                    <span className="text-[14px] text-[#A5F0FF]">
+                                        RAFFLE
+                                    </span>
+                                    <span className="text-[24px] mt-[-9px]">$NOOT</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style={{
+                                backgroundImage: "url('/addy-bg.png')",
+                                backgroundRepeat: "no-repeat",
+                                backgroundSize: "100% 100%",
+                                backgroundPosition: "center",
+                                overflow: "hidden"
+                            }}
+                                className="mt-1 w-full h-[46px] px-4 py-1 flex justify-center items-center"
+                            >
+                                <div className="mr-1">FT2...Hs1</div>
+                                <img className="ml-1" src="/wallet-icon.png" alt="wallet icon" width={32} height={32} />
+                            </div>
+                            <div className="mt-3 flex justify-end">
+                                <button
+                                    className="text-white relative w-[40px] h-[40px]"
+                                    onClick={() => setActiveModal('settings')}
+                                >
+                                    <img src="/small-button.png" alt="bg" className="absolute top-0 left-0" />
+                                    <img src="/cog.png" alt="settings" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[10]" />
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -196,7 +264,8 @@ const LandingPage = ({
                             onClick={() => setActiveModal('upgrades')}
                         >
                             <div className="flex flex-col justify-center items-center">
-                                <StarIcon />
+                                {/* <StarIcon /> */}
+                                <img width={44} height={44} src="/upgrade-icon.png" alt="coming soon icon" />
 
                                 UPGRADE
                             </div>
@@ -211,7 +280,8 @@ const LandingPage = ({
                             onClick={() => setActiveModal('item-shop')}
                         >
                             <div className="flex flex-col justify-center items-center">
-                                <ShoppingCartIcon />
+                                {/* <ShoppingCartIcon /> */}
+                                <img width={44} height={44} src="/shop-icon.png" alt="coming soon icon" />
                                 SHOP
                             </div>
 
@@ -222,11 +292,11 @@ const LandingPage = ({
                             className="w-[calc(33%-6.5px)]"
                             disabled
                             shineClassName="h-[50%]"
-                            onClick={() => {}}
+                            onClick={() => { }}
                         // onClick={() => setMenuState(MenuStates.skins)}
                         >
                             <div className="flex flex-col justify-center items-center">
-                                <img src="/coming-soon-icon.png" alt="coming soon icon" />
+                                <img width={44} height={44} src="/coming-soon-icon.png" alt="coming soon icon" />
                                 SKINS
                             </div>
 

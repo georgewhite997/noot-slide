@@ -56,7 +56,7 @@ export const ItemShop = ({
   };
 
   return (
-    <div style={{ background: "radial-gradient(circle, #0CBED2 0%, #0A94BC 100%)" }} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10  h-full pt-[24px]">
+    <div style={{ background: "radial-gradient(circle, #0CBED2 0%, #0A94BC 100%)" }} className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[402px] z-10">
       <div className="relative">
         <button
           className="text-white absolute left-0 w-[40px] h-[40px] mx-[24px] mb-[16px]"
