@@ -61,17 +61,17 @@ const LandingPage = ({
         //return <p>error, try to sign up again</p>
     }
 
-    // if (!isConnected || !isRegistered) {
-    //     return (
-    //         <AuthPage
-    //             isRegistered={isRegistered}
-    //             register={register}
-    //             isLoading={isLoading}
-    //             isConnected={isConnected}
-    //             balance={balance}
-    //         />
-    //     );
-    // }
+    if (!isConnected || !isRegistered) {
+        return (
+            <AuthPage
+                isRegistered={isRegistered}
+                register={register}
+                isLoading={isLoading}
+                isConnected={isConnected}
+                balance={balance}
+            />
+        );
+    }
 
     const onModalClose = () => {
         setActiveModal('none');
