@@ -1,6 +1,6 @@
 import { ButtonHTMLAttributes } from 'react'
 
-type PrimaryButtonColor = 'green' | 'blue' | 'red'
+type PrimaryButtonColor = 'green' | 'blue' | 'red' | 'purple'
 
 const PrimaryButton = ({
     children,
@@ -26,6 +26,11 @@ const PrimaryButton = ({
         case 'red':
             containerGradientClassName = 'bg-[linear-gradient(to_bottom,_#AEB2FF_0%,_#4257AC_20%,_#192073_92%)]'
             buttonGradientClassName = 'bg-[linear-gradient(to_bottom,_#FF0000_0%,_#FF0000_21%,_#FF0000_50%,_#FF0000_100%)]'
+            shineGradientClassName = 'bg-[linear-gradient(to_bottom,_rgba(255,255,255,0.31)_0%,_rgba(255,255,255,0.18)_100%)]'
+            break;
+        case 'purple':
+            containerGradientClassName = 'bg-[linear-gradient(to_bottom,_#AEB2FF_0%,_#4257AC_20%,_#192073_92%)]'
+            buttonGradientClassName = 'bg-[linear-gradient(to_bottom,_#800080_0%,_#800080_21%,_#800080_50%,_#800080_100%)]'
             shineGradientClassName = 'bg-[linear-gradient(to_bottom,_rgba(255,255,255,0.31)_0%,_rgba(255,255,255,0.18)_100%)]'
             break;
         default:

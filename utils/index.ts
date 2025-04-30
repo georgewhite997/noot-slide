@@ -99,6 +99,7 @@ export interface IItem {
   description: string;
   type: "permanent" | "one-time";
   price: number;
+  iconPath: string,
 }
 
 export type IUserItem = IItem & { quantity: number; isDisabled: boolean }
@@ -110,6 +111,7 @@ export const items: IItem[] = [
     description: "Decreases the speed of the entire game by 15%.",
     type: "permanent",
     price: 0.0022,
+    iconPath: '/slow-skis-icon.png',
   },
   {
     id: 2,
@@ -117,6 +119,7 @@ export const items: IItem[] = [
     description: "Increases the amount of in-game pickups.",
     type: "permanent",
     price: 0.0022,
+    iconPath: '/lucky-charm-icon.png',
   },
   {
     id: 3,
@@ -124,6 +127,7 @@ export const items: IItem[] = [
     description: "Grants extra life on your first crash.",
     type: "one-time",
     price: 0.0005,
+    iconPath: '/abstract-halo-icon.png',
   },
   {
     id: 4,
@@ -131,6 +135,7 @@ export const items: IItem[] = [
     description: "Grants 1,000 distance points to your score from the start.",
     type: "one-time",
     price: 0.0005,
+    iconPath: '/speedy-start-icon.png',
   },
 ];
 
