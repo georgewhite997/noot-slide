@@ -53,11 +53,6 @@ const LandingPage = ({
 }: LandingProps) => {
     const [activeModal, setActiveModal] = useState<ActiveModalType>('none')
 
-    if (!address) {
-        // address = '0xmockupaddr'
-        return <p>error, try to sign in again</p>
-    }
-
     if (!isConnected || !isRegistered) {
         return (
             <AuthPage
@@ -68,6 +63,13 @@ const LandingPage = ({
             />
         );
     }
+
+    if (!address) {
+        // address = '0xmockupaddr'
+        return <p>error, try to sign in again</p>
+    }
+
+
 
     const onModalClose = () => {
         setActiveModal('none');

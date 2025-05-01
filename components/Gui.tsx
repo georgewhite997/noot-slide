@@ -24,8 +24,7 @@ import {
   hasSlowSkisAtom,
   hasLuckyCharmAtom,
   speedyStartQuantityAtom, abstractSessionAtom,
-  SessionData, hasFishingNetAtom,
-  hasMultiplierAtom,
+  SessionData,
   itemsAtom
 } from "@/atoms";
 import { toast, Toaster } from "react-hot-toast";
@@ -57,8 +56,6 @@ export const Gui = memo(function Gui() {
   const setHasLuckyCharm = useSetAtom(hasLuckyCharmAtom);
   const setSpeedyStartQuantity = useSetAtom(speedyStartQuantityAtom);
   const setItems = useSetAtom(itemsAtom)
-  const [hasFishingNet] = useAtom(hasFishingNetAtom);
-  const [hasMultiplier] = useAtom(hasMultiplierAtom);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [balance, setBalance] = useState<bigint>(BigInt(0));
 
@@ -66,7 +63,7 @@ export const Gui = memo(function Gui() {
   const [isRegistered, setIsRegistered] = useState(false);
 
   const fetchWallet = async (session?: SessionData) => {
-    // if (!publicClient || !address || !abstractClient) return;
+    if (!publicClient || !address || !abstractClient) return;
 
     // for (let i = 0; i < powerupsMeta.length; i++) {
     //   console.log(i)

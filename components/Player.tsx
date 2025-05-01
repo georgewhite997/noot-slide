@@ -701,7 +701,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
           -9,
           (0.05 * (hasSlowSkis ? 0.85 : 1)) * clampedDelta,
         );
-        let zVelocity = THREE.MathUtils.lerp(
+        const zVelocity = THREE.MathUtils.lerp(
           currentVelocity.z,
           targetZVelocity.current,
           4 * clampedDelta,
