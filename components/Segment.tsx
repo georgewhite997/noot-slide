@@ -102,7 +102,7 @@ export const Segment = memo(
                     rotation={[0, 0, 0.5]}
                     color={0xffffff}
                     intensity={2}
-                    position={[50, 100, -segment.index * SEGMENT_LENGTH]}
+                    position={[2, 100, -segment.index * SEGMENT_LENGTH]}
                     castShadow
                     shadow-camera-left={-70}
                     shadow-camera-right={70}
@@ -125,7 +125,7 @@ export const Segment = memo(
                     </mesh>
                 </RigidBody>
                 <mesh
-                    position={[0, segment.yOffset, segment.zOffset]}
+                    position={[0, segment.yOffset - (segment.index / 100), segment.zOffset]}
                     rotation={[-Math.PI / 2 + SLOPE_ANGLE, 0, 0]}
                     receiveShadow
                 >

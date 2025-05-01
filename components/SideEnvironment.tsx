@@ -21,7 +21,9 @@ export const SideSnowPlane = ({
     resolutionX = 32,
     resolutionY = 128,
     yOffset = 0,
-    isSide = false
+    isSide = false,
+    grooveAmplitude,
+    grooveFrequency
 }: {
     width: number;
     length: number;
@@ -43,9 +45,16 @@ export const SideSnowPlane = ({
         for (let i = 0; i < positionAttribute.count; i++) {
             const x = positionAttribute.getX(i);
             const y = positionAttribute.getY(i) - yOffset
-            const tillEnd = !isSide ? Math.max(0, (1.2 - (((isRight ? -x : x) + width / 2)) / width)) : 0.5
-            const microDetail = getSnowBumps(x, y, tillEnd * 0.3, 1);
-            positionAttribute.setZ(i, microDetail);
+            if (!isSide) {
+                const tillEnd = Math.max(0, (1.2 - (((isRight ? -x : x) + width / 2)) / width));
+                const microDetail = getSnowBumps(x, y, tillEnd * 0.3, 1);
+                positionAttribute.setZ(i, microDetail);
+            } else {
+                const microDetail = getSnowBumps(x, y, grooveAmplitude, grooveFrequency);
+                positionAttribute.setZ(i, microDetail);
+
+            }
+
         }
 
         positionAttribute.needsUpdate = true;
@@ -119,10 +128,10 @@ function getRandomObstacleModel(modelsGltf: GLTF & ObjectMap | null) {
     return getModel(randomModel.name, randomModel.scale, modelsGltf);
 }
 
-const environmentSegments: IEnvironmentSegment[] = [
+const environmentSegments = [
     {
         name: "stones",
-        GetEnvironment: (isRight, modelsGltf) => {
+        GetEnvironment: (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => {
             const model1 = useMemo(() => getModel("stone_winter_large_2001", 0.03, modelsGltf), []);
             const model2 = useMemo(() => getModel("stone_winter_large_2014", 0.03, modelsGltf), []);
             const model3 = useMemo(() => getModel("stone_winter_large_2003", 0.03, modelsGltf), []);
@@ -149,26 +158,25 @@ const environmentSegments: IEnvironmentSegment[] = [
                     <primitive object={clone(model1)} position={[-80, 0, 0]} />
                     <primitive object={clone(model2)} position={[-90, 0, 0]} />
 
-                    {obstacles.map((obstacle, index) =>
-                        (obstacle) && (
+                    {obstacles.map((obstacle, index) => {
+                        if (!obstacle) return null;
+                        const x = -5 - (index * 5)
+                        const y = (obstacle.name.includes("cane") ? 2 : 0) - 0.1
+                        const z = (isRight ? 1 : -1) * (Math.random() < 0.5 ? 7 : 6)
+                        return obstacle &&
                             <primitive
                                 key={index}
                                 object={clone(obstacle)}
                                 {...(isRight ? { rotation: [Math.PI / 2, 0, 0] } : {})}
-                                position={[-5 - (index * 5), obstacle.name.includes("cane") ? 2 : 0, isRight ? (Math.random() < 0.5 ? 7 : 6) : (Math.random() < 0.5 ? -7 : -6)]}
+                                position={[x, y, z]}
+                                castShadow
                             />
-                        )
-                    )}
+                    })}
                 </>
             )
         }
     },
 ]
-
-interface IEnvironmentSegment {
-    name: string;
-    GetEnvironment: (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => React.ReactElement;
-}
 
 
 export const SideEnvironment = memo(
@@ -195,15 +203,17 @@ export const SideEnvironment = memo(
                 {/* SIDE WALL */}
                 <mesh
                     position={[
-                        isRight ? SEGMENT_WIDTH / 2 : -SEGMENT_WIDTH / 2,
+                        isRight ? SEGMENT_WIDTH / 2 - 0.15 : -SEGMENT_WIDTH / 2 + 0.15,
                         0,
                         sideHeight / 2 - 0.2,
                     ]}
-                    rotation={[0, isRight ? -Math.PI / 2 : Math.PI / 2, 0]}
+                    rotation={[0, isRight ? -Math.PI / 2 + 0.3 : Math.PI / 2 - 0.3, 0]}
                 >
                     <SideSnowPlane width={sideHeight} length={SEGMENT_LENGTH} yOffset={yOffset} isRight={isRight} isSide
-                        grooveAmplitude={0.05}
-                        grooveFrequency={1}
+                        grooveAmplitude={0.1}
+                        grooveFrequency={0.5}
+                        resolutionY={128}
+                        resolutionX={128}
                     />
                     <meshStandardMaterial
                         map={colorMap}
@@ -223,6 +233,7 @@ export const SideEnvironment = memo(
                         sideHeight - 0.2,
                     ]}
                     rotation={[0, 0, 0]}
+                    receiveShadow
                 >
                     <SideSnowPlane width={sideWidth} length={SEGMENT_LENGTH} yOffset={yOffset} isRight={isRight} />
                     <meshStandardMaterial
@@ -262,6 +273,7 @@ export const SideEnvironment = memo(
                     -SEGMENT_LENGTH / 2,
                     sideHeight
                 ]}
+                    castShadow
                     rotation={[Math.PI / 2, -Math.PI / 2, 0]}>
                     {environmentSegments[0].GetEnvironment(isRight, modelsGltf)}
                 </group>

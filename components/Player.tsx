@@ -70,8 +70,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
   const gltf = useLoader(GLTFLoader, "/animations.glb");
 
-  const endGame = () => {
-    playDeathAnimation();
+  const afterDeathAnimation = () => {
     if (reviveCount < MAX_REVIVE_COUNT) {
       if (gameState !== 'reviving') {
         setReviveCount((r) => r + 1);
@@ -79,12 +78,14 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       }
     } else {
       setGameState("game-over");
-      // playDeathAnimation()
       lastTakenFishes.current = new Set<string>();
       ref.current?.setLinvel({ x: 0, y: 0, z: 0 }, true);
       ref.current?.lockTranslations(true, true);
-
     }
+  }
+
+  const endGame = () => {
+    playDeathAnimation();
   };
 
 
@@ -169,6 +170,10 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
         skiingAction.current.setLoop(THREE.LoopRepeat, Infinity);
         skiingAction.current.play();
       }
+    }
+
+    if (e.action === deathAction.current) {
+      afterDeathAnimation()
     }
   }
 
@@ -607,6 +612,13 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       mixer.current.update(clampedDelta); // Delta is the time between frames
     }
 
+
+    const deathTime = deathAction.current?.time || 0;
+    if (deathTime > 1.1) {
+      deathAction.current?.stop()
+      afterDeathAnimation()
+    }
+
     const halo = scene.getObjectByName("halo");
     if (halo) {
       if (!abstractSession) {
@@ -661,6 +673,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
     const skiingTime = skiingAction.current?.time || 0;
 
+
     if (gameState === "game-over" || gameState === "in-menu") {
       ref.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
 
@@ -693,7 +706,6 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
         );
       }
 
-      console.log(hasSlowSkis)
 
       if (!jumpAction.current?.isRunning()) {
         targetZVelocity.current = THREE.MathUtils.lerp(
