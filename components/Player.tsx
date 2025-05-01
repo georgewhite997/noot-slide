@@ -10,7 +10,7 @@ import {
 } from "@react-three/rapier";
 import { SLOPE_ANGLE, lanes } from "./shared";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, hasFishingNetAtom, hasMultiplierAtom, reviveCountAtom, scoreAtom } from "@/atoms";
+import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, hasFishingNetAtom, hasMultiplierAtom, hasSlowSkisAtom, reviveCountAtom, scoreAtom } from "@/atoms";
 import { useAbstractClient } from "@abstract-foundation/agw-react";
 import { chain, items, powerupsContractAddress } from "@/utils";
 import { parseAbi } from "viem";
@@ -44,7 +44,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const lastRemovedName = useRef<string>('');
   const hasHalo = useRef(false);
   const [reviveCount, setReviveCount] = useAtom(reviveCountAtom);
-
+  const hasSlowSkis = useAtomValue(hasSlowSkisAtom);
 
   const magnetCollectedAt = useRef<number>(0);
   const magnetDuration = useRef<number>(0);
@@ -693,13 +693,15 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
         );
       }
 
+      console.log(hasSlowSkis)
+
       if (!jumpAction.current?.isRunning()) {
         targetZVelocity.current = THREE.MathUtils.lerp(
           targetZVelocity.current,
           -9,
-          0.05 * clampedDelta,
+          (0.05 * (hasSlowSkis ? 0.85 : 1)) * clampedDelta,
         );
-        const zVelocity = THREE.MathUtils.lerp(
+        let zVelocity = THREE.MathUtils.lerp(
           currentVelocity.z,
           targetZVelocity.current,
           4 * clampedDelta,

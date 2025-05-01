@@ -9,7 +9,8 @@ import * as THREE from "three";
 import { IUserItem } from "@/utils";
 
 export type GameState = "playing" | "game-over" | "in-menu" | "reviving"
-export type Settings = {
+
+export type SettingsType = {
     antialiasing: boolean;
     shadows: boolean;
     dpr: number;
@@ -24,7 +25,7 @@ export const gameStateAtom = atom<GameState>(
     // process.env.NODE_ENV === "development" ? "playing" : "in-menu",
 );
 
-export const settingsAtom = atom<Settings>({
+export const settingsAtom = atom<SettingsType>({
     antialiasing: true,
     dpr: typeof window !== 'undefined' ? window.devicePixelRatio : 1,
     shadows: true,

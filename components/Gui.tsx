@@ -32,6 +32,7 @@ import { toast, Toaster } from "react-hot-toast";
 import LandingPage from "./LandingPage";
 import GameOver from "./GameOver";
 import Reviving from "./Reviving";
+import { InGameGui } from "./InGameGui";
 
 const registryContract = { address: registryContractAddress, abi: registryAbi };
 const powerupsContract = { address: powerupsContractAddress, abi: powerupsAbi };
@@ -322,22 +323,10 @@ export const Gui = memo(function Gui() {
       <Toaster />
 
       {(gameState === "playing" && dimensions.width > 0 && dimensions.height > 0) && (
-        <div className="absolute left-1/2 -translate-x-1/2 p-2 top-1/2 -translate-y-1/2 z-10 text-md text-white justify-between flex font-bold text-shadow-md" style={{
+        <InGameGui style={{
           width: dimensions.width,
           height: dimensions.height,
-        }}>
-          <div>
-
-          </div>
-          <div className="flex h-fit flex-col items-end">
-            <div className="bg-[rgba(0,0,0,0.35)] w-fit p-2 rounded-lg flex items-center justify-center">Score: {score}</div>
-            <div className="mt-2 bg-[rgba(0,0,0,0.35)] w-fit p-2 rounded-lg flex items-center justify-center">Fishes: {currentFishes}</div>
-            <div className="flex mt-2 justify-center">
-              {hasFishingNet && <div className="bg-[rgba(0,0,0,0.35)] w-fit p-2 rounded-lg flex items-center justify-center">N</div>}
-              {hasMultiplier && <div className="ml-2 bg-[rgba(0,0,0,0.35)] w-fit p-2 rounded-lg flex items-center justify-center">M</div>}
-            </div>
-          </div>
-        </div>
+        }} />
       )}
 
       {overlay && (

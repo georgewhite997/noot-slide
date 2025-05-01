@@ -54,8 +54,6 @@ const LandingPage = ({
     const { logout } = useLoginWithAbstract();
     const [activeModal, setActiveModal] = useState<ActiveModalType>('none')
 
-
-
     if (!address) {
         address = '0xmockupaddr'
         //return <p>error, try to sign up again</p>
