@@ -51,12 +51,11 @@ const LandingPage = ({
     balance,
     handlePurchase,
 }: LandingProps) => {
-    const { logout } = useLoginWithAbstract();
     const [activeModal, setActiveModal] = useState<ActiveModalType>('none')
 
     if (!address) {
-        address = '0xmockupaddr'
-        //return <p>error, try to sign up again</p>
+        // address = '0xmockupaddr'
+        return <p>error, try to sign in again</p>
     }
 
     if (!isConnected || !isRegistered) {
@@ -66,7 +65,6 @@ const LandingPage = ({
                 register={register}
                 isLoading={isLoading}
                 isConnected={isConnected}
-                balance={balance}
             />
         );
     }
@@ -77,7 +75,7 @@ const LandingPage = ({
 
     return (
         <>
-            <div className="h-full w-full flex flex-col justify-between items-center px-[16px] w-[500px]"
+            <div className="h-full w-full flex flex-col justify-between items-center px-[16px] w-[500px] max-h-screen"
                 style={{
                     backgroundImage: "url('/hero2.svg')",
                     backgroundPosition: 'center',
@@ -88,7 +86,7 @@ const LandingPage = ({
                 <div className="w-full mt-[12px]">
                     <img src="/hero.webp" className='px-[26px]' alt="hero" />
 
-                    <div className="flex justify-between mt-[15px] items-center">
+                    <div className="flex justify-between mt-[15px] items-center  relative z-[10]">
                         <div style={{
                             backgroundImage: "url('/landing-stats-bg.png')",
                             backgroundRepeat: "no-repeat",
@@ -109,68 +107,13 @@ const LandingPage = ({
                             </div>
 
                             <div className="mx-3 flex items-center justify-center">
-                                <img src="/eth-icon.png" alt="fish icon" className="w-[24px] h-[24px]" />
+                                <img src="/eth-icon.webp" alt="fish icon" className="w-[24px] h-[24px]" />
                                 <span className="">{truncateEther(balance)} ETH</span>
                             </div>
                         </div>
-
-                        {/* <div className="mx-1"></div>
-
-                        <button
-                            className="text-white relative w-[40px] h-[40px]"
-                            onClick={() => setActiveModal('settings')}
-                        >
-                            <img src="/small-button.png" alt="bg" className="absolute top-0 left-0" />
-                            <img src="/cog.png" alt="settings" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[10]" />
-                        </button> */}
                     </div>
 
-                    {/* <div className="flex justify-between ml-2 mt-5">
-                        <div className="flex items-center">
-                            <div className="relative w-[40px] h-[40px]">
-                                <img src="/small-button.png" alt="bg" className="absolute top-0 left-0" />
-                                <LightingIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                            </div>
-
-                            <div className="ml-2 flex flex-col justify-center">
-                                <span className="text-[14px] text-[#A5F0FF]">
-                                    HIGH SCORE
-                                </span>
-                                <span className="text-[24px] mt-[-9px]">0</span>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center">
-                            <div className="flex flex-col justify-center">
-                                <span className="text-[14px] text-[#A5F0FF]">
-                                    LEADRBOARD
-                                </span>
-                                <span className="text-[24px] mt-[-9px] text-right">1</span>
-                            </div>
-
-                            <div className="relative w-[40px] h-[40px] ml-2">
-                                <img src="/small-button.png" alt="bg" className="absolute top-0 left-0" />
-                                <img src="/trophy-icon.png" alt="trophy-icon" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="ml-2 mt-2">
-                        <div className="flex items-center mt-2">
-                            <div className="relative w-[40px] h-[40px]">
-                                <img src="/small-button.png" alt="bg" className="absolute top-0 left-0" />
-                                <ChestIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                            </div>
-
-                            <div className="ml-2 flex flex-col justify-center">
-                                <span className="text-[14px] text-[#A5F0FF]">
-                                    RAFFLE
-                                </span>
-                                <span className="text-[24px] mt-[-9px]">$NOOT</span>
-                            </div>
-                        </div>
-                    </div> */}
-                    <div className="flex mt-4 justify-between">
+                    <div className="flex mt-4 justify-between relative z-[10]">
                         <div>
                             <div className="flex items-center">
                                 <div className="relative w-[40px] h-[40px]">
@@ -240,8 +183,8 @@ const LandingPage = ({
                     </div>
                 </div>
 
-                <div className="flex flex-col items-center gap-4 mb-10">
-                    <img src="/noot.webp" alt="noot" className="relative bottom-[-4px] w-[60%] mx-auto" />
+                <div className="flex flex-col items-center gap-4 mb-10 relative w-full">
+                    <img src="/noot.webp" alt="noot" className="absolute bottom-[-4px] w-[60%] top-[-275px] mx-auto" />
                     <div className="relative w-full h-[88px] mt-[-20px]">
                         <img src="/button-cover.svg" className="absolute z-[9] top-[-14px] left-1/2 -translate-x-1/2  min-w-[108%]" alt="snow" />
                         <PrimaryButton
@@ -310,7 +253,6 @@ const LandingPage = ({
                 />
             )}
             {activeModal === 'upgrades' && (
-                // <div>dupaaa</div>
                 <Upgrades
                     onClose={onModalClose}
                     address={address}
@@ -318,6 +260,7 @@ const LandingPage = ({
             )}
             {activeModal === 'item-shop' && (
                 <ItemShop
+                    balance={balance}
                     onClose={onModalClose}
                     address={address}
                     handlePurchase={handlePurchase}

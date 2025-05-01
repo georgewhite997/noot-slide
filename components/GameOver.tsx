@@ -23,7 +23,7 @@ const GameOver = ({
             <h2 className="text-2xl font-bold text-center mb-[24px]">Game over</h2>
 
             <p className="text-2xl text-white">Score: {score}</p>
-            <p className="text-2xl text-white">Collected fishes: {currentFishes}</p>
+            <p className="text-2xl text-white">Collected fish: {currentFishes}</p>
 
             <button
                 className="mt-4 rounded bg-green-500 px-4 py-2 text-white w-full"
