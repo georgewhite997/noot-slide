@@ -1,10 +1,9 @@
-import { memo, useMemo, useRef } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import { IChunk, IObstacle, IObstacleType, IObstacleTypeWithChance, laneType } from "./shared";
 import { lanes, SEGMENT_LENGTH } from "./shared";
-import { noise2D } from "@/utils";
+import { getSnowBumps, noise2D } from "@/utils";
 import { CuboidCollider, RigidBody } from "@react-three/rapier";
 import * as THREE from "three";
-import { SnowPlane } from "./Segment";
 import { useFrame } from "@react-three/fiber";
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
@@ -15,6 +14,51 @@ const RAMP_LENGTH = 2.5;
 const RAMP_WIDTH = 3;
 const RUNWAY_LENGTH = 8;
 const RAMP_SLOPE = -0.9;
+
+export const SnowPlane = ({
+  width,
+  length,
+  resolutionX = 32,
+  resolutionY = 128,
+  grooveAmplitude,
+  grooveFrequency
+}: {
+  width: number;
+  length: number;
+  resolutionX?: number;
+  resolutionY?: number;
+  grooveAmplitude?: number;
+  grooveFrequency?: number;
+}) => {
+  const geometryRef = useRef<THREE.PlaneGeometry>(null);
+
+  useEffect(() => {
+    const geometry = geometryRef.current;
+    if (!geometry) return;
+    const positionAttribute = geometry.attributes.position;
+
+    for (let i = 0; i < positionAttribute.count; i++) {
+      const x = positionAttribute.getX(i);
+      const y = positionAttribute.getY(i);
+      const microDetail = getSnowBumps(x, y, grooveAmplitude, grooveFrequency);
+      positionAttribute.setZ(i, microDetail);
+    }
+
+    positionAttribute.needsUpdate = true;
+    geometry.computeVertexNormals();
+
+    return () => {
+      geometry.dispose();
+    };
+  }, [geometryRef.current]);
+
+  return (
+    <planeGeometry
+      ref={geometryRef}
+      args={[width, length, resolutionX, resolutionY]}
+    />
+  );
+}
 
 const chunks: IChunk[] = [
   {
@@ -1716,7 +1760,6 @@ export const Obstacle = memo(
               <SnowPlane
                 width={RAMP_WIDTH}
                 length={RAMP_LENGTH}
-                isSide={false}
                 resolutionX={30}
                 resolutionY={30}
                 grooveAmplitude={0.05}
@@ -1743,7 +1786,6 @@ export const Obstacle = memo(
               <SnowPlane
                 width={RAMP_WIDTH}
                 length={RUNWAY_LENGTH}
-                isSide={false}
                 resolutionX={30}
                 resolutionY={30}
                 grooveAmplitude={0.05}

@@ -9,6 +9,10 @@ import registryAddress from "../addresses/Registry.json";
 import powerupsAddress from "../addresses/Powerups.json";
 // import { address as SkinsAddress } from "../addresses/Skins.json";
 import { createNoise2D } from "simplex-noise";
+import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { ObjectMap } from "@react-three/fiber";
+import * as THREE from 'three'
+
 
 const dockerizedNode = defineChain({
   id: 270,
@@ -95,6 +99,23 @@ export const getSnowBumps = (
 
   return z;
 };
+
+export function getModel(name: string, scale: number, modelsGltf: GLTF & ObjectMap | null) {
+  if (!modelsGltf?.scene) return null;
+  const object = modelsGltf.scene.getObjectByName(name);
+  if (!object) return null;
+
+  // Reset position of all meshes in the tree
+  object.traverse((child: THREE.Object3D) => {
+    if (child instanceof THREE.Mesh) {
+      child.position.set(0, 0, 0);
+      child.updateMatrix();
+    }
+  });
+
+  object.scale.set(scale, scale, scale);
+  return object;
+}
 
 export interface IItem {
   id: number;
