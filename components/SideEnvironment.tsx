@@ -1,4 +1,4 @@
-import { memo, useRef, useEffect, useMemo } from 'react';
+import { memo, useRef, useEffect, useMemo, useState } from 'react';
 import * as THREE from 'three'
 import { useAtomValue } from "jotai";
 import { modelsGltfAtom } from "@/atoms";
@@ -128,55 +128,129 @@ function getRandomObstacleModel(modelsGltf: GLTF & ObjectMap | null) {
     return getModel(randomModel.name, randomModel.scale, modelsGltf);
 }
 
-const environmentSegments = [
-    {
-        name: "stones",
-        GetEnvironment: (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => {
-            const model1 = useMemo(() => getModel("stone_winter_large_2001", 0.03, modelsGltf), []);
-            const model2 = useMemo(() => getModel("stone_winter_large_2014", 0.03, modelsGltf), []);
-            const model3 = useMemo(() => getModel("stone_winter_large_2003", 0.03, modelsGltf), []);
+const Stones = (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => {
+    const model1 = useMemo(() => getModel("stone_winter_large_2001", 0.03, modelsGltf), []);
+    const model2 = useMemo(() => getModel("stone_winter_large_2014", 0.03, modelsGltf), []);
+    const model3 = useMemo(() => getModel("stone_winter_large_2003", 0.03, modelsGltf), []);
 
-            if (!model1 || !model2 || !model3) return <></>;
+    if (!model1 || !model2 || !model3) return <></>;
 
-            // Generate array of 20 random obstacles
-            const obstacles = Array.from({ length: 20 }, () => {
-                let obstacle;
-                do {
-                    obstacle = getRandomObstacleModel(modelsGltf);
-                } while (obstacle?.name.includes("house") && Math.random() < 0.8);
-                return obstacle;
-            });
+    // Generate array of 20 random obstacles
+    const obstacles = Array.from({ length: 20 }, () => {
+        let obstacle;
+        do {
+            obstacle = getRandomObstacleModel(modelsGltf);
+        } while (obstacle?.name.includes("house") && Math.random() < 0.8);
+        return obstacle;
+    });
 
-            return (
-                <>
-                    <primitive object={clone(model1)} />
-                    <primitive object={clone(model2)} position={[-20, 0, 0]} />
-                    <primitive object={clone(model3)} position={[-40, 0, 0]} />
-                    <primitive object={clone(model1)} position={[-40, 0, 0]} />
-                    <primitive object={clone(model2)} position={[-60, 0, 0]} />
-                    <primitive object={clone(model3)} position={[-80, 0, 0]} />
-                    <primitive object={clone(model1)} position={[-80, 0, 0]} />
-                    <primitive object={clone(model2)} position={[-90, 0, 0]} />
+    return (
+        <>
+            <primitive object={clone(model1)} />
+            <primitive object={clone(model2)} position={[-20, 0, 0]} />
+            <primitive object={clone(model3)} position={[-40, 0, 0]} />
+            <primitive object={clone(model1)} position={[-40, 0, 0]} />
+            <primitive object={clone(model2)} position={[-60, 0, 0]} />
+            <primitive object={clone(model3)} position={[-80, 0, 0]} />
+            <primitive object={clone(model1)} position={[-80, 0, 0]} />
+            <primitive object={clone(model2)} position={[-90, 0, 0]} />
 
-                    {obstacles.map((obstacle, index) => {
-                        if (!obstacle) return null;
-                        const x = -5 - (index * 5)
-                        const y = (obstacle.name.includes("cane") ? 2 : 0) - 0.1
-                        const z = (isRight ? 1 : -1) * (Math.random() < 0.5 ? 7 : 6)
-                        return obstacle &&
-                            <primitive
-                                key={index}
-                                object={clone(obstacle)}
-                                {...(isRight ? { rotation: [Math.PI / 2, 0, 0] } : {})}
-                                position={[x, y, z]}
-                                castShadow
-                            />
-                    })}
-                </>
-            )
+            {obstacles.map((obstacle, index) => {
+                if (!obstacle) return null;
+                const x = -5 - (index * 5)
+                const y = (obstacle.name.includes("cane") ? 2 : 0) - 0.1
+                const z = (isRight ? 1 : -1) * (Math.random() < 0.5 ? 7 : 6)
+                return obstacle &&
+                    <primitive
+                        key={index}
+                        object={clone(obstacle)}
+                        {...(isRight ? { rotation: [Math.PI / 2, 0, 0] } : {})}
+                        position={[x, y, z]}
+                        castShadow
+                    />
+            })}
+        </>
+    )
+}
+const Stones2 = (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => {
+    const model1 = useMemo(() => getModel("stone_winter_large_2001", 0.03, modelsGltf), []);
+    const model2 = useMemo(() => getModel("stone_winter_large_2014", 0.03, modelsGltf), []);
+    const model3 = useMemo(() => getModel("stone_winter_large_2003", 0.03, modelsGltf), []);
+    const model4 = useMemo(() => getModel("stone_winter_small_8__2_002", 0.09, modelsGltf), []);
+
+    const redFlag = useMemo(() => getModel("ski_flag_red__1_", 0.018, modelsGltf), []);
+    const house1 = useMemo(() => getModel("winter_house_7", 0.015, modelsGltf), []);
+    const house2 = useMemo(() => getModel("winter_house_8", 0.015, modelsGltf), []);
+    const house3 = useMemo(() => getModel("wooden_winter_house_3", 0.015, modelsGltf), []);
+    const house4 = useMemo(() => getModel("wooden_winter_house", 0.015, modelsGltf), []);
+    const house5 = useMemo(() => getModel("winter_house_6", 0.01, modelsGltf), []);
+    const tree = useMemo(() => getModel("fir_tree_winter_large_2__5_", 0.0065, modelsGltf), []);
+    const sled = useMemo(() => getModel("sled_green", 0.02, modelsGltf), []);
+
+    const skiLift = useMemo(() => {
+        const model = getModel("ski_lift", 0.011, modelsGltf);
+        if (model) {
+            const cloned = clone(model)
+            cloned.children[0].position.set(278, 0, -1430)
+            return cloned
         }
-    },
-]
+        return new THREE.Object3D()
+    }, []);
+
+
+    const arr = [model1, model2, model3, model4,
+        skiLift, redFlag,
+        house1, house2, house3, house4,
+        tree, sled, house5
+    ]
+
+    if (!arr.every(Boolean)) {
+        console.log("missing models in 'stones2'")
+        return <></>;
+    }
+
+    const hasLift = Math.random() > 0.5
+
+    return (
+        <>
+            <primitive object={clone(model2)} />
+            {!isRight && (
+                <>
+                    <primitive object={clone(redFlag)} position={[-0.3, 13.5, -4]} rotation={[Math.PI / 2, 0, Math.PI / 2 - 0.4]} visible={hasLift} />
+                    <primitive object={skiLift} position={[-3, 0, -17]} visible={hasLift} />
+                    <primitive object={clone(model1)} position={[3, 8, 0]} visible={hasLift} />
+                    <primitive object={clone(house1)} position={[-16, 0, -3]} rotation={[Math.PI / 2, 0, -Math.PI / 2 + 0.3]} />
+                    <primitive object={clone(house2)} position={[-28, 0, -3]} rotation={[Math.PI / 2, 0, Math.PI + 0.3]} />
+                    <primitive object={clone(model3)} position={[-36, 0, 0]} rotation={[Math.PI / 2, 0.2, -Math.PI / 2]} />
+                    <primitive object={clone(model1)} position={[-58, -1, 6]} />
+
+                    <primitive object={clone(house3)} position={[-57, 0, 0]} rotation={[Math.PI / 2, 0, -Math.PI - 0.6]} />
+                    <primitive object={clone(tree)} position={[-65, 0, -2]} />
+                    <primitive object={clone(tree)} position={[-69, 0, -2]} />
+                    <primitive object={clone(house4)} position={[-77, 0, 0]} rotation={[Math.PI / 2, 0, -Math.PI + 0.6]} />
+                    <primitive object={clone(model4)} position={[-87, 0, 0]} rotation={[Math.PI / 2, 0, 0.2]} />
+                    <primitive object={clone(sled)} position={[-86, 0, -6.5]} rotation={[Math.PI / 2, 0, -Math.PI / 2 + 0.2]} />
+
+                </>
+            )}
+
+            {isRight && (
+                <>
+                    <primitive object={clone(model2)} position={[-20, 0, -3]} />
+                    <primitive object={clone(house4)} position={[-34, 0, 0]} rotation={[Math.PI / 2, 0, Math.PI - 0.6]} />
+                    <primitive object={clone(model1)} position={[-40, 0, -3]} />
+                    <primitive object={clone(model2)} position={[-60, 0, -3]} />
+                    <primitive object={clone(house5)} position={[-60, 0, 5]} rotation={[Math.PI / 2, 0, 0.2]} />
+                    <primitive object={clone(model3)} position={[-80, 0, -3]} />
+                    <primitive object={clone(model1)} position={[-80, 0, -3]} />
+                    <primitive object={clone(model2)} position={[-90, 0, -3]} />
+                </>
+            )}
+        </>
+    )
+}
+
+const allEnvironments = [Stones, Stones2]
 
 
 export const SideEnvironment = memo(
@@ -192,11 +266,13 @@ export const SideEnvironment = memo(
         normalMap: THREE.Texture;
     }) {
         const modelsGltf = useAtomValue(modelsGltfAtom);
-        const model1 = getModel("stone_winter_large_2001", 0.03, modelsGltf);
-        const model2 = getModel("stone_winter_large_2014", 0.03, modelsGltf);
-        const model3 = getModel("stone_winter_large_2003", 0.03, modelsGltf);
 
-        if (!model1 || !model2 || !model3) return null;
+        const EnvironmentSegment = useMemo(() =>
+            allEnvironments[
+            1//  Math.floor(Math.random() * allEnvironments.length)
+            ],
+            [allEnvironments.length]
+        );
 
         return (
             <>
@@ -275,12 +351,12 @@ export const SideEnvironment = memo(
                 ]}
                     castShadow
                     rotation={[Math.PI / 2, -Math.PI / 2, 0]}>
-                    {environmentSegments[0].GetEnvironment(isRight, modelsGltf)}
+                    {EnvironmentSegment(isRight, modelsGltf)}
                 </group>
             </>
         );
     },
     (prevProps, nextProps) => {
-        return prevProps.isRight === nextProps.isRight;
+        return prevProps.isRight === nextProps.isRight && prevProps.yOffset === nextProps.yOffset
     },
 );

@@ -125,11 +125,11 @@ const Scene = () => {
   return (
     <>
       <PerspectiveCamera
-        makeDefault // Makes this the default camera for the scene
+        makeDefault
         fov={75}
         near={0.5}
         far={20000}
-        position={[0, 5, 0]}
+        position={[0, 10, 0]}
       />
       <ambientLight color={0x787878} intensity={1} />
       <Suspense>

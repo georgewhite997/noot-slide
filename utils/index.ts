@@ -101,9 +101,16 @@ export const getSnowBumps = (
 };
 
 export function getModel(name: string, scale: number, modelsGltf: GLTF & ObjectMap | null) {
-  if (!modelsGltf?.scene) return null;
+  if (!modelsGltf?.scene) {
+    console.log("Error getting model for", name)
+    return new THREE.Object3D()
+  }
   const object = modelsGltf.scene.getObjectByName(name);
-  if (!object) return null;
+
+  if (!object) {
+    console.log("Missing object", name)
+    return new THREE.Object3D()
+  }
 
   // Reset position of all meshes in the tree
   object.traverse((child: THREE.Object3D) => {

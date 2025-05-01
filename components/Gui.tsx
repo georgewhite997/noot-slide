@@ -323,7 +323,7 @@ export const Gui = memo(function Gui() {
     return () => window.removeEventListener("resize", updateDimensions);
   }, []);
 
-
+  return null
   return (
     <>
       <Toaster />
