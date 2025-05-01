@@ -18,8 +18,6 @@ export type SettingsType = {
     sounds: boolean;
 }
 
-//
-// Define the atom with a type
 export const gameStateAtom = atom<GameState>(
     "in-menu",
     // process.env.NODE_ENV === "development" ? "playing" : "in-menu",
