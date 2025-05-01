@@ -49,7 +49,6 @@ export const Gui = memo(function Gui() {
     useState<boolean>(false);
 
   const [gameState, setGameState] = useAtom(gameStateAtom);
-  // const [menuState, setMenuState] = useState<MenuState>(MenuStates.landingPage);
   const [currentFishes, setCurrentFishes] = useAtom(currentFishesAtom);
   const [score, setScore] = useAtom(scoreAtom);
   const setHaloQuantity = useSetAtom(haloQuantityAtom);
@@ -66,7 +65,7 @@ export const Gui = memo(function Gui() {
   const [isRegistered, setIsRegistered] = useState(false);
 
   const fetchWallet = async (session?: SessionData) => {
-    if (!publicClient || !address || !abstractClient) return;
+    // if (!publicClient || !address || !abstractClient) return;
 
     // for (let i = 0; i < powerupsMeta.length; i++) {
     //   console.log(i)
@@ -83,22 +82,30 @@ export const Gui = memo(function Gui() {
 
     const ids = itemsMeta.map((p) => p.id);
 
-    const [[registeredRes, ownedRes], balance] = await Promise.all([await publicClient.multicall({
-      contracts: [
-        {
-          ...registryContract,
-          functionName: "registeredAddresses",
-          args: [address],
-        },
-        {
-          ...powerupsContract,
-          functionName: "getOwnedPowerups",
-          args: [address, ids],
-        },
-      ],
-    }), publicClient.getBalance({
-      address: address as `0x${string}`,
-    })])
+    let registeredRes, ownedRes, balance;
+    try {
+      [[registeredRes, ownedRes], balance] = await Promise.all([await publicClient.multicall({
+        contracts: [
+          {
+            ...registryContract,
+            functionName: "registeredAddresses",
+            args: [address],
+          },
+          {
+            ...powerupsContract,
+            functionName: "getOwnedPowerups",
+            args: [address, ids],
+          },
+        ],
+      }), publicClient.getBalance({
+        address: address as `0x${string}`,
+      })])
+    } catch (err) {
+      toast.error("Error fetching player's data");
+      registeredRes = { result: false };
+      ownedRes = { result: new Array(itemsMeta.length).fill(0) };
+      balance = BigInt(0);
+    }
 
     setBalance(balance);
 
@@ -114,25 +121,26 @@ export const Gui = memo(function Gui() {
       owned.map((qty, i) => {
         const meta = itemsMeta[i];
         const hasDisabledIndex = disabledIds.indexOf(meta.id);
+        const isEnabled = hasDisabledIndex == -1;
         const quantity = Number(qty);
 
         if (meta.name === "Abstract Halo") {
-          setHaloQuantity(hasDisabledIndex == -1 ? quantity : 0);
+          setHaloQuantity(isEnabled ? quantity : 0);
         }
 
         if (meta.name === "Speedy Start") {
-          setSpeedyStartQuantity(hasDisabledIndex == -1 ? quantity : 0);
+          setSpeedyStartQuantity(isEnabled ? quantity : 0);
         }
 
         if (meta.name === "Slow Skis") {
-          setHasSlowSkis(hasDisabledIndex == -1 ? quantity > 0 : false);
+          setHasSlowSkis(isEnabled ? quantity > 0 : false);
         }
 
         if (meta.name === "Lucky Charm") {
-          setHasLuckyCharm(hasDisabledIndex == -1 ? quantity > 0 : false);
+          setHasLuckyCharm(isEnabled ? quantity > 0 : false);
         }
 
-        return { ...meta, quantity, isDisabled: hasDisabledIndex !== -1 };
+        return { ...meta, quantity, isDisabled: !isEnabled };
       }),
     );
 
@@ -247,7 +255,7 @@ export const Gui = memo(function Gui() {
     (async () => {
       if (isConnected) {
         setIsLoadingWalletData(true);
-        if (abstractClient?.account) {
+        if (abstractClient?.account.address) {
           const s = (await checkForExistingSession()) as SessionData;
           fetchWallet(s);
           setIsLoadingWalletData(false);
@@ -257,7 +265,7 @@ export const Gui = memo(function Gui() {
         }
       }
     })();
-  }, [address, isConnected, abstractClient?.account?.address]);
+  }, [isConnected, abstractClient?.account?.address]);
 
   const checkForExistingSession = async () => {
     let session = null;
@@ -341,7 +349,7 @@ export const Gui = memo(function Gui() {
       )}
 
       {overlay && (
-        <div className="absolute inset-0 bg-black/80 z-[90] flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/80 z-[90] flex items-center justify-center w-screen">
           <div className="h-full"
             style={{
               width: dimensions.width + "px",

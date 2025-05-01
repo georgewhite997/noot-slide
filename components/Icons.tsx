@@ -407,3 +407,25 @@ export const PlusIcon = ({ className }: { className?: string }) => {
 
     )
 }
+
+export const MinusIcon = ({ className }: { className?: string }) => {
+    return (
+        <svg className={className} width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g filter="url(#filter0_d_19_1442)">
+                <path d="M21.375 12C21.375 12.2984 21.2565 12.5845 21.0455 12.7955C20.8345 13.0065 20.5484 13.125 20.25 13.125H3.75C3.45163 13.125 3.16548 13.0065 2.9545 12.7955C2.74353 12.5845 2.625 12.2984 2.625 12C2.625 11.7016 2.74353 11.4155 2.9545 11.2045C3.16548 10.9935 3.45163 10.875 3.75 10.875H20.25C20.5484 10.875 20.8345 10.9935 21.0455 11.2045C21.2565 11.4155 21.375 11.7016 21.375 12Z" fill="white" />
+                <path d="M20.25 10.125L20.4355 10.1338C20.8647 10.1764 21.2685 10.3662 21.5762 10.6738L21.7002 10.8115C21.9737 11.1452 22.125 11.5648 22.125 12C22.125 12.4352 21.9737 12.8548 21.7002 13.1885L21.5762 13.3262C21.2245 13.6778 20.7473 13.875 20.25 13.875H3.75C3.31479 13.875 2.8952 13.7237 2.56152 13.4502L2.42383 13.3262C2.0722 12.9745 1.875 12.4973 1.875 12C1.875 11.5027 2.0722 11.0255 2.42383 10.6738L2.56152 10.5498C2.8952 10.2763 3.31479 10.125 3.75 10.125H20.25Z" stroke="black" stroke-width="1.5" />
+            </g>
+            <defs>
+                <filter id="filter0_d_19_1442" x="1.125" y="9.375" width="22.75" height="6.25" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+                    <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha" />
+                    <feOffset dx="1" dy="1" />
+                    <feComposite in2="hardAlpha" operator="out" />
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0" />
+                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_19_1442" />
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_19_1442" result="shape" />
+                </filter>
+            </defs>
+        </svg>
+    )
+}
