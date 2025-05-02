@@ -65,7 +65,7 @@ const Reviving = ({ setGameState, address, publicClient, abstractClient }: Reviv
     };
 
     return (
-        <div className="flex justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[402px] h-full bg-[rgba(0,0,0,0.8)]">
+        <div className="flex justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[402px] h-full">
             <div className={`flex flex-col items-center bg-[#C7F4FE] w-[350px] h-fit p-[24px] rounded-md border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]`}>
                 <h1 className="text-center text-[32px]">Continue?</h1>
 
