@@ -197,6 +197,7 @@ const Stones2 = (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => {
         return new THREE.Object3D()
     }, []);
 
+    const hasLift = useMemo(() => Math.random() > 0.5, [])
 
     const arr = [model1, model2, model3, model4,
         skiLift, redFlag,
@@ -208,8 +209,6 @@ const Stones2 = (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => {
         console.log("missing models in 'stones2'")
         return <></>;
     }
-
-    const hasLift = useMemo(() => Math.random() > 0.5, [])
 
     return (
         <>

@@ -1,10 +1,10 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
-
 import "./Ownable.sol";
 import "./IERC20.sol";
-
 contract Registry is Ownable {
     mapping(address => bool) public registeredAddresses;
+
     uint256 public registrationFee = 0.0028 ether;
 
     event Registered(address indexed registeredAddress);
@@ -35,6 +35,3 @@ contract Registry is Ownable {
     receive() external payable {}
     fallback() external payable {}
 }
-
- 
- 
