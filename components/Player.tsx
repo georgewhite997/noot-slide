@@ -10,7 +10,7 @@ import {
 } from "@react-three/rapier";
 import { SLOPE_ANGLE, lanes } from "./shared";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, magnetCollectedAtAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, hasSlowSkisAtom, reviveCountAtom, scoreAtom } from "@/atoms";
+import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, magnetCollectedAtAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, hasSlowSkisAtom, reviveCountAtom, scoreAtom, storeAssetsGltfAtom } from "@/atoms";
 import { useAbstractClient } from "@abstract-foundation/agw-react";
 import { chain, hasPowerup, items, powerupsContractAddress } from "@/utils";
 import { parseAbi } from "viem";
@@ -44,7 +44,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const lastRemovedName = useRef<string>('');
   const hasHalo = useRef(false);
   const [reviveCount, setReviveCount] = useAtom(reviveCountAtom);
-  const hasSlowSkis = useAtomValue(hasSlowSkisAtom);
+  const [hasSlowSkis, setHasSlowSkis] = useAtom(hasSlowSkisAtom);
 
   const [magnetCollectedAt, setMagnetCollectedAt] = useAtom(magnetCollectedAtAtom);
   const [magnetDuration, setMagnetDuration] = useAtom(magnetDurationAtom);
@@ -67,6 +67,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const isVisible = useRef(true)
 
   const gltf = useLoader(GLTFLoader, "/animations.glb");
+  const storeAssetsGltf = useAtomValue(storeAssetsGltfAtom);
 
   const afterDeathAnimation = () => {
     if (reviveCount < MAX_REVIVE_COUNT) {
@@ -221,6 +222,12 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
           lane.current = currentLane - 1;
         }
       }
+      // if (key === 'g') {
+      //   setHasSlowSkis(prev => {
+      //     console.log(!prev)
+      //     return !prev;
+      //   });
+      // }
       if (key === "d" || key === "arrowright") {
         const currentLane = lane.current;
         if (currentLane < 2) {
@@ -757,6 +764,67 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     camera.position.copy(cameraTargetRef.current);
     camera.lookAt(cameraLookAtRef.current);
   });
+
+  useEffect(() => {
+    if (!storeAssetsGltf) return;
+
+    const playerScene = gltf.scene;
+    const storeScene = storeAssetsGltf.scene;
+
+    if (!playerScene || !storeScene) return;
+
+    // Get default skis
+    const ski_L007 = playerScene.getObjectByName("ski_L007");
+    const ski_R007 = playerScene.getObjectByName("ski_R007");
+
+    // Get slow skis if already in scene
+    let ski_L_slow = playerScene.getObjectByName("ski_L_slow");
+    let ski_R_slow = playerScene.getObjectByName("ski_R_slow");
+
+    // Parent nodes
+    const leftParent = ski_L007?.parent;
+    const rightParent = ski_R007?.parent;
+
+    // Add slow skis once if not added yet
+    if (!ski_L_slow && storeScene.getObjectByName("ski_L001") && leftParent) {
+      const cloned = storeScene.getObjectByName("ski_L001")?.clone();
+      if (cloned) {
+        cloned.name = "ski_L_slow";
+        cloned.position.copy(ski_L007.position);
+        cloned.rotation.copy(ski_L007.rotation);
+        cloned.scale.copy(ski_L007.scale);
+        leftParent.add(cloned);
+        ski_L_slow = cloned;
+      }
+    }
+
+    if (!ski_R_slow && storeScene.getObjectByName("ski_R001") && rightParent) {
+      const cloned = storeScene.getObjectByName("ski_R001")?.clone();
+      if (cloned) {
+        cloned.name = "ski_R_slow";
+        cloned.position.copy(ski_R007.position);
+        cloned.rotation.copy(ski_R007.rotation);
+        cloned.scale.copy(ski_R007.scale);
+        rightParent.add(cloned);
+        ski_R_slow = cloned;
+      }
+    }
+
+    // Toggle visibility
+    if (hasSlowSkis) {
+      if (ski_L007) ski_L007.visible = false;
+      if (ski_R007) ski_R007.visible = false;
+      if (ski_L_slow) ski_L_slow.visible = true;
+      if (ski_R_slow) ski_R_slow.visible = true;
+    } else {
+      if (ski_L007) ski_L007.visible = true;
+      if (ski_R007) ski_R007.visible = true;
+      if (ski_L_slow) ski_L_slow.visible = false;
+      if (ski_R_slow) ski_R_slow.visible = false;
+    }
+
+  }, [storeAssetsGltf, hasSlowSkis]);
+
 
   return (
     <RigidBody

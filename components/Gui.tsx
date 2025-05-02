@@ -58,9 +58,7 @@ export const Gui = memo(function Gui() {
   const setItems = useSetAtom(itemsAtom)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [balance, setBalance] = useState<bigint>(BigInt(0));
-
-
-  const [isRegistered, setIsRegistered] = useState(true);//
+  const [isRegistered, setIsRegistered] = useState(false);
 
   const fetchWallet = async (session?: SessionData) => {
     if (!publicClient || !address || !abstractClient) return;
@@ -155,7 +153,12 @@ export const Gui = memo(function Gui() {
       address: abstractClient.account.address as `0x${string}`,
     });
 
-    if (!bal) return toast.error("Error getting balance");
+    if (bal === BigInt(0)) {
+      return toast.error("You don't have enough balance");
+    }
+    if (!bal) {
+      return toast.error("Error getting balance");
+    }
 
     const [feeRes, registeredRes] = await publicClient.multicall({
       contracts: [
