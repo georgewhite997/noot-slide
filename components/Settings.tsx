@@ -3,6 +3,7 @@ import { useAtom } from "jotai";
 import PrimaryButton from "./buttons/PrimaryButton";
 import { useState } from "react";
 import { Confirmation } from "./Confirmation";
+import { useDisconnect } from "wagmi";
 
 const ToggleSetting = ({ label, options, selected, onChange, className }: { label: string, options: [string, string], selected: 0 | 1, onChange: () => void, className?: string }) => {
     const [first, second] = options;
@@ -29,6 +30,12 @@ const Settings = ({ onClose, inGame = false }: { onClose: () => void, inGame?: b
     const [settings, setSettings] = useAtom(settingsAtom);
     const [confirmingEnding, setConfirmingEnding] = useState<boolean>(false);
     const [newSettings, setNewSettings] = useState<SettingsType>(settings);
+    const { disconnect } = useDisconnect();
+
+    const handleLogout = () => {
+        disconnect();
+        onClose();
+    };
 
     return (
         <>
@@ -45,7 +52,7 @@ const Settings = ({ onClose, inGame = false }: { onClose: () => void, inGame?: b
                                     <img width={39} height={39} src="/wallet-icon.png" alt="" />
                                     <div className="ml-1">FT2...Hs1</div>
                                 </div>
-                                <PrimaryButton className="w-[100px]" color="red">LOG OUT</PrimaryButton>
+                                <PrimaryButton className="w-[100px]" color="red" onClick={handleLogout}>LOG OUT</PrimaryButton>
                             </div>
                         )}
 

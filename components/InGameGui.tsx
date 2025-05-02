@@ -1,9 +1,10 @@
-import { currentFishesAtom, hasFishingNetAtom, hasMultiplierAtom, scoreAtom } from "@/atoms";
+import { currentFishesAtom, magnetCollectedAtAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, scoreAtom } from "@/atoms";
 import { useAtom } from "jotai";
 import { HTMLAttributes, useState } from "react"
 import { LightingIcon } from "./Icons";
 import Settings from "./Settings";
 import Pause from "./Pause";
+import { getRemainingTime, hasPowerup } from "@/utils";
 
 type ActiveModalType = 'none' | 'settings' | 'pause'
 
@@ -13,8 +14,10 @@ export const InGameGui = ({
 }: HTMLAttributes<HTMLDivElement> & {
     className?: string
 }) => {
-    const [hasFishingNet] = useAtom(hasFishingNetAtom);
-    const [hasMultiplier] = useAtom(hasMultiplierAtom);
+    const [magnetCollectedAt] = useAtom(magnetCollectedAtAtom);
+    const [magnetDuration] = useAtom(magnetDurationAtom);
+    const [multiplierCollectedAt] = useAtom(multiplierCollectedAtAtom);
+    const [multiplierDuration] = useAtom(multiplierDurationAtom);
     const [score] = useAtom(scoreAtom);
     const [currentFishes] = useAtom(currentFishesAtom);
     const [activeModal, setActiveModal] = useState<ActiveModalType>('none');
@@ -65,8 +68,18 @@ export const InGameGui = ({
                         <div className="ml-1">{score}</div>
                     </div>
                     <div className="flex mt-2 justify-center">
-                        {hasFishingNet && <div className="bg-[rgba(0,0,0,0.35)] w-fit p-2 rounded-lg flex items-center justify-center">N</div>}
-                        {hasMultiplier && <div className="ml-2 bg-[rgba(0,0,0,0.35)] w-fit p-2 rounded-lg flex items-center justify-center">M</div>}
+                        {hasPowerup(magnetCollectedAt, magnetDuration) && (
+                            <div className="bg-[rgba(0,0,0,0.35)] w-fit p-2 rounded-lg flex items-center justify-center">
+                                <span>N</span>
+                                <span className="ml-1 text-xs">{getRemainingTime(magnetCollectedAt, magnetDuration)}s</span>
+                            </div>
+                        )}
+                        {hasPowerup(multiplierCollectedAt, multiplierDuration) && (
+                            <div className="ml-2 bg-[rgba(0,0,0,0.35)] w-fit p-2 rounded-lg flex items-center justify-center">
+                                <span>M</span>
+                                <span className="ml-1 text-xs">{getRemainingTime(multiplierCollectedAt, multiplierDuration)}s</span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

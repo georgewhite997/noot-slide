@@ -294,7 +294,7 @@ export const SideEnvironment = memo(
                         map={colorMap}
                         normalMap={normalMap}
                         normalScale={new THREE.Vector2(1, 1)}
-                        roughness={0}
+                        roughness={0.3}
                         metalness={0}
                     />
 

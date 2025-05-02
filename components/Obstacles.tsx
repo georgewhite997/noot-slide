@@ -1,14 +1,14 @@
 import { memo, useEffect, useMemo, useRef } from "react";
 import { IChunk, IObstacle, IObstacleType, IObstacleTypeWithChance, laneType } from "./shared";
 import { lanes, SEGMENT_LENGTH } from "./shared";
-import { getSnowBumps, noise2D } from "@/utils";
+import { getSnowBumps, hasPowerup, noise2D } from "@/utils";
 import { CuboidCollider, RigidBody } from "@react-three/rapier";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { clone } from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { useAtom } from "jotai";
-import { hasFishingNetAtom, scoreAtom } from "@/atoms";
+import { magnetCollectedAtAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, scoreAtom } from "@/atoms";
 
 const RAMP_LENGTH = 2.5;
 const RAMP_WIDTH = 3;
@@ -1388,7 +1388,9 @@ const TexturedObstacle = ({ x, y, z, obstacle, objectName, gltf, scale = 1, rota
 };
 
 export const Fish = ({ x, y, z, Model }: { x: number; y: number; z: number, Model: any }) => {
-  const [hasFishingNet] = useAtom(hasFishingNetAtom);
+  const [magnetCollectedAt] = useAtom(magnetCollectedAtAtom);
+  const [magnetDuration] = useAtom(magnetDurationAtom);
+
   const groupRef = useRef<THREE.Group & { wasHit: boolean; opacity: number; } | null>(null)
   const fishId = useMemo(() => THREE.MathUtils.generateUUID(), [])
 
@@ -1435,7 +1437,7 @@ export const Fish = ({ x, y, z, Model }: { x: number; y: number; z: number, Mode
         sensor
         onIntersectionEnter={({ other }) => {
           //if no hasMagnet atom return
-          if (!hasFishingNet) return;
+          if (!hasPowerup(magnetCollectedAt, magnetDuration)) return;
           if (other.rigidBodyObject?.name === 'player' && groupRef.current && !groupRef.current.wasHit) {
             groupRef.current.wasHit = true
           }
