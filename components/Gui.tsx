@@ -149,6 +149,7 @@ export const Gui = memo(function Gui() {
   };
 
   const register = async () => {
+    return;
     if (!abstractClient || isRegistered || !publicClient) return;
 
     const bal = await publicClient.getBalance({
@@ -169,7 +170,7 @@ export const Gui = memo(function Gui() {
     });
 
     if (registeredRes.result) {
-      setIsRegistered(true);
+      // setIsRegistered(true);
       return toast.error("You are already registered");
     }
 
