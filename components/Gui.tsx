@@ -58,9 +58,7 @@ export const Gui = memo(function Gui() {
   const setItems = useSetAtom(itemsAtom)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [balance, setBalance] = useState<bigint>(BigInt(0));
-
-
-  const [isRegistered, setIsRegistered] = useState(true);//
+  const [isRegistered, setIsRegistered] = useState(false);
 
   const fetchWallet = async (session?: SessionData) => {
     if (!publicClient || !address || !abstractClient) return;
@@ -174,7 +172,7 @@ export const Gui = memo(function Gui() {
     });
 
     if (registeredRes.result) {
-      // setIsRegistered(true);
+      setIsRegistered(true);
       return toast.error("You are already registered");
     }
 
