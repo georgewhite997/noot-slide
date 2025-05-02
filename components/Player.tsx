@@ -205,11 +205,14 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
     deathAction.current.setLoop(THREE.LoopOnce, 1);
     deathAction.current.clampWhenFinished = true;
+    deathAction.current.time = 0.1;
     deathAction.current.play();
   };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (deathAction.current?.isRunning()) return;
+
       const key = e.key.toLowerCase();
       if (key === "a" || key === "arrowleft") {
         const currentLane = lane.current;
@@ -246,6 +249,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     };
 
     const handleTouchMove = (e: TouchEvent) => {
+      if (deathAction.current?.isRunning()) return;
       if (!isTouchActive.current) return;
 
       const touchEndX = e.touches[0].clientX;
@@ -614,7 +618,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
 
     const deathTime = deathAction.current?.time || 0;
-    if (deathTime > 1.1) {
+    if (deathTime > 1) {
       deathAction.current?.stop()
       afterDeathAnimation()
     }
