@@ -209,7 +209,7 @@ const Stones2 = (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => {
         return <></>;
     }
 
-    const hasLift = Math.random() > 0.5
+    const hasLift = useMemo(() => Math.random() > 0.5, [])
 
     return (
         <>
@@ -269,7 +269,7 @@ export const SideEnvironment = memo(
 
         const EnvironmentSegment = useMemo(() =>
             allEnvironments[
-            1//  Math.floor(Math.random() * allEnvironments.length)
+            Math.floor(Math.random() * allEnvironments.length)
             ],
             [allEnvironments.length]
         );

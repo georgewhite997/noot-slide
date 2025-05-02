@@ -251,9 +251,7 @@ export const Ground = memo(function Ground() {
 
   return (
     <>
-      {/*
       <Player onChunkRemoved={onChunkRemoved} />
-      */}
       <group>
         {segments.map((segment) => (
           <group key={`${segment.index}-${segment.zOffset}-${segment.yOffset}`}>
