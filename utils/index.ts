@@ -171,6 +171,14 @@ export const items: IItem[] = [
 ];
 
 
+export const hasPowerup = (collectedAt: number, duration: number) => {
+  return Date.now() < collectedAt + duration;
+}
+
+export const getRemainingTime = (collectedAt: number, duration: number) => {
+  return Math.ceil((collectedAt + duration - Date.now()) / 1000);
+}
+
 export const MAX_MOBILE_WIDTH = 402;
 export const MAX_MOBILE_HEIGHT = 874;
 

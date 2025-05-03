@@ -178,7 +178,7 @@ const Item = ({
           transition: 'max-height 0.4s ease, opacity 0.3s ease',
         }}
       >
-        {item.type === "one-time" && <div className="text-[14px] mt-2 text-[#5FFF7A] uppercase">{item.quantity} owned</div>}
+        {(item.type === "one-time" && item.quantity > 0) && <div className="text-[14px] mt-2 text-[#5FFF7A] uppercase">{item.quantity} owned</div>}
 
         <div className="mt-2 text-[14px]">{item.description}</div>
         {item.type === 'permanent' && item.quantity === 0 && (

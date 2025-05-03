@@ -10,9 +10,9 @@ import {
 } from "@react-three/rapier";
 import { SLOPE_ANGLE, lanes } from "./shared";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, hasFishingNetAtom, hasMultiplierAtom, hasSlowSkisAtom, reviveCountAtom, scoreAtom, storeAssetsGltfAtom } from "@/atoms";
+import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, magnetCollectedAtAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, hasSlowSkisAtom, reviveCountAtom, scoreAtom, storeAssetsGltfAtom } from "@/atoms";
 import { useAbstractClient } from "@abstract-foundation/agw-react";
-import { chain, items, powerupsContractAddress } from "@/utils";
+import { chain, hasPowerup, items, powerupsContractAddress } from "@/utils";
 import { parseAbi } from "viem";
 
 const LANE_TRANSITION_SPEED = 2.5;
@@ -46,13 +46,12 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const [reviveCount, setReviveCount] = useAtom(reviveCountAtom);
   const [hasSlowSkis, setHasSlowSkis] = useAtom(hasSlowSkisAtom);
 
-  const magnetCollectedAt = useRef<number>(0);
-  const magnetDuration = useRef<number>(0);
+  const [magnetCollectedAt, setMagnetCollectedAt] = useAtom(magnetCollectedAtAtom);
+  const [magnetDuration, setMagnetDuration] = useAtom(magnetDurationAtom);
 
-  const multiplierCollectedAt = useRef<number>(0);
-  const multiplierDuration = useRef<number>(0);
+  const [multiplierCollectedAt, setMultiplierCollectedAt] = useAtom(multiplierCollectedAtAtom);
+  const [multiplierDuration, setMultiplierDuration] = useAtom(multiplierDurationAtom);
   const [haloQuantity, setHaloQuantity] = useAtom(haloQuantityAtom);
-  const [hasMultiplier, setHasMultiplier] = useAtom(hasMultiplierAtom);
 
   const touchStartX = useRef<number>(0);
   const touchStartY = useRef<number>(0);
@@ -61,12 +60,11 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
   const targetZVelocity = useRef(-3);
   const lastTakenFishes = useRef<Set<string>>(new Set());
+  const lastTakenPowerups = useRef<Set<string>>(new Set());
 
   const [gameState, setGameState] = useAtom(gameStateAtom);
   const setCurrentFishes = useSetAtom(currentFishesAtom);
   const isVisible = useRef(true)
-
-  const [hasFishingNet, setHasFishingNet] = useAtom(hasFishingNetAtom);
 
   const gltf = useLoader(GLTFLoader, "/animations.glb");
   const storeAssetsGltf = useAtomValue(storeAssetsGltfAtom);
@@ -505,79 +503,71 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       const name = event.other.rigidBodyObject.name;
 
       if (name === "fishing-net") {
-        const currentPosition = ref.current.translation();
-
-        // Initialize initial position if not set
-        if (initialZPosition.current === null) {
-          initialZPosition.current = currentPosition.z;
-        }
-
-        // Calculate and log distance traveled
-        if (initialZPosition.current !== null) {
-          const distanceTraveled = Math.round(Math.abs(initialZPosition.current - currentPosition.z) * 2);
-
+        const powerupId = `fishing-net-${event.other.rigidBodyObject.uuid}`;
+        
+        if (!lastTakenPowerups.current.has(powerupId)) {
+          lastTakenPowerups.current.add(powerupId);
+          
           let newDuration;
-
-          // Randomly select magnet duration based on rarity
           const rarity = Math.random();
-          if (rarity < 0.6) { // 60% chance for common
-            newDuration = 100;
-          } else if (rarity < 0.9) { // 30% chance for rare
-            newDuration = 250;
-          } else { // 10% chance for giga rare
-            newDuration = 750;
+          if (rarity < 0.6) {
+            newDuration = 10_000;
+          } else if (rarity < 0.9) {
+            newDuration = 25_000;
+          } else {
+            newDuration = 75_000;
           }
 
-          if (hasFishingNet) {
-            magnetDuration.current += newDuration;
+          if (hasPowerup(magnetCollectedAt, magnetDuration)) {
+            setMagnetDuration(prev => prev + newDuration);
           } else {
-            magnetCollectedAt.current = distanceTraveled;
-            magnetDuration.current = newDuration;
-            setHasFishingNet(true);
+            setMagnetCollectedAt(Date.now());
+            setMagnetDuration(newDuration);
+          }
+
+          if (lastTakenPowerups.current.size === 20) {
+            const powerupsToDelete = Array.from(lastTakenPowerups.current.values()).slice(0, 5);
+            powerupsToDelete.forEach(powerup => lastTakenPowerups.current.delete(powerup));
           }
         }
       }
 
       if (name === "fish-multiplier") {
-        const currentPosition = ref.current.translation();
-
-        // Initialize initial position if not set
-        if (initialZPosition.current === null) {
-          initialZPosition.current = currentPosition.z;
-        }
-
-        // Calculate and log distance traveled
-        if (initialZPosition.current !== null) {
-          const distanceTraveled = Math.round(Math.abs(initialZPosition.current - currentPosition.z) * 2);
-
+        const powerupId = `fish-multiplier-${event.other.rigidBodyObject.uuid}`;
+        
+        if (!lastTakenPowerups.current.has(powerupId)) {
+          lastTakenPowerups.current.add(powerupId);
+          
           let newDuration;
-
-          // Randomly select magnet duration based on rarity
           const rarity = Math.random();
-          if (rarity < 0.6) { // 60% chance for common
-            newDuration = 100;
-          } else if (rarity < 0.9) { // 30% chance for rare
-            newDuration = 250;
-          } else { // 10% chance for giga rare
-            newDuration = 750;
+          if (rarity < 0.6) {
+            newDuration = 10_000;
+          } else if (rarity < 0.9) {
+            newDuration = 25_000;
+          } else {
+            newDuration = 75_000;
           }
 
-          if (hasMultiplier) {
-            multiplierDuration.current += newDuration;
+          if (hasPowerup(multiplierCollectedAt, multiplierDuration)) {
+            setMultiplierDuration(prev => prev + newDuration);
           } else {
-            multiplierCollectedAt.current = distanceTraveled;
-            multiplierDuration.current = newDuration;
-            setHasMultiplier(true);
+            setMultiplierCollectedAt(Date.now());
+            setMultiplierDuration(newDuration);
+          }
+
+          if (lastTakenPowerups.current.size === 20) {
+            const powerupsToDelete = Array.from(lastTakenPowerups.current.values()).slice(0, 5);
+            powerupsToDelete.forEach(powerup => lastTakenPowerups.current.delete(powerup));
           }
         }
       }
 
-      if (name.startsWith('fish') && !hasFishingNet) {
+      if (name.startsWith('fish') && !hasPowerup(magnetCollectedAt, magnetDuration)) {
         const fishUuid = name.split("-")[1];
 
         if (!lastTakenFishes.current.has(fishUuid)) {
           lastTakenFishes.current.add(fishUuid);
-          setCurrentFishes(prev => prev + (hasMultiplier ? 2 : 1));
+          setCurrentFishes(prev => prev + (hasPowerup(multiplierCollectedAt, multiplierDuration) ? 2 : 1));
         }
 
         if (lastTakenFishes.current.size === 20) {
@@ -586,13 +576,13 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
         }
       }
 
-      if (hasFishingNet && name.startsWith("fish-hitbox")) {
+      if (hasPowerup(magnetCollectedAt, magnetDuration) && name.startsWith("fish-hitbox")) {
         const fishUuid = name.split("-")[2];
 
         if (!lastTakenFishes.current.has(fishUuid)) {
           lastTakenFishes.current.add(fishUuid);
           // setCurrentFishes(prev => prev + 1);
-          setCurrentFishes(prev => prev + (hasMultiplier ? 2 : 1));
+          setCurrentFishes(prev => prev + (hasPowerup(multiplierCollectedAt, multiplierDuration) ? 2 : 1));
         }
 
         if (lastTakenFishes.current.size === 20) {
@@ -657,18 +647,6 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       if (score != distanceTraveled) {
         setScore(distanceTraveled);
       }
-
-      if (score > magnetCollectedAt.current + magnetDuration.current) {
-        setHasFishingNet(false);
-        magnetCollectedAt.current = 0;
-        magnetDuration.current = 0;
-      }
-
-      if (score > multiplierCollectedAt.current + multiplierDuration.current) {
-        setHasMultiplier(false);
-        multiplierCollectedAt.current = 0;
-        multiplierDuration.current = 0;
-      }
     }
 
     const currentVelocity = ref.current.linvel();
@@ -689,8 +667,10 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       ref.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
 
       setReviveCount(0)
-      setHasFishingNet(false);
-      setHasMultiplier(false);
+      setMagnetCollectedAt(0);
+      setMagnetDuration(0);
+      setMultiplierCollectedAt(0);
+      setMultiplierDuration(0);
       hasHalo.current = haloQuantity > 0;
       lastRemovedName.current = '';
       lastCollided.current = ''
@@ -887,9 +867,7 @@ const Halo = memo(function Halo() {
       <meshBasicMaterial color="#41f09c" />
     </mesh>
   )
-});
-
-const FishingNetIndicator = memo(function FishingNetIndicator() {
+});const FishingNetIndicator = memo(function FishingNetIndicator() {
   return (
     <mesh position={[0, 2, 0.2]} rotation={[Math.PI / 2, 0, 0]}>
       <boxGeometry args={[0.2, 0.02, 0.2]} />
@@ -906,3 +884,4 @@ const MultiplierIndicator = memo(function MultiplierIndicator() {
     </mesh>
   )
 })
+
