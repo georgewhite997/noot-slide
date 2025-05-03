@@ -5,6 +5,7 @@ import { LightingIcon } from "./Icons";
 import Settings from "./Settings";
 import Pause from "./Pause";
 import { getRemainingTime, hasPowerup } from "@/utils";
+import { useAccount } from "wagmi";
 
 type ActiveModalType = 'none' | 'settings' | 'pause'
 
@@ -21,6 +22,7 @@ export const InGameGui = ({
     const [score] = useAtom(scoreAtom);
     const [currentFishes] = useAtom(currentFishesAtom);
     const [activeModal, setActiveModal] = useState<ActiveModalType>('none');
+    const { address } = useAccount();
 
     const onModalClose = () => {
         setActiveModal('none');
@@ -88,6 +90,7 @@ export const InGameGui = ({
                 <Settings
                     onClose={onModalClose}
                     inGame={true}
+                    address={address}
                 />
             )}
             {activeModal === 'pause' && (

@@ -1,3 +1,4 @@
+import { displayAddress } from "@/utils";
 import ConnectButton from "./ConnectButton";
 
 type AuthPageProps = {
@@ -34,7 +35,7 @@ const AuthPage = ({
                         {address && <div className="absolute top-[20px] right-[10px]">
                             <div className="relative flex items-center justify-center gap-[1px] py-[2px] px-[6px]"
                                 style={{ background: 'url(/wallet-badge-bg.svg)' }}>
-                                {address.slice(0, 4) + '...' + address.slice(-3)}
+                                {displayAddress(address)}
                                 <img src="/wallet-icon.png" className="" />
                             </div>
                         </div>

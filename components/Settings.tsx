@@ -4,6 +4,7 @@ import PrimaryButton from "./buttons/PrimaryButton";
 import { useState } from "react";
 import { Confirmation } from "./Confirmation";
 import { useDisconnect } from "wagmi";
+import { displayAddress } from "@/utils";
 
 const ToggleSetting = ({ label, options, selected, onChange, className }: { label: string, options: [string, string], selected: 0 | 1, onChange: () => void, className?: string }) => {
     const [first, second] = options;
@@ -26,7 +27,7 @@ const ToggleSetting = ({ label, options, selected, onChange, className }: { labe
     )
 }
 
-const Settings = ({ onClose, inGame = false }: { onClose: () => void, inGame?: boolean }) => {
+const Settings = ({ onClose, inGame = false, address }: { onClose: () => void, inGame?: boolean, address?: string }) => {
     const [settings, setSettings] = useAtom(settingsAtom);
     const [confirmingEnding, setConfirmingEnding] = useState<boolean>(false);
     const [newSettings, setNewSettings] = useState<SettingsType>(settings);
@@ -50,7 +51,7 @@ const Settings = ({ onClose, inGame = false }: { onClose: () => void, inGame?: b
                             <div className="mt-[8px] bg-[#E6FAFF] w-full border-[2px] border-[#030303] rounded-sm p-[8px] flex items-center justify-between shadow-[0px_2px_0px_rgba(0,0,0,0.45)]">
                                 <div className="flex items-center">
                                     <img width={39} height={39} src="/wallet-icon.png" alt="" />
-                                    <div className="ml-1">FT2...Hs1</div>
+                                    <div className="ml-1">{displayAddress(address)}</div>
                                 </div>
                                 <PrimaryButton className="w-[100px]" color="red" onClick={handleLogout}>LOG OUT</PrimaryButton>
                             </div>
