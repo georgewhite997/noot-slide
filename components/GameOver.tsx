@@ -41,11 +41,11 @@ const GameOver = ({
                 setCurrentFishes(0);
                 setScore(0);
                 setGameState("playing");
-            }} className="mt-[24px] w-full h-[44px]" color="green">PLAY AGAIN</PrimaryButton>
+            }} className="mt-[24px] w-full h-[44px]" color="green">TRY AGAIN</PrimaryButton>
 
             <PrimaryButton onClick={() => {
                 setGameState('in-menu');
-            }} className="mt-[10px] w-full h-[44px]" color="blue">BACK TO MENU</PrimaryButton>
+            }} className="mt-[10px] w-full h-[44px]" color="blue">GO HOME</PrimaryButton>
 
         </div>
     </div>
