@@ -10,7 +10,7 @@ import {
 } from "@react-three/rapier";
 import { SLOPE_ANGLE, lanes } from "./shared";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, magnetCollectedAtAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, hasSlowSkisAtom, reviveCountAtom, scoreAtom, storeAssetsGltfAtom } from "@/atoms";
+import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, magnetCollectedAtAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, hasSlowSkisAtom, reviveCountAtom, scoreAtom, storeAssetsGltfAtom, isGamePausedAtom } from "@/atoms";
 import { useAbstractClient } from "@abstract-foundation/agw-react";
 import { chain, hasPowerup, items, powerupsContractAddress } from "@/utils";
 import { parseAbi } from "viem";
@@ -27,6 +27,8 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const [score, setScore] = useAtom(scoreAtom);
   const ref = useRef<RapierRigidBody>(null);
   const lastCollided = useRef('')
+  // const cameraTargetRef = useRef(new THREE.Vector3(0, 15.128119638063186, -21.88320813904049));
+  // const cameraLookAtRef = useRef(new THREE.Vector3(0, 4.32057135223726, -23.200149593075263));
   const cameraTargetRef = useRef(new THREE.Vector3(0, 0, 0));
   const cameraLookAtRef = useRef(new THREE.Vector3(0, 0, 0));
   const initialZPosition = useRef<number | null>(null);
@@ -64,7 +66,10 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
   const [gameState, setGameState] = useAtom(gameStateAtom);
   const setCurrentFishes = useSetAtom(currentFishesAtom);
+  const [isGamePaused, setIsGamePaused] = useAtom(isGamePausedAtom);
   const isVisible = useRef(true)
+
+  const previousVelocity = useRef<{ x: number, y: number, z: number }>({ x: 0, y: 0, z: 0});
 
   const gltf = useLoader(GLTFLoader, "/animations.glb");
   const storeAssetsGltf = useAtomValue(storeAssetsGltfAtom);
@@ -177,6 +182,8 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   }
 
   useEffect(() => {
+    setIsGamePaused(false);
+
     if (gameState === "playing" && reviveCount === 0) {
       ref.current?.setTranslation(PLAYER_START_POSITION, true);
       ref.current?.setLinvel({ x: 0, y: 0, z: -0.5 }, true);
@@ -210,7 +217,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (deathAction.current?.isRunning()) return;
+      if (deathAction.current?.isRunning() || isGamePaused) return;
 
       const key = e.key.toLowerCase();
       if (key === "a" || key === "arrowleft") {
@@ -254,8 +261,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (deathAction.current?.isRunning()) return;
-      if (!isTouchActive.current) return;
+      if (deathAction.current?.isRunning() || isGamePaused || !isTouchActive.current) return;
 
       const touchEndX = e.touches[0].clientX;
       const touchEndY = e.touches[0].clientY;
@@ -504,10 +510,10 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
       if (name === "fishing-net") {
         const powerupId = `fishing-net-${event.other.rigidBodyObject.uuid}`;
-        
+
         if (!lastTakenPowerups.current.has(powerupId)) {
           lastTakenPowerups.current.add(powerupId);
-          
+
           let newDuration;
           const rarity = Math.random();
           if (rarity < 0.6) {
@@ -534,10 +540,10 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
       if (name === "fish-multiplier") {
         const powerupId = `fish-multiplier-${event.other.rigidBodyObject.uuid}`;
-        
+
         if (!lastTakenPowerups.current.has(powerupId)) {
           lastTakenPowerups.current.add(powerupId);
-          
+
           let newDuration;
           const rarity = Math.random();
           if (rarity < 0.6) {
@@ -604,10 +610,16 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
   useFrame(({ camera }, delta) => {
     if (!ref || !("current" in ref) || !ref.current || !isVisible.current) return;
-
+    
+    if (isGamePaused) {
+      camera.position.copy(cameraTargetRef.current);
+      camera.lookAt(cameraLookAtRef.current);
+      return;
+    }
 
     const maxDelta = 1 / 20; // Clamp to 50ms
-    const clampedDelta = Math.min(delta, maxDelta);
+    // const clampedDelta = Math.min(delta, maxDelta);
+    const clampedDelta = delta;
 
     if (mixer.current && gameState !== "in-menu") {
       mixer.current.update(clampedDelta); // Delta is the time between frames
@@ -867,7 +879,7 @@ const Halo = memo(function Halo() {
       <meshBasicMaterial color="#41f09c" />
     </mesh>
   )
-});const FishingNetIndicator = memo(function FishingNetIndicator() {
+}); const FishingNetIndicator = memo(function FishingNetIndicator() {
   return (
     <mesh position={[0, 2, 0.2]} rotation={[Math.PI / 2, 0, 0]}>
       <boxGeometry args={[0.2, 0.02, 0.2]} />

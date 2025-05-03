@@ -52,3 +52,4 @@ export const reviveCountAtom = atom<number>(0);
 export const modelsGltfAtom = atom<GLTF & ObjectMap | null>(null);
 export const storeAssetsGltfAtom = atom<(GLTF & ObjectMap) | null>(null);
 export const fishMeshesAtom = atom<Record<string, THREE.Mesh>>({});
+export const isGamePausedAtom = atom<boolean>(false);

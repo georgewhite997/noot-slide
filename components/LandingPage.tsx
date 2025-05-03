@@ -190,7 +190,7 @@ const LandingPage = ({
                 </div>
 
                 <div className="flex flex-col items-center gap-4 mb-10 relative w-full">
-                    <img src="/noot.webp" alt="noot" className="absolute bottom-[-4px] w-[60%] top-[-275px] mx-auto" />
+                    <img style={{ filter: "drop-shadow(0 0px 33px rgba(0, 0, 0, 0.72))" }} src="/noot.webp" alt="noot" className="absolute bottom-[-4px] w-[60%] top-[-275px] mx-auto z-10" />
                     <div className="relative w-full h-[88px] mt-[-20px]">
                         <img src="/button-cover.svg" className="absolute z-[9] top-[-14px] left-1/2 -translate-x-1/2  min-w-[108%]" alt="snow" />
                         <PrimaryButton

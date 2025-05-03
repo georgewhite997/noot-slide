@@ -1,23 +1,20 @@
-import { settingsAtom } from "@/atoms";
-import { useAtom } from "jotai";
+import { gameStateAtom, settingsAtom } from "@/atoms";
+import { useAtom, useSetAtom } from "jotai";
 import PrimaryButton from "./buttons/PrimaryButton";
 import { useEffect, useState } from "react";
 import { Confirmation } from "./Confirmation";
 
 
 const Pause = ({ onContinue }: { onContinue: () => void }) => {
-    // useEffect(() => {
-    //     alert('Finna add pause functionality');
-    // }, [])
-
-    const [confirming, setConfirming] = useState<boolean>(false);
+     const [confirming, setConfirming] = useState<boolean>(false);
+    const setGameState = useSetAtom(gameStateAtom)
 
     return (
         <>
             {confirming ? (
                 <Confirmation
-                    onYes={() => { alert('no end game functionality') }}
-                    onBack={() => setConfirming(false)}
+                    onYes={() => { setGameState('game-over') }}
+                    onBack={onContinue}
                 />
             ) : (
                 <div className="flex justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[402px] h-full bg-[rgba(0,0,0,0.8)]">
