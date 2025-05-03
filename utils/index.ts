@@ -182,3 +182,23 @@ export const getRemainingTime = (collectedAt: number, duration: number) => {
 export const MAX_MOBILE_WIDTH = 402;
 export const MAX_MOBILE_HEIGHT = 874;
 
+export const displayAddress = (address?: string) => {
+  if (!address) return "";
+
+  return address.slice(0, 4) + "..." + address.slice(-3);
+}
+
+export const formatNootBalance = (n?: bigint) => {
+  if (!n) return "0"
+  const number = Number(formatEther(n))
+  if (number < 1000) {
+    return number.toString();
+  } else if (number < 1_000_000) {
+    return Math.floor(number / 1000) + "K";
+  } else {
+    let formatted = (number / 1_000_000).toFixed(2);
+    formatted = formatted.replace(/\.?0+$/, "");
+    return formatted + "M";
+  }
+}
+

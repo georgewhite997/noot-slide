@@ -17,6 +17,8 @@ import {
     MAX_MOBILE_HEIGHT,
     IUserItem,
     truncateEther,
+    displayAddress,
+    formatNootBalance,
 } from "@/utils";
 import { ChestIcon, LightingIcon, ShoppingCartIcon, StarIcon } from "./Icons";
 import PrimaryButton from "./buttons/PrimaryButton";
@@ -37,6 +39,7 @@ type LandingProps = {
     isLoading: boolean;
     isConnected: boolean;
     balance: bigint;
+    nootBalance: bigint;
 };
 
 type ActiveModalType = 'none' | 'settings' | 'upgrades' | 'item-shop'
@@ -50,6 +53,7 @@ const LandingPage = ({
     isConnected,
     balance,
     handlePurchase,
+    nootBalance,
 }: LandingProps) => {
     const [activeModal, setActiveModal] = useState<ActiveModalType>('none')
 
@@ -104,8 +108,8 @@ const LandingPage = ({
                             </div>
 
                             <div className="mx-3 flex items-center justify-center">
-                                <img src="/penguin-icon.png" alt="fish icon" className="w-[20px] h-[20px]" />
-                                <span className="mx-1">0</span>
+                                <img src="/penguin-icon.png" alt="noot icon" className="w-[20px] h-[20px]" />
+                                <span className="mx-1">{formatNootBalance(nootBalance)}</span>
                             </div>
 
                             <div className="mx-3 flex items-center justify-center">
@@ -169,7 +173,7 @@ const LandingPage = ({
                             }}
                                 className="mt-1 w-full h-[46px] px-4 py-1 flex justify-center items-center"
                             >
-                                <div className="mr-1">FT2...Hs1</div>
+                                <div className="mr-1">{displayAddress(address)}</div>
                                 <img className="ml-1" src="/wallet-icon.png" alt="wallet icon" width={32} height={32} />
                             </div>
                             <div className="mt-3 flex justify-end">
@@ -252,6 +256,7 @@ const LandingPage = ({
                 <Settings
                     onClose={onModalClose}
                     inGame={false}
+                    address={address}
                 />
             )}
             {activeModal === 'upgrades' && (

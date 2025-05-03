@@ -15,7 +15,7 @@ import {
   MAX_MOBILE_HEIGHT
 } from "@/utils";
 import { useEffect, useState, memo } from "react";
-import { formatEther, parseEther } from "viem";
+import { formatEther, parseEther, parseAbi } from "viem";
 import { useAtom, useSetAtom } from "jotai";
 import {
   gameStateAtom, currentFishesAtom,
@@ -32,9 +32,13 @@ import LandingPage from "./LandingPage";
 import GameOver from "./GameOver";
 import Reviving from "./Reviving";
 import { InGameGui } from "./InGameGui";
+import NootToken from "../addresses/Noot.json";
+
+
 
 const registryContract = { address: registryContractAddress, abi: registryAbi };
 const powerupsContract = { address: powerupsContractAddress, abi: powerupsAbi };
+
 // const skinsContract = { address: skinsContractAddress, abi: skinsAbi };
 
 export const Gui = memo(function Gui() {
@@ -58,6 +62,7 @@ export const Gui = memo(function Gui() {
   const setItems = useSetAtom(itemsAtom)
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [balance, setBalance] = useState<bigint>(BigInt(0));
+  const [nootBalance, setNootBalance] = useState<bigint>(BigInt(0));
   const [isRegistered, setIsRegistered] = useState(false);
 
   const fetchWallet = async (session?: SessionData) => {
@@ -78,10 +83,10 @@ export const Gui = memo(function Gui() {
 
     const ids = itemsMeta.map((p) => p.id);
 
-    let registeredRes, ownedRes, balance;
+    let registeredRes, ownedRes, balance, nootBalance;
 
     try {
-      [[registeredRes, ownedRes], balance] = await Promise.all([await publicClient.multicall({
+      [[registeredRes, ownedRes, nootBalance], balance] = await Promise.all([await publicClient.multicall({
         contracts: [
           {
             ...registryContract,
@@ -92,6 +97,14 @@ export const Gui = memo(function Gui() {
             ...powerupsContract,
             functionName: "getOwnedPowerups",
             args: [address, ids],
+          },
+          {
+            abi: parseAbi([
+              "function balanceOf(address account) view returns (uint256)",
+            ]),
+            address: NootToken.address as `0x${string}`,
+            functionName: "balanceOf",
+            args: [address],
           },
         ],
       }), publicClient.getBalance({
@@ -105,6 +118,7 @@ export const Gui = memo(function Gui() {
     }
 
     setBalance(balance);
+    setNootBalance(nootBalance?.result || BigInt(0));
 
     const registered = registeredRes.result as boolean;
     const owned =
@@ -369,6 +383,7 @@ export const Gui = memo(function Gui() {
                   isRegistered={isRegistered}
                   register={register}
                   setGameState={setGameState}
+                  nootBalance={nootBalance}
                   // setMenuState={setMenuState}
                   // items={items}
                   handlePurchase={handlePurchase}

@@ -1,10 +1,11 @@
-import { currentFishesAtom, isGamePausedAtom, magnetCollectedAtAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, scoreAtom } from "@/atoms";
-import { useAtom } from "jotai";
+import { currentFishesAtom, magnetCollectedAtAtom, isGamePausedAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, scoreAtom } from "@/atoms";
+import { useAtom, useSetAtom } from "jotai";
 import { HTMLAttributes, useEffect, useState } from "react"
 import { LightingIcon } from "./Icons";
 import Settings from "./Settings";
 import Pause from "./Pause";
 import { getRemainingTime, hasPowerup } from "@/utils";
+import { useAccount } from "wagmi";
 
 type ActiveModalType = 'none' | 'settings' | 'pause'
 
@@ -21,8 +22,9 @@ export const InGameGui = ({
     const [score] = useAtom(scoreAtom);
     const [currentFishes] = useAtom(currentFishesAtom);
     const [activeModal, setActiveModal] = useState<ActiveModalType>('none');
-    const [isGamePaused, setIsGamePaused] = useAtom(isGamePausedAtom);
+    const setIsGamePaused = useSetAtom(isGamePausedAtom);
     const [countdown, setCountdown] = useState<number | null>(0);
+    const { address } = useAccount();
 
     // Update onModalClose function
     const onModalClose = () => {
@@ -118,6 +120,7 @@ export const InGameGui = ({
                 <Settings
                     onClose={onModalClose}
                     inGame={true}
+                    address={address}
                 />
             )}
             {activeModal === 'pause' && (
