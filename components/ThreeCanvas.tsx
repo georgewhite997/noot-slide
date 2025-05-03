@@ -11,7 +11,7 @@ import {
 } from "@react-three/drei";
 import * as THREE from "three";
 import { useAtomValue } from "jotai";
-import { fishMeshesAtom, storeAssetsGltfAtom, settingsAtom } from "@/atoms";
+import { fishMeshesAtom, storeAssetsGltfAtom, settingsAtom, isGamePausedAtom } from "@/atoms";
 import { useGLTF } from '@react-three/drei';
 import { useSetAtom } from 'jotai';
 import { modelsGltfAtom } from '../atoms';
@@ -112,6 +112,7 @@ export const ThreeCanvas = () => {
 
 const Scene = () => {
   const { scene, gl } = useThree(); // Access the scene and renderer (gl)
+  const isGamePaused = useAtomValue(isGamePausedAtom);
 
   useEffect(() => {
     gl.setClearColor(0xd4e8f0, 1);
@@ -136,6 +137,7 @@ const Scene = () => {
         <Physics
           gravity={[0, -9.81, 0]}
           timeStep="vary"
+          paused={isGamePaused}
         // debug
         >
           <Ground />

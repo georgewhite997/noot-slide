@@ -53,7 +53,7 @@ const PrimaryButton = ({
             {...props}
             className={`text-white rounded-sm p-[5px] ${buttonGradientClassName} border-[#030303] border-2 shadow-[0px_2px_0px_rgba(0,0,0,0.45)] ${className || ''}`}
         >
-            <div>{children}</div>
+            {children}
         </button>
     )
 }

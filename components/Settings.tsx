@@ -1,5 +1,5 @@
-import { settingsAtom, SettingsType } from "@/atoms";
-import { useAtom } from "jotai";
+import { gameStateAtom, settingsAtom, SettingsType } from "@/atoms";
+import { useAtom, useSetAtom } from "jotai";
 import PrimaryButton from "./buttons/PrimaryButton";
 import { useState } from "react";
 import { Confirmation } from "./Confirmation";
@@ -31,6 +31,7 @@ const Settings = ({ onClose, inGame = false }: { onClose: () => void, inGame?: b
     const [confirmingEnding, setConfirmingEnding] = useState<boolean>(false);
     const [newSettings, setNewSettings] = useState<SettingsType>(settings);
     const { disconnect } = useDisconnect();
+    const setGameState = useSetAtom(gameStateAtom)
 
     const handleLogout = () => {
         disconnect();
@@ -154,7 +155,7 @@ const Settings = ({ onClose, inGame = false }: { onClose: () => void, inGame?: b
             ) : (
                 <Confirmation
                     onBack={() => setConfirmingEnding(false)}
-                    onYes={() => alert('no end game functionality yet')}
+                    onYes={() => { setGameState('game-over') }}
                 />
             )}
         </>

@@ -1,6 +1,6 @@
-import { currentFishesAtom, magnetCollectedAtAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, scoreAtom } from "@/atoms";
+import { currentFishesAtom, isGamePausedAtom, magnetCollectedAtAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, scoreAtom } from "@/atoms";
 import { useAtom } from "jotai";
-import { HTMLAttributes, useState } from "react"
+import { HTMLAttributes, useEffect, useState } from "react"
 import { LightingIcon } from "./Icons";
 import Settings from "./Settings";
 import Pause from "./Pause";
@@ -21,10 +21,32 @@ export const InGameGui = ({
     const [score] = useAtom(scoreAtom);
     const [currentFishes] = useAtom(currentFishesAtom);
     const [activeModal, setActiveModal] = useState<ActiveModalType>('none');
+    const [isGamePaused, setIsGamePaused] = useAtom(isGamePausedAtom);
+    const [countdown, setCountdown] = useState<number | null>(0);
 
+    // Update onModalClose function
     const onModalClose = () => {
         setActiveModal('none');
-    }
+        setCountdown(3); // Start countdown
+    };
+
+    //  useEffect to handle countdown logic
+    useEffect(() => {
+        if (countdown === null) return;
+
+        if (countdown === 0) {
+            setIsGamePaused(false);
+            setCountdown(null);
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setCountdown((prev) => (prev ?? 0) - 1);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [countdown]);
+
 
     return (
         <>
@@ -32,7 +54,11 @@ export const InGameGui = ({
                 <div>
                     <button
                         className="text-white relative w-[40px] h-[40px]"
-                        onClick={() => setActiveModal('pause')}
+                        onClick={() => {
+                            setCountdown(null);
+                            setActiveModal('pause');
+                            setIsGamePaused(true);
+                        }}
                     >
                         <img src="/small-button.png" alt="bg" className="" />
                         <img src="/pause-icon.png" alt="settings" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[10]" />
@@ -53,7 +79,11 @@ export const InGameGui = ({
                 <div className="flex h-fit flex-col items-end">
                     <button
                         className="text-white relative w-[40px] h-[40px]"
-                        onClick={() => setActiveModal('settings')}
+                        onClick={() => {
+                            setCountdown(null);
+                            setActiveModal('settings')
+                            setIsGamePaused(true);
+                        }}
                     >
                         <img src="/small-button.png" alt="bg" className="" />
                         <img src="/cog.png" alt="settings" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[10]" />
@@ -94,6 +124,11 @@ export const InGameGui = ({
                 <Pause
                     onContinue={onModalClose}
                 />
+            )}
+            {(countdown !== null && countdown > 0) && (
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-white text-6xl font-bold z-50">
+                    {countdown}
+                </div>
             )}
         </>
     )
