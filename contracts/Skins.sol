@@ -6,12 +6,12 @@ import "./IERC20.sol";
 contract Skins is Ownable {
     address public paymentToken;
 
-    mapping(uint16 => uint256) public skinPrice;
-    mapping(address => mapping(uint16 => bool)) private owns;
+    mapping(uint256 => uint256) public skinPrice;
+    mapping(address => mapping(uint256 => bool)) public ownedSkins;
 
     event SkinPurchased(
         address indexed buyer,
-        uint16 indexed skinId,
+        uint256 indexed skinId,
         uint256 price
     );
 
@@ -26,29 +26,29 @@ contract Skins is Ownable {
         paymentToken = token;
     }
 
-    function setSkinPrice(uint16 skinId, uint256 price) external onlyOwner {
+    function setSkinPrice(uint256 skinId, uint256 price) external onlyOwner {
         skinPrice[skinId] = price;
     }
 
-    function purchase(uint16 skinId) external {
+    function purchase(uint256 skinId) external {
         uint256 price = skinPrice[skinId];
         require(price != 0, "Skin not for sale");
-        require(!owns[msg.sender][skinId], "Already owned");
+        require(!ownedSkins[msg.sender][skinId], "Skin already owned");
         require(
             IERC20(paymentToken).transferFrom(msg.sender, address(this), price),
             "Token transfer failed"
         );
-        owns[msg.sender][skinId] = true;
+        ownedSkins[msg.sender][skinId] = true;
         emit SkinPurchased(msg.sender, skinId, price);
     }
 
     function getOwnedSkins(
         address user,
-        uint16[] calldata skinIds
+        uint256[] calldata skinIds
     ) external view returns (bool[] memory) {
         bool[] memory result = new bool[](skinIds.length);
         for (uint256 i = 0; i < skinIds.length; i++) {
-            result[i] = owns[user][skinIds[i]];
+            result[i] = ownedSkins[user][skinIds[i]];
         }
         return result;
     }

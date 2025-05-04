@@ -27,6 +27,7 @@ import { useState } from "react";
 import { ItemShop } from "./ItemShop";
 import { Upgrades } from "./Upgrades";
 import { div } from "three/src/nodes/TSL.js";
+import { SkinShop } from "./SkinShop";
 
 type Items = Array<IUserItem>;
 
@@ -36,13 +37,14 @@ type LandingProps = {
     register: () => void;
     setGameState: (gs: GameState) => void;
     handlePurchase: (p: Items[number]) => void;
+    handleSkinPurchase: (p: Items[number]) => void;
     isLoading: boolean;
     isConnected: boolean;
     balance: bigint;
     nootBalance: bigint;
 };
 
-type ActiveModalType = 'none' | 'settings' | 'upgrades' | 'item-shop'
+type ActiveModalType = 'none' | 'settings' | 'upgrades' | 'item-shop' | 'skin-shop'
 
 const LandingPage = ({
     address,
@@ -53,6 +55,7 @@ const LandingPage = ({
     isConnected,
     balance,
     handlePurchase,
+    handleSkinPurchase,
     nootBalance,
 }: LandingProps) => {
     const [activeModal, setActiveModal] = useState<ActiveModalType>('none')
@@ -190,9 +193,11 @@ const LandingPage = ({
                 </div>
 
                 <div className="flex flex-col items-center gap-4 mb-10 relative w-full">
-                    <img style={{ filter: "drop-shadow(0 0px 33px rgba(0, 0, 0, 0.72))" }} src="/noot.webp" alt="noot" className="absolute bottom-[-4px] w-[60%] top-[-275px] mx-auto" />
-                    <div className="relative w-full h-[88px] mt-[-20px]">
-                        <img src="/button-cover.svg" className="absolute z-[9] top-[-14px] left-1/2 -translate-x-1/2  min-w-[108%]" alt="snow" />
+                    <img style={{ filter: "drop-shadow(0 0px 33px rgba(0, 0, 0, 0.72))" }} src="/noot.webp" alt="noot" className="absolute bottom-[-4px] w-[60%] top-[-275px] mx-auto z-[9]" />
+                    <div className="relative w-full h-[88px] mt-[-20px] z-[1]">
+                        <img src="/button-cover.svg" className="absolute z-[9] top-[-14px] left-1/2 -translate-x-1/2  min-w-[108%] hover:cursor-pointer" alt="snow"
+                            onClick={() => setGameState('playing')}
+                        />
                         <PrimaryButton
                             color='green'
                             className="w-full text-[40px]"
@@ -211,7 +216,6 @@ const LandingPage = ({
                             onClick={() => setActiveModal('upgrades')}
                         >
                             <div className="flex flex-col justify-center items-center">
-                                {/* <StarIcon /> */}
                                 <img width={44} height={44} src="/upgrade-icon.png" alt="coming soon icon" />
 
                                 UPGRADE
@@ -223,11 +227,9 @@ const LandingPage = ({
                             color='blue'
                             className="w-[calc(33%-6.5px)]"
                             shineClassName="h-[50%]"
-                            // onClick={() => setMenuState(MenuStates.items)}
                             onClick={() => setActiveModal('item-shop')}
                         >
                             <div className="flex flex-col justify-center items-center">
-                                {/* <ShoppingCartIcon /> */}
                                 <img width={44} height={44} src="/shop-icon.png" alt="coming soon icon" />
                                 SHOP
                             </div>
@@ -237,10 +239,8 @@ const LandingPage = ({
                         <PrimaryButton
                             color='blue'
                             className="w-[calc(33%-6.5px)]"
-                            disabled
                             shineClassName="h-[50%]"
-                            onClick={() => { }}
-                        // onClick={() => setMenuState(MenuStates.skins)}
+                            onClick={() => setActiveModal('skin-shop')}
                         >
                             <div className="flex flex-col justify-center items-center">
                                 <img width={44} height={44} src="/coming-soon-icon.png" alt="coming soon icon" />
@@ -273,6 +273,15 @@ const LandingPage = ({
                     handlePurchase={handlePurchase}
                 />
             )}
+            {activeModal === 'skin-shop' && (
+                <SkinShop
+                    nootBalance={nootBalance}
+                    onClose={onModalClose}
+                    address={address}
+                    handlePurchase={handleSkinPurchase}
+                />
+            )}
+
         </>
     );
 };

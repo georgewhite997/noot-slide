@@ -19,8 +19,8 @@ export type SettingsType = {
 }
 
 export const gameStateAtom = atom<GameState>(
-    // "in-menu",
-    process.env.NODE_ENV === "development" ? "playing" : "in-menu",
+    "in-menu",
+    // process.env.NODE_ENV === "development" ? "playing" : "in-menu",
 );
 
 export const settingsAtom = atom<SettingsType>({

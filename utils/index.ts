@@ -2,17 +2,18 @@ import { createPublicClient, defineChain, formatEther, http, PublicClient } from
 import { abstract, abstractTestnet } from "viem/chains";
 import { useEffect, useState } from "react";
 import { eip712WalletActions } from "viem/zksync";
-import Registry from "../artifacts-zk/contracts/Registry.sol/Registry.json";
-import Powerups from "../artifacts-zk/contracts/Powerups.sol/Powerups.json";
-// import Skins from "../artifacts-zk/contracts/Skins.sol/Skins.json";
-import registryAddress from "../addresses/Registry.json";
-import powerupsAddress from "../addresses/Powerups.json";
-// import { address as SkinsAddress } from "../addresses/Skins.json";
 import { createNoise2D } from "simplex-noise";
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { ObjectMap } from "@react-three/fiber";
 import * as THREE from 'three'
 
+import Registry from "../artifacts-zk/contracts/Registry.sol/Registry.json";
+import Powerups from "../artifacts-zk/contracts/Powerups.sol/Powerups.json";
+import Skins from "../artifacts-zk/contracts/Skins.sol/Skins.json";
+import registryAddress from "../addresses/Registry.json";
+import powerupsAddress from "../addresses/Powerups.json";
+import skinsAddress from "../addresses/Skins.json";
+import NootToken from "../addresses/Noot.json";
 
 const dockerizedNode = defineChain({
   id: 270,
@@ -41,6 +42,31 @@ export const nootTreasury = '0x1Ed3aB46773Dd5789eC5553A7D4b4E2f34d7c7c6'
 
 export type SupportedChain = typeof chain;
 
+export interface ISkin {
+  id: number;
+  name: string;
+  price: number;
+}
+
+export const skins: ISkin[] = [
+  {
+    id: 1,
+    name: "Skin 1",
+    price: 100,
+  },
+  {
+    id: 2,
+    name: "Skin 2",
+    price: 200,
+  },
+  {
+    id: 3,
+    name: "Skin 3",
+    price: 300,
+  },
+
+]
+
 export function usePublicClient(): PublicClient | null {
   const [publicClient, setPublicClient] = useState(null);
 
@@ -63,8 +89,10 @@ export const registryContractAddress = registryAddress.address as `0x${string}`;
 export const powerupsAbi = [...Powerups.abi] as const;
 export const powerupsContractAddress = powerupsAddress.address as `0x${string}`;
 
-// export const skinsAbi = [...Skins.abi] as const;
-// export const skinsContractAddress = skinsAddress as `0x${string}`;
+export const skinsAbi = [...Skins.abi] as const;
+export const skinsContractAddress = skinsAddress.address as `0x${string}`;
+
+export const nootTokenAddress = NootToken.address as `0x${string}`;
 
 // MADE BY GROK
 // function to generate snow on the ground
