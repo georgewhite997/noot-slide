@@ -14,21 +14,24 @@
   "dependencies": {
     "@abstract-foundation/agw-client": "^1.6.0",
     "@abstract-foundation/agw-react": "^1.6.0",
+    "@prisma/client": "^6.7.0",
     "@privy-io/cross-app-connect": "^0.1.8",
     "@react-three/drei": "^10.0.5",
     "@react-three/fiber": "^9.1.0",
     "@react-three/rapier": "^2.0.0",
+    "@sentry/node": "^8.x.x",
     "@tanstack/react-query": "^5.69.0",
     "jotai": "^2.12.2",
+    "jsonwebtoken": "^9.0.2",
     "next": "^15.2.4",
+    "prisma": "^6.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.2",
     "simplex-noise": "^4.0.3",
     "three": "^0.174.0",
     "viem": "2.x",
-    "wagmi": "^2.14.15",
-    "@sentry/node": "^8.x.x"
+    "wagmi": "^2.14.15"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -38,6 +41,7 @@
     "@openzeppelin/contracts": "^5.2.0",
     "@tailwindcss/postcss": "^4",
     "@types/chai": "^5.2.0",
+    "@types/jsonwebtoken": "^9.0.9",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.13.11",
     "@types/react": "^19",
@@ -56,4 +60,3 @@
     "zksync-ethers": "^6.16.2"
   }
 }
-
