@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output = "../prisma/generated"
+  output   = "../prisma/generated"
 }
 
 datasource db {
@@ -15,8 +15,26 @@ datasource db {
 }
 
 model User {
-  id           Int    @id @unique @default(autoincrement())
-  wallet       String @unique
-  fish         Int    @default(0)
-  highestScore Int    @default(0)
+  id           Int           @id @default(autoincrement())
+  wallet       String        @unique
+  highestScore Int           @default(0)
+  fishes       Int           @default(0)
+  userUpgrades UserUpgrade[] // Relation to UserUpgrade
+}
+
+model Upgrade {
+  id           Int           @id @default(autoincrement())
+  name         String
+  description  String
+  levels       Json // Array of level objects
+  userUpgrades UserUpgrade[] // Back relation
+}
+
+model UserUpgrade {
+  id        Int     @id @default(autoincrement())
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+  upgrade   Upgrade @relation(fields: [upgradeId], references: [id])
+  upgradeId Int
+  level     Int // Current level user has unlocked
 }

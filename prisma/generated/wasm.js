@@ -123,8 +123,22 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   wallet: 'wallet',
-  fish: 'fish',
-  highestScore: 'highestScore'
+  highestScore: 'highestScore',
+  fishes: 'fishes'
+};
+
+exports.Prisma.UpgradeScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  description: 'description',
+  levels: 'levels'
+};
+
+exports.Prisma.UserUpgradeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  upgradeId: 'upgradeId',
+  level: 'level'
 };
 
 exports.Prisma.SortOrder = {
@@ -132,13 +146,35 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.UserOrderByRelevanceFieldEnum = {
   wallet: 'wallet'
 };
 
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
+
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+
+exports.Prisma.UpgradeOrderByRelevanceFieldEnum = {
+  name: 'name',
+  description: 'description'
+};
+
 
 exports.Prisma.ModelName = {
-  User: 'User'
+  User: 'User',
+  Upgrade: 'Upgrade',
+  UserUpgrade: 'UserUpgrade'
 };
 
 /**

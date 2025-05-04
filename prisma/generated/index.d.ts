@@ -18,6 +18,16 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  * 
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
+/**
+ * Model Upgrade
+ * 
+ */
+export type Upgrade = $Result.DefaultSelection<Prisma.$UpgradePayload>
+/**
+ * Model UserUpgrade
+ * 
+ */
+export type UserUpgrade = $Result.DefaultSelection<Prisma.$UserUpgradePayload>
 
 /**
  * ##  Prisma Client ʲˢ
@@ -153,6 +163,26 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.upgrade`: Exposes CRUD operations for the **Upgrade** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Upgrades
+    * const upgrades = await prisma.upgrade.findMany()
+    * ```
+    */
+  get upgrade(): Prisma.UpgradeDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.userUpgrade`: Exposes CRUD operations for the **UserUpgrade** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more UserUpgrades
+    * const userUpgrades = await prisma.userUpgrade.findMany()
+    * ```
+    */
+  get userUpgrade(): Prisma.UserUpgradeDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -593,7 +623,9 @@ export namespace Prisma {
 
 
   export const ModelName: {
-    User: 'User'
+    User: 'User',
+    Upgrade: 'Upgrade',
+    UserUpgrade: 'UserUpgrade'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -612,7 +644,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user"
+      modelProps: "user" | "upgrade" | "userUpgrade"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -679,6 +711,138 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      Upgrade: {
+        payload: Prisma.$UpgradePayload<ExtArgs>
+        fields: Prisma.UpgradeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.UpgradeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UpgradePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.UpgradeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UpgradePayload>
+          }
+          findFirst: {
+            args: Prisma.UpgradeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UpgradePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.UpgradeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UpgradePayload>
+          }
+          findMany: {
+            args: Prisma.UpgradeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UpgradePayload>[]
+          }
+          create: {
+            args: Prisma.UpgradeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UpgradePayload>
+          }
+          createMany: {
+            args: Prisma.UpgradeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.UpgradeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UpgradePayload>
+          }
+          update: {
+            args: Prisma.UpgradeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UpgradePayload>
+          }
+          deleteMany: {
+            args: Prisma.UpgradeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.UpgradeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.UpgradeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UpgradePayload>
+          }
+          aggregate: {
+            args: Prisma.UpgradeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateUpgrade>
+          }
+          groupBy: {
+            args: Prisma.UpgradeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<UpgradeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.UpgradeCountArgs<ExtArgs>
+            result: $Utils.Optional<UpgradeCountAggregateOutputType> | number
+          }
+        }
+      }
+      UserUpgrade: {
+        payload: Prisma.$UserUpgradePayload<ExtArgs>
+        fields: Prisma.UserUpgradeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.UserUpgradeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserUpgradePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.UserUpgradeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserUpgradePayload>
+          }
+          findFirst: {
+            args: Prisma.UserUpgradeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserUpgradePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.UserUpgradeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserUpgradePayload>
+          }
+          findMany: {
+            args: Prisma.UserUpgradeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserUpgradePayload>[]
+          }
+          create: {
+            args: Prisma.UserUpgradeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserUpgradePayload>
+          }
+          createMany: {
+            args: Prisma.UserUpgradeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          delete: {
+            args: Prisma.UserUpgradeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserUpgradePayload>
+          }
+          update: {
+            args: Prisma.UserUpgradeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserUpgradePayload>
+          }
+          deleteMany: {
+            args: Prisma.UserUpgradeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.UserUpgradeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          upsert: {
+            args: Prisma.UserUpgradeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserUpgradePayload>
+          }
+          aggregate: {
+            args: Prisma.UserUpgradeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateUserUpgrade>
+          }
+          groupBy: {
+            args: Prisma.UserUpgradeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<UserUpgradeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.UserUpgradeCountArgs<ExtArgs>
+            result: $Utils.Optional<UserUpgradeCountAggregateOutputType> | number
           }
         }
       }
@@ -767,6 +931,8 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
+    upgrade?: UpgradeOmit
+    userUpgrade?: UserUpgradeOmit
   }
 
   /* Types for Logging */
@@ -856,6 +1022,67 @@ export namespace Prisma {
    */
 
 
+  /**
+   * Count Type UserCountOutputType
+   */
+
+  export type UserCountOutputType = {
+    userUpgrades: number
+  }
+
+  export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    userUpgrades?: boolean | UserCountOutputTypeCountUserUpgradesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserCountOutputType
+     */
+    select?: UserCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountUserUpgradesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserUpgradeWhereInput
+  }
+
+
+  /**
+   * Count Type UpgradeCountOutputType
+   */
+
+  export type UpgradeCountOutputType = {
+    userUpgrades: number
+  }
+
+  export type UpgradeCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    userUpgrades?: boolean | UpgradeCountOutputTypeCountUserUpgradesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * UpgradeCountOutputType without action
+   */
+  export type UpgradeCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UpgradeCountOutputType
+     */
+    select?: UpgradeCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * UpgradeCountOutputType without action
+   */
+  export type UpgradeCountOutputTypeCountUserUpgradesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserUpgradeWhereInput
+  }
+
 
   /**
    * Models
@@ -875,70 +1102,70 @@ export namespace Prisma {
 
   export type UserAvgAggregateOutputType = {
     id: number | null
-    fish: number | null
     highestScore: number | null
+    fishes: number | null
   }
 
   export type UserSumAggregateOutputType = {
     id: number | null
-    fish: number | null
     highestScore: number | null
+    fishes: number | null
   }
 
   export type UserMinAggregateOutputType = {
     id: number | null
     wallet: string | null
-    fish: number | null
     highestScore: number | null
+    fishes: number | null
   }
 
   export type UserMaxAggregateOutputType = {
     id: number | null
     wallet: string | null
-    fish: number | null
     highestScore: number | null
+    fishes: number | null
   }
 
   export type UserCountAggregateOutputType = {
     id: number
     wallet: number
-    fish: number
     highestScore: number
+    fishes: number
     _all: number
   }
 
 
   export type UserAvgAggregateInputType = {
     id?: true
-    fish?: true
     highestScore?: true
+    fishes?: true
   }
 
   export type UserSumAggregateInputType = {
     id?: true
-    fish?: true
     highestScore?: true
+    fishes?: true
   }
 
   export type UserMinAggregateInputType = {
     id?: true
     wallet?: true
-    fish?: true
     highestScore?: true
+    fishes?: true
   }
 
   export type UserMaxAggregateInputType = {
     id?: true
     wallet?: true
-    fish?: true
     highestScore?: true
+    fishes?: true
   }
 
   export type UserCountAggregateInputType = {
     id?: true
     wallet?: true
-    fish?: true
     highestScore?: true
+    fishes?: true
     _all?: true
   }
 
@@ -1031,8 +1258,8 @@ export namespace Prisma {
   export type UserGroupByOutputType = {
     id: number
     wallet: string
-    fish: number
     highestScore: number
+    fishes: number
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
     _sum: UserSumAggregateOutputType | null
@@ -1057,8 +1284,10 @@ export namespace Prisma {
   export type UserSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     wallet?: boolean
-    fish?: boolean
     highestScore?: boolean
+    fishes?: boolean
+    userUpgrades?: boolean | User$userUpgradesArgs<ExtArgs>
+    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
 
@@ -1066,20 +1295,26 @@ export namespace Prisma {
   export type UserSelectScalar = {
     id?: boolean
     wallet?: boolean
-    fish?: boolean
     highestScore?: boolean
+    fishes?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "wallet" | "fish" | "highestScore", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "wallet" | "highestScore" | "fishes", ExtArgs["result"]["user"]>
+  export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    userUpgrades?: boolean | User$userUpgradesArgs<ExtArgs>
+    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
+  }
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
-    objects: {}
+    objects: {
+      userUpgrades: Prisma.$UserUpgradePayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: number
       wallet: string
-      fish: number
       highestScore: number
+      fishes: number
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -1420,6 +1655,7 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    userUpgrades<T extends User$userUpgradesArgs<ExtArgs> = {}>(args?: Subset<T, User$userUpgradesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserUpgradePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1451,8 +1687,8 @@ export namespace Prisma {
   interface UserFieldRefs {
     readonly id: FieldRef<"User", 'Int'>
     readonly wallet: FieldRef<"User", 'String'>
-    readonly fish: FieldRef<"User", 'Int'>
     readonly highestScore: FieldRef<"User", 'Int'>
+    readonly fishes: FieldRef<"User", 'Int'>
   }
     
 
@@ -1469,6 +1705,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -1488,6 +1728,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -1505,6 +1749,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -1554,6 +1802,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which User to fetch.
      */
     where?: UserWhereInput
@@ -1602,6 +1854,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which Users to fetch.
      */
     where?: UserWhereInput
@@ -1645,6 +1901,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * The data needed to create a User.
      */
     data: XOR<UserCreateInput, UserUncheckedCreateInput>
@@ -1673,6 +1933,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to update a User.
      */
@@ -1714,6 +1978,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * The filter to search for the User to update in case it exists.
      */
     where: UserWhereUniqueInput
@@ -1740,6 +2008,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter which User to delete.
      */
     where: UserWhereUniqueInput
@@ -1760,6 +2032,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.userUpgrades
+   */
+  export type User$userUpgradesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserUpgrade
+     */
+    select?: UserUpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserUpgrade
+     */
+    omit?: UserUpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserUpgradeInclude<ExtArgs> | null
+    where?: UserUpgradeWhereInput
+    orderBy?: UserUpgradeOrderByWithRelationInput | UserUpgradeOrderByWithRelationInput[]
+    cursor?: UserUpgradeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserUpgradeScalarFieldEnum | UserUpgradeScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1771,6 +2067,1952 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Upgrade
+   */
+
+  export type AggregateUpgrade = {
+    _count: UpgradeCountAggregateOutputType | null
+    _avg: UpgradeAvgAggregateOutputType | null
+    _sum: UpgradeSumAggregateOutputType | null
+    _min: UpgradeMinAggregateOutputType | null
+    _max: UpgradeMaxAggregateOutputType | null
+  }
+
+  export type UpgradeAvgAggregateOutputType = {
+    id: number | null
+  }
+
+  export type UpgradeSumAggregateOutputType = {
+    id: number | null
+  }
+
+  export type UpgradeMinAggregateOutputType = {
+    id: number | null
+    name: string | null
+    description: string | null
+  }
+
+  export type UpgradeMaxAggregateOutputType = {
+    id: number | null
+    name: string | null
+    description: string | null
+  }
+
+  export type UpgradeCountAggregateOutputType = {
+    id: number
+    name: number
+    description: number
+    levels: number
+    _all: number
+  }
+
+
+  export type UpgradeAvgAggregateInputType = {
+    id?: true
+  }
+
+  export type UpgradeSumAggregateInputType = {
+    id?: true
+  }
+
+  export type UpgradeMinAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+  }
+
+  export type UpgradeMaxAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+  }
+
+  export type UpgradeCountAggregateInputType = {
+    id?: true
+    name?: true
+    description?: true
+    levels?: true
+    _all?: true
+  }
+
+  export type UpgradeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Upgrade to aggregate.
+     */
+    where?: UpgradeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Upgrades to fetch.
+     */
+    orderBy?: UpgradeOrderByWithRelationInput | UpgradeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: UpgradeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Upgrades from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Upgrades.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Upgrades
+    **/
+    _count?: true | UpgradeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: UpgradeAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: UpgradeSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: UpgradeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: UpgradeMaxAggregateInputType
+  }
+
+  export type GetUpgradeAggregateType<T extends UpgradeAggregateArgs> = {
+        [P in keyof T & keyof AggregateUpgrade]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateUpgrade[P]>
+      : GetScalarType<T[P], AggregateUpgrade[P]>
+  }
+
+
+
+
+  export type UpgradeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UpgradeWhereInput
+    orderBy?: UpgradeOrderByWithAggregationInput | UpgradeOrderByWithAggregationInput[]
+    by: UpgradeScalarFieldEnum[] | UpgradeScalarFieldEnum
+    having?: UpgradeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: UpgradeCountAggregateInputType | true
+    _avg?: UpgradeAvgAggregateInputType
+    _sum?: UpgradeSumAggregateInputType
+    _min?: UpgradeMinAggregateInputType
+    _max?: UpgradeMaxAggregateInputType
+  }
+
+  export type UpgradeGroupByOutputType = {
+    id: number
+    name: string
+    description: string
+    levels: JsonValue
+    _count: UpgradeCountAggregateOutputType | null
+    _avg: UpgradeAvgAggregateOutputType | null
+    _sum: UpgradeSumAggregateOutputType | null
+    _min: UpgradeMinAggregateOutputType | null
+    _max: UpgradeMaxAggregateOutputType | null
+  }
+
+  type GetUpgradeGroupByPayload<T extends UpgradeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<UpgradeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof UpgradeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], UpgradeGroupByOutputType[P]>
+            : GetScalarType<T[P], UpgradeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type UpgradeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    levels?: boolean
+    userUpgrades?: boolean | Upgrade$userUpgradesArgs<ExtArgs>
+    _count?: boolean | UpgradeCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["upgrade"]>
+
+
+
+  export type UpgradeSelectScalar = {
+    id?: boolean
+    name?: boolean
+    description?: boolean
+    levels?: boolean
+  }
+
+  export type UpgradeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "levels", ExtArgs["result"]["upgrade"]>
+  export type UpgradeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    userUpgrades?: boolean | Upgrade$userUpgradesArgs<ExtArgs>
+    _count?: boolean | UpgradeCountOutputTypeDefaultArgs<ExtArgs>
+  }
+
+  export type $UpgradePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Upgrade"
+    objects: {
+      userUpgrades: Prisma.$UserUpgradePayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      name: string
+      description: string
+      levels: Prisma.JsonValue
+    }, ExtArgs["result"]["upgrade"]>
+    composites: {}
+  }
+
+  type UpgradeGetPayload<S extends boolean | null | undefined | UpgradeDefaultArgs> = $Result.GetResult<Prisma.$UpgradePayload, S>
+
+  type UpgradeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<UpgradeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: UpgradeCountAggregateInputType | true
+    }
+
+  export interface UpgradeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Upgrade'], meta: { name: 'Upgrade' } }
+    /**
+     * Find zero or one Upgrade that matches the filter.
+     * @param {UpgradeFindUniqueArgs} args - Arguments to find a Upgrade
+     * @example
+     * // Get one Upgrade
+     * const upgrade = await prisma.upgrade.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends UpgradeFindUniqueArgs>(args: SelectSubset<T, UpgradeFindUniqueArgs<ExtArgs>>): Prisma__UpgradeClient<$Result.GetResult<Prisma.$UpgradePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Upgrade that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {UpgradeFindUniqueOrThrowArgs} args - Arguments to find a Upgrade
+     * @example
+     * // Get one Upgrade
+     * const upgrade = await prisma.upgrade.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends UpgradeFindUniqueOrThrowArgs>(args: SelectSubset<T, UpgradeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__UpgradeClient<$Result.GetResult<Prisma.$UpgradePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Upgrade that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UpgradeFindFirstArgs} args - Arguments to find a Upgrade
+     * @example
+     * // Get one Upgrade
+     * const upgrade = await prisma.upgrade.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends UpgradeFindFirstArgs>(args?: SelectSubset<T, UpgradeFindFirstArgs<ExtArgs>>): Prisma__UpgradeClient<$Result.GetResult<Prisma.$UpgradePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Upgrade that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UpgradeFindFirstOrThrowArgs} args - Arguments to find a Upgrade
+     * @example
+     * // Get one Upgrade
+     * const upgrade = await prisma.upgrade.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends UpgradeFindFirstOrThrowArgs>(args?: SelectSubset<T, UpgradeFindFirstOrThrowArgs<ExtArgs>>): Prisma__UpgradeClient<$Result.GetResult<Prisma.$UpgradePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Upgrades that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UpgradeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Upgrades
+     * const upgrades = await prisma.upgrade.findMany()
+     * 
+     * // Get first 10 Upgrades
+     * const upgrades = await prisma.upgrade.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const upgradeWithIdOnly = await prisma.upgrade.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends UpgradeFindManyArgs>(args?: SelectSubset<T, UpgradeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UpgradePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Upgrade.
+     * @param {UpgradeCreateArgs} args - Arguments to create a Upgrade.
+     * @example
+     * // Create one Upgrade
+     * const Upgrade = await prisma.upgrade.create({
+     *   data: {
+     *     // ... data to create a Upgrade
+     *   }
+     * })
+     * 
+     */
+    create<T extends UpgradeCreateArgs>(args: SelectSubset<T, UpgradeCreateArgs<ExtArgs>>): Prisma__UpgradeClient<$Result.GetResult<Prisma.$UpgradePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Upgrades.
+     * @param {UpgradeCreateManyArgs} args - Arguments to create many Upgrades.
+     * @example
+     * // Create many Upgrades
+     * const upgrade = await prisma.upgrade.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends UpgradeCreateManyArgs>(args?: SelectSubset<T, UpgradeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a Upgrade.
+     * @param {UpgradeDeleteArgs} args - Arguments to delete one Upgrade.
+     * @example
+     * // Delete one Upgrade
+     * const Upgrade = await prisma.upgrade.delete({
+     *   where: {
+     *     // ... filter to delete one Upgrade
+     *   }
+     * })
+     * 
+     */
+    delete<T extends UpgradeDeleteArgs>(args: SelectSubset<T, UpgradeDeleteArgs<ExtArgs>>): Prisma__UpgradeClient<$Result.GetResult<Prisma.$UpgradePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Upgrade.
+     * @param {UpgradeUpdateArgs} args - Arguments to update one Upgrade.
+     * @example
+     * // Update one Upgrade
+     * const upgrade = await prisma.upgrade.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends UpgradeUpdateArgs>(args: SelectSubset<T, UpgradeUpdateArgs<ExtArgs>>): Prisma__UpgradeClient<$Result.GetResult<Prisma.$UpgradePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Upgrades.
+     * @param {UpgradeDeleteManyArgs} args - Arguments to filter Upgrades to delete.
+     * @example
+     * // Delete a few Upgrades
+     * const { count } = await prisma.upgrade.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends UpgradeDeleteManyArgs>(args?: SelectSubset<T, UpgradeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Upgrades.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UpgradeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Upgrades
+     * const upgrade = await prisma.upgrade.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends UpgradeUpdateManyArgs>(args: SelectSubset<T, UpgradeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one Upgrade.
+     * @param {UpgradeUpsertArgs} args - Arguments to update or create a Upgrade.
+     * @example
+     * // Update or create a Upgrade
+     * const upgrade = await prisma.upgrade.upsert({
+     *   create: {
+     *     // ... data to create a Upgrade
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Upgrade we want to update
+     *   }
+     * })
+     */
+    upsert<T extends UpgradeUpsertArgs>(args: SelectSubset<T, UpgradeUpsertArgs<ExtArgs>>): Prisma__UpgradeClient<$Result.GetResult<Prisma.$UpgradePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Upgrades.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UpgradeCountArgs} args - Arguments to filter Upgrades to count.
+     * @example
+     * // Count the number of Upgrades
+     * const count = await prisma.upgrade.count({
+     *   where: {
+     *     // ... the filter for the Upgrades we want to count
+     *   }
+     * })
+    **/
+    count<T extends UpgradeCountArgs>(
+      args?: Subset<T, UpgradeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], UpgradeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Upgrade.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UpgradeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends UpgradeAggregateArgs>(args: Subset<T, UpgradeAggregateArgs>): Prisma.PrismaPromise<GetUpgradeAggregateType<T>>
+
+    /**
+     * Group by Upgrade.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UpgradeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends UpgradeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: UpgradeGroupByArgs['orderBy'] }
+        : { orderBy?: UpgradeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, UpgradeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetUpgradeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Upgrade model
+   */
+  readonly fields: UpgradeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Upgrade.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__UpgradeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    userUpgrades<T extends Upgrade$userUpgradesArgs<ExtArgs> = {}>(args?: Subset<T, Upgrade$userUpgradesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserUpgradePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Upgrade model
+   */
+  interface UpgradeFieldRefs {
+    readonly id: FieldRef<"Upgrade", 'Int'>
+    readonly name: FieldRef<"Upgrade", 'String'>
+    readonly description: FieldRef<"Upgrade", 'String'>
+    readonly levels: FieldRef<"Upgrade", 'Json'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Upgrade findUnique
+   */
+  export type UpgradeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Upgrade
+     */
+    select?: UpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Upgrade
+     */
+    omit?: UpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UpgradeInclude<ExtArgs> | null
+    /**
+     * Filter, which Upgrade to fetch.
+     */
+    where: UpgradeWhereUniqueInput
+  }
+
+  /**
+   * Upgrade findUniqueOrThrow
+   */
+  export type UpgradeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Upgrade
+     */
+    select?: UpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Upgrade
+     */
+    omit?: UpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UpgradeInclude<ExtArgs> | null
+    /**
+     * Filter, which Upgrade to fetch.
+     */
+    where: UpgradeWhereUniqueInput
+  }
+
+  /**
+   * Upgrade findFirst
+   */
+  export type UpgradeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Upgrade
+     */
+    select?: UpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Upgrade
+     */
+    omit?: UpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UpgradeInclude<ExtArgs> | null
+    /**
+     * Filter, which Upgrade to fetch.
+     */
+    where?: UpgradeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Upgrades to fetch.
+     */
+    orderBy?: UpgradeOrderByWithRelationInput | UpgradeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Upgrades.
+     */
+    cursor?: UpgradeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Upgrades from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Upgrades.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Upgrades.
+     */
+    distinct?: UpgradeScalarFieldEnum | UpgradeScalarFieldEnum[]
+  }
+
+  /**
+   * Upgrade findFirstOrThrow
+   */
+  export type UpgradeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Upgrade
+     */
+    select?: UpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Upgrade
+     */
+    omit?: UpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UpgradeInclude<ExtArgs> | null
+    /**
+     * Filter, which Upgrade to fetch.
+     */
+    where?: UpgradeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Upgrades to fetch.
+     */
+    orderBy?: UpgradeOrderByWithRelationInput | UpgradeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Upgrades.
+     */
+    cursor?: UpgradeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Upgrades from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Upgrades.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Upgrades.
+     */
+    distinct?: UpgradeScalarFieldEnum | UpgradeScalarFieldEnum[]
+  }
+
+  /**
+   * Upgrade findMany
+   */
+  export type UpgradeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Upgrade
+     */
+    select?: UpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Upgrade
+     */
+    omit?: UpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UpgradeInclude<ExtArgs> | null
+    /**
+     * Filter, which Upgrades to fetch.
+     */
+    where?: UpgradeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Upgrades to fetch.
+     */
+    orderBy?: UpgradeOrderByWithRelationInput | UpgradeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Upgrades.
+     */
+    cursor?: UpgradeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Upgrades from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Upgrades.
+     */
+    skip?: number
+    distinct?: UpgradeScalarFieldEnum | UpgradeScalarFieldEnum[]
+  }
+
+  /**
+   * Upgrade create
+   */
+  export type UpgradeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Upgrade
+     */
+    select?: UpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Upgrade
+     */
+    omit?: UpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UpgradeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Upgrade.
+     */
+    data: XOR<UpgradeCreateInput, UpgradeUncheckedCreateInput>
+  }
+
+  /**
+   * Upgrade createMany
+   */
+  export type UpgradeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Upgrades.
+     */
+    data: UpgradeCreateManyInput | UpgradeCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Upgrade update
+   */
+  export type UpgradeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Upgrade
+     */
+    select?: UpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Upgrade
+     */
+    omit?: UpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UpgradeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Upgrade.
+     */
+    data: XOR<UpgradeUpdateInput, UpgradeUncheckedUpdateInput>
+    /**
+     * Choose, which Upgrade to update.
+     */
+    where: UpgradeWhereUniqueInput
+  }
+
+  /**
+   * Upgrade updateMany
+   */
+  export type UpgradeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Upgrades.
+     */
+    data: XOR<UpgradeUpdateManyMutationInput, UpgradeUncheckedUpdateManyInput>
+    /**
+     * Filter which Upgrades to update
+     */
+    where?: UpgradeWhereInput
+    /**
+     * Limit how many Upgrades to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Upgrade upsert
+   */
+  export type UpgradeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Upgrade
+     */
+    select?: UpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Upgrade
+     */
+    omit?: UpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UpgradeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Upgrade to update in case it exists.
+     */
+    where: UpgradeWhereUniqueInput
+    /**
+     * In case the Upgrade found by the `where` argument doesn't exist, create a new Upgrade with this data.
+     */
+    create: XOR<UpgradeCreateInput, UpgradeUncheckedCreateInput>
+    /**
+     * In case the Upgrade was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<UpgradeUpdateInput, UpgradeUncheckedUpdateInput>
+  }
+
+  /**
+   * Upgrade delete
+   */
+  export type UpgradeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Upgrade
+     */
+    select?: UpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Upgrade
+     */
+    omit?: UpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UpgradeInclude<ExtArgs> | null
+    /**
+     * Filter which Upgrade to delete.
+     */
+    where: UpgradeWhereUniqueInput
+  }
+
+  /**
+   * Upgrade deleteMany
+   */
+  export type UpgradeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Upgrades to delete
+     */
+    where?: UpgradeWhereInput
+    /**
+     * Limit how many Upgrades to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Upgrade.userUpgrades
+   */
+  export type Upgrade$userUpgradesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserUpgrade
+     */
+    select?: UserUpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserUpgrade
+     */
+    omit?: UserUpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserUpgradeInclude<ExtArgs> | null
+    where?: UserUpgradeWhereInput
+    orderBy?: UserUpgradeOrderByWithRelationInput | UserUpgradeOrderByWithRelationInput[]
+    cursor?: UserUpgradeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserUpgradeScalarFieldEnum | UserUpgradeScalarFieldEnum[]
+  }
+
+  /**
+   * Upgrade without action
+   */
+  export type UpgradeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Upgrade
+     */
+    select?: UpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Upgrade
+     */
+    omit?: UpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UpgradeInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model UserUpgrade
+   */
+
+  export type AggregateUserUpgrade = {
+    _count: UserUpgradeCountAggregateOutputType | null
+    _avg: UserUpgradeAvgAggregateOutputType | null
+    _sum: UserUpgradeSumAggregateOutputType | null
+    _min: UserUpgradeMinAggregateOutputType | null
+    _max: UserUpgradeMaxAggregateOutputType | null
+  }
+
+  export type UserUpgradeAvgAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    upgradeId: number | null
+    level: number | null
+  }
+
+  export type UserUpgradeSumAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    upgradeId: number | null
+    level: number | null
+  }
+
+  export type UserUpgradeMinAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    upgradeId: number | null
+    level: number | null
+  }
+
+  export type UserUpgradeMaxAggregateOutputType = {
+    id: number | null
+    userId: number | null
+    upgradeId: number | null
+    level: number | null
+  }
+
+  export type UserUpgradeCountAggregateOutputType = {
+    id: number
+    userId: number
+    upgradeId: number
+    level: number
+    _all: number
+  }
+
+
+  export type UserUpgradeAvgAggregateInputType = {
+    id?: true
+    userId?: true
+    upgradeId?: true
+    level?: true
+  }
+
+  export type UserUpgradeSumAggregateInputType = {
+    id?: true
+    userId?: true
+    upgradeId?: true
+    level?: true
+  }
+
+  export type UserUpgradeMinAggregateInputType = {
+    id?: true
+    userId?: true
+    upgradeId?: true
+    level?: true
+  }
+
+  export type UserUpgradeMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    upgradeId?: true
+    level?: true
+  }
+
+  export type UserUpgradeCountAggregateInputType = {
+    id?: true
+    userId?: true
+    upgradeId?: true
+    level?: true
+    _all?: true
+  }
+
+  export type UserUpgradeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UserUpgrade to aggregate.
+     */
+    where?: UserUpgradeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserUpgrades to fetch.
+     */
+    orderBy?: UserUpgradeOrderByWithRelationInput | UserUpgradeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: UserUpgradeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserUpgrades from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserUpgrades.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned UserUpgrades
+    **/
+    _count?: true | UserUpgradeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: UserUpgradeAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: UserUpgradeSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: UserUpgradeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: UserUpgradeMaxAggregateInputType
+  }
+
+  export type GetUserUpgradeAggregateType<T extends UserUpgradeAggregateArgs> = {
+        [P in keyof T & keyof AggregateUserUpgrade]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateUserUpgrade[P]>
+      : GetScalarType<T[P], AggregateUserUpgrade[P]>
+  }
+
+
+
+
+  export type UserUpgradeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserUpgradeWhereInput
+    orderBy?: UserUpgradeOrderByWithAggregationInput | UserUpgradeOrderByWithAggregationInput[]
+    by: UserUpgradeScalarFieldEnum[] | UserUpgradeScalarFieldEnum
+    having?: UserUpgradeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: UserUpgradeCountAggregateInputType | true
+    _avg?: UserUpgradeAvgAggregateInputType
+    _sum?: UserUpgradeSumAggregateInputType
+    _min?: UserUpgradeMinAggregateInputType
+    _max?: UserUpgradeMaxAggregateInputType
+  }
+
+  export type UserUpgradeGroupByOutputType = {
+    id: number
+    userId: number
+    upgradeId: number
+    level: number
+    _count: UserUpgradeCountAggregateOutputType | null
+    _avg: UserUpgradeAvgAggregateOutputType | null
+    _sum: UserUpgradeSumAggregateOutputType | null
+    _min: UserUpgradeMinAggregateOutputType | null
+    _max: UserUpgradeMaxAggregateOutputType | null
+  }
+
+  type GetUserUpgradeGroupByPayload<T extends UserUpgradeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<UserUpgradeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof UserUpgradeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], UserUpgradeGroupByOutputType[P]>
+            : GetScalarType<T[P], UserUpgradeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type UserUpgradeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    upgradeId?: boolean
+    level?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    upgrade?: boolean | UpgradeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userUpgrade"]>
+
+
+
+  export type UserUpgradeSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    upgradeId?: boolean
+    level?: boolean
+  }
+
+  export type UserUpgradeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "upgradeId" | "level", ExtArgs["result"]["userUpgrade"]>
+  export type UserUpgradeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    upgrade?: boolean | UpgradeDefaultArgs<ExtArgs>
+  }
+
+  export type $UserUpgradePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "UserUpgrade"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      upgrade: Prisma.$UpgradePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      userId: number
+      upgradeId: number
+      level: number
+    }, ExtArgs["result"]["userUpgrade"]>
+    composites: {}
+  }
+
+  type UserUpgradeGetPayload<S extends boolean | null | undefined | UserUpgradeDefaultArgs> = $Result.GetResult<Prisma.$UserUpgradePayload, S>
+
+  type UserUpgradeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<UserUpgradeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: UserUpgradeCountAggregateInputType | true
+    }
+
+  export interface UserUpgradeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['UserUpgrade'], meta: { name: 'UserUpgrade' } }
+    /**
+     * Find zero or one UserUpgrade that matches the filter.
+     * @param {UserUpgradeFindUniqueArgs} args - Arguments to find a UserUpgrade
+     * @example
+     * // Get one UserUpgrade
+     * const userUpgrade = await prisma.userUpgrade.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends UserUpgradeFindUniqueArgs>(args: SelectSubset<T, UserUpgradeFindUniqueArgs<ExtArgs>>): Prisma__UserUpgradeClient<$Result.GetResult<Prisma.$UserUpgradePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one UserUpgrade that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {UserUpgradeFindUniqueOrThrowArgs} args - Arguments to find a UserUpgrade
+     * @example
+     * // Get one UserUpgrade
+     * const userUpgrade = await prisma.userUpgrade.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends UserUpgradeFindUniqueOrThrowArgs>(args: SelectSubset<T, UserUpgradeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__UserUpgradeClient<$Result.GetResult<Prisma.$UserUpgradePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first UserUpgrade that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserUpgradeFindFirstArgs} args - Arguments to find a UserUpgrade
+     * @example
+     * // Get one UserUpgrade
+     * const userUpgrade = await prisma.userUpgrade.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends UserUpgradeFindFirstArgs>(args?: SelectSubset<T, UserUpgradeFindFirstArgs<ExtArgs>>): Prisma__UserUpgradeClient<$Result.GetResult<Prisma.$UserUpgradePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first UserUpgrade that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserUpgradeFindFirstOrThrowArgs} args - Arguments to find a UserUpgrade
+     * @example
+     * // Get one UserUpgrade
+     * const userUpgrade = await prisma.userUpgrade.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends UserUpgradeFindFirstOrThrowArgs>(args?: SelectSubset<T, UserUpgradeFindFirstOrThrowArgs<ExtArgs>>): Prisma__UserUpgradeClient<$Result.GetResult<Prisma.$UserUpgradePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more UserUpgrades that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserUpgradeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all UserUpgrades
+     * const userUpgrades = await prisma.userUpgrade.findMany()
+     * 
+     * // Get first 10 UserUpgrades
+     * const userUpgrades = await prisma.userUpgrade.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const userUpgradeWithIdOnly = await prisma.userUpgrade.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends UserUpgradeFindManyArgs>(args?: SelectSubset<T, UserUpgradeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserUpgradePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a UserUpgrade.
+     * @param {UserUpgradeCreateArgs} args - Arguments to create a UserUpgrade.
+     * @example
+     * // Create one UserUpgrade
+     * const UserUpgrade = await prisma.userUpgrade.create({
+     *   data: {
+     *     // ... data to create a UserUpgrade
+     *   }
+     * })
+     * 
+     */
+    create<T extends UserUpgradeCreateArgs>(args: SelectSubset<T, UserUpgradeCreateArgs<ExtArgs>>): Prisma__UserUpgradeClient<$Result.GetResult<Prisma.$UserUpgradePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many UserUpgrades.
+     * @param {UserUpgradeCreateManyArgs} args - Arguments to create many UserUpgrades.
+     * @example
+     * // Create many UserUpgrades
+     * const userUpgrade = await prisma.userUpgrade.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends UserUpgradeCreateManyArgs>(args?: SelectSubset<T, UserUpgradeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a UserUpgrade.
+     * @param {UserUpgradeDeleteArgs} args - Arguments to delete one UserUpgrade.
+     * @example
+     * // Delete one UserUpgrade
+     * const UserUpgrade = await prisma.userUpgrade.delete({
+     *   where: {
+     *     // ... filter to delete one UserUpgrade
+     *   }
+     * })
+     * 
+     */
+    delete<T extends UserUpgradeDeleteArgs>(args: SelectSubset<T, UserUpgradeDeleteArgs<ExtArgs>>): Prisma__UserUpgradeClient<$Result.GetResult<Prisma.$UserUpgradePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one UserUpgrade.
+     * @param {UserUpgradeUpdateArgs} args - Arguments to update one UserUpgrade.
+     * @example
+     * // Update one UserUpgrade
+     * const userUpgrade = await prisma.userUpgrade.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends UserUpgradeUpdateArgs>(args: SelectSubset<T, UserUpgradeUpdateArgs<ExtArgs>>): Prisma__UserUpgradeClient<$Result.GetResult<Prisma.$UserUpgradePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more UserUpgrades.
+     * @param {UserUpgradeDeleteManyArgs} args - Arguments to filter UserUpgrades to delete.
+     * @example
+     * // Delete a few UserUpgrades
+     * const { count } = await prisma.userUpgrade.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends UserUpgradeDeleteManyArgs>(args?: SelectSubset<T, UserUpgradeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more UserUpgrades.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserUpgradeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many UserUpgrades
+     * const userUpgrade = await prisma.userUpgrade.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends UserUpgradeUpdateManyArgs>(args: SelectSubset<T, UserUpgradeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one UserUpgrade.
+     * @param {UserUpgradeUpsertArgs} args - Arguments to update or create a UserUpgrade.
+     * @example
+     * // Update or create a UserUpgrade
+     * const userUpgrade = await prisma.userUpgrade.upsert({
+     *   create: {
+     *     // ... data to create a UserUpgrade
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the UserUpgrade we want to update
+     *   }
+     * })
+     */
+    upsert<T extends UserUpgradeUpsertArgs>(args: SelectSubset<T, UserUpgradeUpsertArgs<ExtArgs>>): Prisma__UserUpgradeClient<$Result.GetResult<Prisma.$UserUpgradePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of UserUpgrades.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserUpgradeCountArgs} args - Arguments to filter UserUpgrades to count.
+     * @example
+     * // Count the number of UserUpgrades
+     * const count = await prisma.userUpgrade.count({
+     *   where: {
+     *     // ... the filter for the UserUpgrades we want to count
+     *   }
+     * })
+    **/
+    count<T extends UserUpgradeCountArgs>(
+      args?: Subset<T, UserUpgradeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], UserUpgradeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a UserUpgrade.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserUpgradeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends UserUpgradeAggregateArgs>(args: Subset<T, UserUpgradeAggregateArgs>): Prisma.PrismaPromise<GetUserUpgradeAggregateType<T>>
+
+    /**
+     * Group by UserUpgrade.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserUpgradeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends UserUpgradeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: UserUpgradeGroupByArgs['orderBy'] }
+        : { orderBy?: UserUpgradeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, UserUpgradeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetUserUpgradeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the UserUpgrade model
+   */
+  readonly fields: UserUpgradeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for UserUpgrade.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__UserUpgradeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    upgrade<T extends UpgradeDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UpgradeDefaultArgs<ExtArgs>>): Prisma__UpgradeClient<$Result.GetResult<Prisma.$UpgradePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the UserUpgrade model
+   */
+  interface UserUpgradeFieldRefs {
+    readonly id: FieldRef<"UserUpgrade", 'Int'>
+    readonly userId: FieldRef<"UserUpgrade", 'Int'>
+    readonly upgradeId: FieldRef<"UserUpgrade", 'Int'>
+    readonly level: FieldRef<"UserUpgrade", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * UserUpgrade findUnique
+   */
+  export type UserUpgradeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserUpgrade
+     */
+    select?: UserUpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserUpgrade
+     */
+    omit?: UserUpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserUpgradeInclude<ExtArgs> | null
+    /**
+     * Filter, which UserUpgrade to fetch.
+     */
+    where: UserUpgradeWhereUniqueInput
+  }
+
+  /**
+   * UserUpgrade findUniqueOrThrow
+   */
+  export type UserUpgradeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserUpgrade
+     */
+    select?: UserUpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserUpgrade
+     */
+    omit?: UserUpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserUpgradeInclude<ExtArgs> | null
+    /**
+     * Filter, which UserUpgrade to fetch.
+     */
+    where: UserUpgradeWhereUniqueInput
+  }
+
+  /**
+   * UserUpgrade findFirst
+   */
+  export type UserUpgradeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserUpgrade
+     */
+    select?: UserUpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserUpgrade
+     */
+    omit?: UserUpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserUpgradeInclude<ExtArgs> | null
+    /**
+     * Filter, which UserUpgrade to fetch.
+     */
+    where?: UserUpgradeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserUpgrades to fetch.
+     */
+    orderBy?: UserUpgradeOrderByWithRelationInput | UserUpgradeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UserUpgrades.
+     */
+    cursor?: UserUpgradeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserUpgrades from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserUpgrades.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserUpgrades.
+     */
+    distinct?: UserUpgradeScalarFieldEnum | UserUpgradeScalarFieldEnum[]
+  }
+
+  /**
+   * UserUpgrade findFirstOrThrow
+   */
+  export type UserUpgradeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserUpgrade
+     */
+    select?: UserUpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserUpgrade
+     */
+    omit?: UserUpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserUpgradeInclude<ExtArgs> | null
+    /**
+     * Filter, which UserUpgrade to fetch.
+     */
+    where?: UserUpgradeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserUpgrades to fetch.
+     */
+    orderBy?: UserUpgradeOrderByWithRelationInput | UserUpgradeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UserUpgrades.
+     */
+    cursor?: UserUpgradeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserUpgrades from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserUpgrades.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserUpgrades.
+     */
+    distinct?: UserUpgradeScalarFieldEnum | UserUpgradeScalarFieldEnum[]
+  }
+
+  /**
+   * UserUpgrade findMany
+   */
+  export type UserUpgradeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserUpgrade
+     */
+    select?: UserUpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserUpgrade
+     */
+    omit?: UserUpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserUpgradeInclude<ExtArgs> | null
+    /**
+     * Filter, which UserUpgrades to fetch.
+     */
+    where?: UserUpgradeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserUpgrades to fetch.
+     */
+    orderBy?: UserUpgradeOrderByWithRelationInput | UserUpgradeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing UserUpgrades.
+     */
+    cursor?: UserUpgradeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserUpgrades from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserUpgrades.
+     */
+    skip?: number
+    distinct?: UserUpgradeScalarFieldEnum | UserUpgradeScalarFieldEnum[]
+  }
+
+  /**
+   * UserUpgrade create
+   */
+  export type UserUpgradeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserUpgrade
+     */
+    select?: UserUpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserUpgrade
+     */
+    omit?: UserUpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserUpgradeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a UserUpgrade.
+     */
+    data: XOR<UserUpgradeCreateInput, UserUpgradeUncheckedCreateInput>
+  }
+
+  /**
+   * UserUpgrade createMany
+   */
+  export type UserUpgradeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many UserUpgrades.
+     */
+    data: UserUpgradeCreateManyInput | UserUpgradeCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * UserUpgrade update
+   */
+  export type UserUpgradeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserUpgrade
+     */
+    select?: UserUpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserUpgrade
+     */
+    omit?: UserUpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserUpgradeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a UserUpgrade.
+     */
+    data: XOR<UserUpgradeUpdateInput, UserUpgradeUncheckedUpdateInput>
+    /**
+     * Choose, which UserUpgrade to update.
+     */
+    where: UserUpgradeWhereUniqueInput
+  }
+
+  /**
+   * UserUpgrade updateMany
+   */
+  export type UserUpgradeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update UserUpgrades.
+     */
+    data: XOR<UserUpgradeUpdateManyMutationInput, UserUpgradeUncheckedUpdateManyInput>
+    /**
+     * Filter which UserUpgrades to update
+     */
+    where?: UserUpgradeWhereInput
+    /**
+     * Limit how many UserUpgrades to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * UserUpgrade upsert
+   */
+  export type UserUpgradeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserUpgrade
+     */
+    select?: UserUpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserUpgrade
+     */
+    omit?: UserUpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserUpgradeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the UserUpgrade to update in case it exists.
+     */
+    where: UserUpgradeWhereUniqueInput
+    /**
+     * In case the UserUpgrade found by the `where` argument doesn't exist, create a new UserUpgrade with this data.
+     */
+    create: XOR<UserUpgradeCreateInput, UserUpgradeUncheckedCreateInput>
+    /**
+     * In case the UserUpgrade was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<UserUpgradeUpdateInput, UserUpgradeUncheckedUpdateInput>
+  }
+
+  /**
+   * UserUpgrade delete
+   */
+  export type UserUpgradeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserUpgrade
+     */
+    select?: UserUpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserUpgrade
+     */
+    omit?: UserUpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserUpgradeInclude<ExtArgs> | null
+    /**
+     * Filter which UserUpgrade to delete.
+     */
+    where: UserUpgradeWhereUniqueInput
+  }
+
+  /**
+   * UserUpgrade deleteMany
+   */
+  export type UserUpgradeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UserUpgrades to delete
+     */
+    where?: UserUpgradeWhereInput
+    /**
+     * Limit how many UserUpgrades to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * UserUpgrade without action
+   */
+  export type UserUpgradeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserUpgrade
+     */
+    select?: UserUpgradeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserUpgrade
+     */
+    omit?: UserUpgradeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserUpgradeInclude<ExtArgs> | null
   }
 
 
@@ -1791,11 +4033,31 @@ export namespace Prisma {
   export const UserScalarFieldEnum: {
     id: 'id',
     wallet: 'wallet',
-    fish: 'fish',
-    highestScore: 'highestScore'
+    highestScore: 'highestScore',
+    fishes: 'fishes'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+  export const UpgradeScalarFieldEnum: {
+    id: 'id',
+    name: 'name',
+    description: 'description',
+    levels: 'levels'
+  };
+
+  export type UpgradeScalarFieldEnum = (typeof UpgradeScalarFieldEnum)[keyof typeof UpgradeScalarFieldEnum]
+
+
+  export const UserUpgradeScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    upgradeId: 'upgradeId',
+    level: 'level'
+  };
+
+  export type UserUpgradeScalarFieldEnum = (typeof UserUpgradeScalarFieldEnum)[keyof typeof UserUpgradeScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -1806,11 +4068,43 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
   export const UserOrderByRelevanceFieldEnum: {
     wallet: 'wallet'
   };
 
   export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+  export const QueryMode: {
+    default: 'default',
+    insensitive: 'insensitive'
+  };
+
+  export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+  export const UpgradeOrderByRelevanceFieldEnum: {
+    name: 'name',
+    description: 'description'
+  };
+
+  export type UpgradeOrderByRelevanceFieldEnum = (typeof UpgradeOrderByRelevanceFieldEnum)[keyof typeof UpgradeOrderByRelevanceFieldEnum]
 
 
   /**
@@ -1833,6 +4127,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -1848,15 +4156,17 @@ export namespace Prisma {
     NOT?: UserWhereInput | UserWhereInput[]
     id?: IntFilter<"User"> | number
     wallet?: StringFilter<"User"> | string
-    fish?: IntFilter<"User"> | number
     highestScore?: IntFilter<"User"> | number
+    fishes?: IntFilter<"User"> | number
+    userUpgrades?: UserUpgradeListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
     id?: SortOrder
     wallet?: SortOrder
-    fish?: SortOrder
     highestScore?: SortOrder
+    fishes?: SortOrder
+    userUpgrades?: UserUpgradeOrderByRelationAggregateInput
     _relevance?: UserOrderByRelevanceInput
   }
 
@@ -1866,15 +4176,16 @@ export namespace Prisma {
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
-    fish?: IntFilter<"User"> | number
     highestScore?: IntFilter<"User"> | number
-  }, "id" | "id" | "wallet">
+    fishes?: IntFilter<"User"> | number
+    userUpgrades?: UserUpgradeListRelationFilter
+  }, "id" | "wallet">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
     wallet?: SortOrder
-    fish?: SortOrder
     highestScore?: SortOrder
+    fishes?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -1888,54 +4199,260 @@ export namespace Prisma {
     NOT?: UserScalarWhereWithAggregatesInput | UserScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"User"> | number
     wallet?: StringWithAggregatesFilter<"User"> | string
-    fish?: IntWithAggregatesFilter<"User"> | number
     highestScore?: IntWithAggregatesFilter<"User"> | number
+    fishes?: IntWithAggregatesFilter<"User"> | number
+  }
+
+  export type UpgradeWhereInput = {
+    AND?: UpgradeWhereInput | UpgradeWhereInput[]
+    OR?: UpgradeWhereInput[]
+    NOT?: UpgradeWhereInput | UpgradeWhereInput[]
+    id?: IntFilter<"Upgrade"> | number
+    name?: StringFilter<"Upgrade"> | string
+    description?: StringFilter<"Upgrade"> | string
+    levels?: JsonFilter<"Upgrade">
+    userUpgrades?: UserUpgradeListRelationFilter
+  }
+
+  export type UpgradeOrderByWithRelationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    levels?: SortOrder
+    userUpgrades?: UserUpgradeOrderByRelationAggregateInput
+    _relevance?: UpgradeOrderByRelevanceInput
+  }
+
+  export type UpgradeWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: UpgradeWhereInput | UpgradeWhereInput[]
+    OR?: UpgradeWhereInput[]
+    NOT?: UpgradeWhereInput | UpgradeWhereInput[]
+    name?: StringFilter<"Upgrade"> | string
+    description?: StringFilter<"Upgrade"> | string
+    levels?: JsonFilter<"Upgrade">
+    userUpgrades?: UserUpgradeListRelationFilter
+  }, "id">
+
+  export type UpgradeOrderByWithAggregationInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    levels?: SortOrder
+    _count?: UpgradeCountOrderByAggregateInput
+    _avg?: UpgradeAvgOrderByAggregateInput
+    _max?: UpgradeMaxOrderByAggregateInput
+    _min?: UpgradeMinOrderByAggregateInput
+    _sum?: UpgradeSumOrderByAggregateInput
+  }
+
+  export type UpgradeScalarWhereWithAggregatesInput = {
+    AND?: UpgradeScalarWhereWithAggregatesInput | UpgradeScalarWhereWithAggregatesInput[]
+    OR?: UpgradeScalarWhereWithAggregatesInput[]
+    NOT?: UpgradeScalarWhereWithAggregatesInput | UpgradeScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"Upgrade"> | number
+    name?: StringWithAggregatesFilter<"Upgrade"> | string
+    description?: StringWithAggregatesFilter<"Upgrade"> | string
+    levels?: JsonWithAggregatesFilter<"Upgrade">
+  }
+
+  export type UserUpgradeWhereInput = {
+    AND?: UserUpgradeWhereInput | UserUpgradeWhereInput[]
+    OR?: UserUpgradeWhereInput[]
+    NOT?: UserUpgradeWhereInput | UserUpgradeWhereInput[]
+    id?: IntFilter<"UserUpgrade"> | number
+    userId?: IntFilter<"UserUpgrade"> | number
+    upgradeId?: IntFilter<"UserUpgrade"> | number
+    level?: IntFilter<"UserUpgrade"> | number
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    upgrade?: XOR<UpgradeScalarRelationFilter, UpgradeWhereInput>
+  }
+
+  export type UserUpgradeOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    upgradeId?: SortOrder
+    level?: SortOrder
+    user?: UserOrderByWithRelationInput
+    upgrade?: UpgradeOrderByWithRelationInput
+  }
+
+  export type UserUpgradeWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: UserUpgradeWhereInput | UserUpgradeWhereInput[]
+    OR?: UserUpgradeWhereInput[]
+    NOT?: UserUpgradeWhereInput | UserUpgradeWhereInput[]
+    userId?: IntFilter<"UserUpgrade"> | number
+    upgradeId?: IntFilter<"UserUpgrade"> | number
+    level?: IntFilter<"UserUpgrade"> | number
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    upgrade?: XOR<UpgradeScalarRelationFilter, UpgradeWhereInput>
+  }, "id">
+
+  export type UserUpgradeOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    upgradeId?: SortOrder
+    level?: SortOrder
+    _count?: UserUpgradeCountOrderByAggregateInput
+    _avg?: UserUpgradeAvgOrderByAggregateInput
+    _max?: UserUpgradeMaxOrderByAggregateInput
+    _min?: UserUpgradeMinOrderByAggregateInput
+    _sum?: UserUpgradeSumOrderByAggregateInput
+  }
+
+  export type UserUpgradeScalarWhereWithAggregatesInput = {
+    AND?: UserUpgradeScalarWhereWithAggregatesInput | UserUpgradeScalarWhereWithAggregatesInput[]
+    OR?: UserUpgradeScalarWhereWithAggregatesInput[]
+    NOT?: UserUpgradeScalarWhereWithAggregatesInput | UserUpgradeScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"UserUpgrade"> | number
+    userId?: IntWithAggregatesFilter<"UserUpgrade"> | number
+    upgradeId?: IntWithAggregatesFilter<"UserUpgrade"> | number
+    level?: IntWithAggregatesFilter<"UserUpgrade"> | number
   }
 
   export type UserCreateInput = {
     wallet: string
-    fish?: number
     highestScore?: number
+    fishes?: number
+    userUpgrades?: UserUpgradeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
     id?: number
     wallet: string
-    fish?: number
     highestScore?: number
+    fishes?: number
+    userUpgrades?: UserUpgradeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
     wallet?: StringFieldUpdateOperationsInput | string
-    fish?: IntFieldUpdateOperationsInput | number
     highestScore?: IntFieldUpdateOperationsInput | number
+    fishes?: IntFieldUpdateOperationsInput | number
+    userUpgrades?: UserUpgradeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
     wallet?: StringFieldUpdateOperationsInput | string
-    fish?: IntFieldUpdateOperationsInput | number
     highestScore?: IntFieldUpdateOperationsInput | number
+    fishes?: IntFieldUpdateOperationsInput | number
+    userUpgrades?: UserUpgradeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
     id?: number
     wallet: string
-    fish?: number
     highestScore?: number
+    fishes?: number
   }
 
   export type UserUpdateManyMutationInput = {
     wallet?: StringFieldUpdateOperationsInput | string
-    fish?: IntFieldUpdateOperationsInput | number
     highestScore?: IntFieldUpdateOperationsInput | number
+    fishes?: IntFieldUpdateOperationsInput | number
   }
 
   export type UserUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
     wallet?: StringFieldUpdateOperationsInput | string
-    fish?: IntFieldUpdateOperationsInput | number
     highestScore?: IntFieldUpdateOperationsInput | number
+    fishes?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type UpgradeCreateInput = {
+    name: string
+    description: string
+    levels: JsonNullValueInput | InputJsonValue
+    userUpgrades?: UserUpgradeCreateNestedManyWithoutUpgradeInput
+  }
+
+  export type UpgradeUncheckedCreateInput = {
+    id?: number
+    name: string
+    description: string
+    levels: JsonNullValueInput | InputJsonValue
+    userUpgrades?: UserUpgradeUncheckedCreateNestedManyWithoutUpgradeInput
+  }
+
+  export type UpgradeUpdateInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    levels?: JsonNullValueInput | InputJsonValue
+    userUpgrades?: UserUpgradeUpdateManyWithoutUpgradeNestedInput
+  }
+
+  export type UpgradeUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    levels?: JsonNullValueInput | InputJsonValue
+    userUpgrades?: UserUpgradeUncheckedUpdateManyWithoutUpgradeNestedInput
+  }
+
+  export type UpgradeCreateManyInput = {
+    id?: number
+    name: string
+    description: string
+    levels: JsonNullValueInput | InputJsonValue
+  }
+
+  export type UpgradeUpdateManyMutationInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    levels?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type UpgradeUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    levels?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type UserUpgradeCreateInput = {
+    level: number
+    user: UserCreateNestedOneWithoutUserUpgradesInput
+    upgrade: UpgradeCreateNestedOneWithoutUserUpgradesInput
+  }
+
+  export type UserUpgradeUncheckedCreateInput = {
+    id?: number
+    userId: number
+    upgradeId: number
+    level: number
+  }
+
+  export type UserUpgradeUpdateInput = {
+    level?: IntFieldUpdateOperationsInput | number
+    user?: UserUpdateOneRequiredWithoutUserUpgradesNestedInput
+    upgrade?: UpgradeUpdateOneRequiredWithoutUserUpgradesNestedInput
+  }
+
+  export type UserUpgradeUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    upgradeId?: IntFieldUpdateOperationsInput | number
+    level?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type UserUpgradeCreateManyInput = {
+    id?: number
+    userId: number
+    upgradeId: number
+    level: number
+  }
+
+  export type UserUpgradeUpdateManyMutationInput = {
+    level?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type UserUpgradeUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    upgradeId?: IntFieldUpdateOperationsInput | number
+    level?: IntFieldUpdateOperationsInput | number
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -1964,6 +4481,16 @@ export namespace Prisma {
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
+  export type UserUpgradeListRelationFilter = {
+    every?: UserUpgradeWhereInput
+    some?: UserUpgradeWhereInput
+    none?: UserUpgradeWhereInput
+  }
+
+  export type UserUpgradeOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserOrderByRelevanceInput = {
     fields: UserOrderByRelevanceFieldEnum | UserOrderByRelevanceFieldEnum[]
     sort: SortOrder
@@ -1973,34 +4500,34 @@ export namespace Prisma {
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     wallet?: SortOrder
-    fish?: SortOrder
     highestScore?: SortOrder
+    fishes?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
     id?: SortOrder
-    fish?: SortOrder
     highestScore?: SortOrder
+    fishes?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
     id?: SortOrder
     wallet?: SortOrder
-    fish?: SortOrder
     highestScore?: SortOrder
+    fishes?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
     id?: SortOrder
     wallet?: SortOrder
-    fish?: SortOrder
     highestScore?: SortOrder
+    fishes?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
     id?: SortOrder
-    fish?: SortOrder
     highestScore?: SortOrder
+    fishes?: SortOrder
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -2036,6 +4563,147 @@ export namespace Prisma {
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
   }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue
+    lte?: InputJsonValue
+    gt?: InputJsonValue
+    gte?: InputJsonValue
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type UpgradeOrderByRelevanceInput = {
+    fields: UpgradeOrderByRelevanceFieldEnum | UpgradeOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
+  export type UpgradeCountOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    levels?: SortOrder
+  }
+
+  export type UpgradeAvgOrderByAggregateInput = {
+    id?: SortOrder
+  }
+
+  export type UpgradeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+  }
+
+  export type UpgradeMinOrderByAggregateInput = {
+    id?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+  }
+
+  export type UpgradeSumOrderByAggregateInput = {
+    id?: SortOrder
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue
+    lte?: InputJsonValue
+    gt?: InputJsonValue
+    gte?: InputJsonValue
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
+  }
+
+  export type UpgradeScalarRelationFilter = {
+    is?: UpgradeWhereInput
+    isNot?: UpgradeWhereInput
+  }
+
+  export type UserUpgradeCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    upgradeId?: SortOrder
+    level?: SortOrder
+  }
+
+  export type UserUpgradeAvgOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    upgradeId?: SortOrder
+    level?: SortOrder
+  }
+
+  export type UserUpgradeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    upgradeId?: SortOrder
+    level?: SortOrder
+  }
+
+  export type UserUpgradeMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    upgradeId?: SortOrder
+    level?: SortOrder
+  }
+
+  export type UserUpgradeSumOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    upgradeId?: SortOrder
+    level?: SortOrder
+  }
+
+  export type UserUpgradeCreateNestedManyWithoutUserInput = {
+    create?: XOR<UserUpgradeCreateWithoutUserInput, UserUpgradeUncheckedCreateWithoutUserInput> | UserUpgradeCreateWithoutUserInput[] | UserUpgradeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserUpgradeCreateOrConnectWithoutUserInput | UserUpgradeCreateOrConnectWithoutUserInput[]
+    createMany?: UserUpgradeCreateManyUserInputEnvelope
+    connect?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+  }
+
+  export type UserUpgradeUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<UserUpgradeCreateWithoutUserInput, UserUpgradeUncheckedCreateWithoutUserInput> | UserUpgradeCreateWithoutUserInput[] | UserUpgradeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserUpgradeCreateOrConnectWithoutUserInput | UserUpgradeCreateOrConnectWithoutUserInput[]
+    createMany?: UserUpgradeCreateManyUserInputEnvelope
+    connect?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+  }
 
   export type StringFieldUpdateOperationsInput = {
     set?: string
@@ -2047,6 +4715,104 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type UserUpgradeUpdateManyWithoutUserNestedInput = {
+    create?: XOR<UserUpgradeCreateWithoutUserInput, UserUpgradeUncheckedCreateWithoutUserInput> | UserUpgradeCreateWithoutUserInput[] | UserUpgradeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserUpgradeCreateOrConnectWithoutUserInput | UserUpgradeCreateOrConnectWithoutUserInput[]
+    upsert?: UserUpgradeUpsertWithWhereUniqueWithoutUserInput | UserUpgradeUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: UserUpgradeCreateManyUserInputEnvelope
+    set?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    disconnect?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    delete?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    connect?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    update?: UserUpgradeUpdateWithWhereUniqueWithoutUserInput | UserUpgradeUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: UserUpgradeUpdateManyWithWhereWithoutUserInput | UserUpgradeUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: UserUpgradeScalarWhereInput | UserUpgradeScalarWhereInput[]
+  }
+
+  export type UserUpgradeUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<UserUpgradeCreateWithoutUserInput, UserUpgradeUncheckedCreateWithoutUserInput> | UserUpgradeCreateWithoutUserInput[] | UserUpgradeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: UserUpgradeCreateOrConnectWithoutUserInput | UserUpgradeCreateOrConnectWithoutUserInput[]
+    upsert?: UserUpgradeUpsertWithWhereUniqueWithoutUserInput | UserUpgradeUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: UserUpgradeCreateManyUserInputEnvelope
+    set?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    disconnect?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    delete?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    connect?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    update?: UserUpgradeUpdateWithWhereUniqueWithoutUserInput | UserUpgradeUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: UserUpgradeUpdateManyWithWhereWithoutUserInput | UserUpgradeUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: UserUpgradeScalarWhereInput | UserUpgradeScalarWhereInput[]
+  }
+
+  export type UserUpgradeCreateNestedManyWithoutUpgradeInput = {
+    create?: XOR<UserUpgradeCreateWithoutUpgradeInput, UserUpgradeUncheckedCreateWithoutUpgradeInput> | UserUpgradeCreateWithoutUpgradeInput[] | UserUpgradeUncheckedCreateWithoutUpgradeInput[]
+    connectOrCreate?: UserUpgradeCreateOrConnectWithoutUpgradeInput | UserUpgradeCreateOrConnectWithoutUpgradeInput[]
+    createMany?: UserUpgradeCreateManyUpgradeInputEnvelope
+    connect?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+  }
+
+  export type UserUpgradeUncheckedCreateNestedManyWithoutUpgradeInput = {
+    create?: XOR<UserUpgradeCreateWithoutUpgradeInput, UserUpgradeUncheckedCreateWithoutUpgradeInput> | UserUpgradeCreateWithoutUpgradeInput[] | UserUpgradeUncheckedCreateWithoutUpgradeInput[]
+    connectOrCreate?: UserUpgradeCreateOrConnectWithoutUpgradeInput | UserUpgradeCreateOrConnectWithoutUpgradeInput[]
+    createMany?: UserUpgradeCreateManyUpgradeInputEnvelope
+    connect?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+  }
+
+  export type UserUpgradeUpdateManyWithoutUpgradeNestedInput = {
+    create?: XOR<UserUpgradeCreateWithoutUpgradeInput, UserUpgradeUncheckedCreateWithoutUpgradeInput> | UserUpgradeCreateWithoutUpgradeInput[] | UserUpgradeUncheckedCreateWithoutUpgradeInput[]
+    connectOrCreate?: UserUpgradeCreateOrConnectWithoutUpgradeInput | UserUpgradeCreateOrConnectWithoutUpgradeInput[]
+    upsert?: UserUpgradeUpsertWithWhereUniqueWithoutUpgradeInput | UserUpgradeUpsertWithWhereUniqueWithoutUpgradeInput[]
+    createMany?: UserUpgradeCreateManyUpgradeInputEnvelope
+    set?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    disconnect?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    delete?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    connect?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    update?: UserUpgradeUpdateWithWhereUniqueWithoutUpgradeInput | UserUpgradeUpdateWithWhereUniqueWithoutUpgradeInput[]
+    updateMany?: UserUpgradeUpdateManyWithWhereWithoutUpgradeInput | UserUpgradeUpdateManyWithWhereWithoutUpgradeInput[]
+    deleteMany?: UserUpgradeScalarWhereInput | UserUpgradeScalarWhereInput[]
+  }
+
+  export type UserUpgradeUncheckedUpdateManyWithoutUpgradeNestedInput = {
+    create?: XOR<UserUpgradeCreateWithoutUpgradeInput, UserUpgradeUncheckedCreateWithoutUpgradeInput> | UserUpgradeCreateWithoutUpgradeInput[] | UserUpgradeUncheckedCreateWithoutUpgradeInput[]
+    connectOrCreate?: UserUpgradeCreateOrConnectWithoutUpgradeInput | UserUpgradeCreateOrConnectWithoutUpgradeInput[]
+    upsert?: UserUpgradeUpsertWithWhereUniqueWithoutUpgradeInput | UserUpgradeUpsertWithWhereUniqueWithoutUpgradeInput[]
+    createMany?: UserUpgradeCreateManyUpgradeInputEnvelope
+    set?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    disconnect?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    delete?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    connect?: UserUpgradeWhereUniqueInput | UserUpgradeWhereUniqueInput[]
+    update?: UserUpgradeUpdateWithWhereUniqueWithoutUpgradeInput | UserUpgradeUpdateWithWhereUniqueWithoutUpgradeInput[]
+    updateMany?: UserUpgradeUpdateManyWithWhereWithoutUpgradeInput | UserUpgradeUpdateManyWithWhereWithoutUpgradeInput[]
+    deleteMany?: UserUpgradeScalarWhereInput | UserUpgradeScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutUserUpgradesInput = {
+    create?: XOR<UserCreateWithoutUserUpgradesInput, UserUncheckedCreateWithoutUserUpgradesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUserUpgradesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UpgradeCreateNestedOneWithoutUserUpgradesInput = {
+    create?: XOR<UpgradeCreateWithoutUserUpgradesInput, UpgradeUncheckedCreateWithoutUserUpgradesInput>
+    connectOrCreate?: UpgradeCreateOrConnectWithoutUserUpgradesInput
+    connect?: UpgradeWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutUserUpgradesNestedInput = {
+    create?: XOR<UserCreateWithoutUserUpgradesInput, UserUncheckedCreateWithoutUserUpgradesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutUserUpgradesInput
+    upsert?: UserUpsertWithoutUserUpgradesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutUserUpgradesInput, UserUpdateWithoutUserUpgradesInput>, UserUncheckedUpdateWithoutUserUpgradesInput>
+  }
+
+  export type UpgradeUpdateOneRequiredWithoutUserUpgradesNestedInput = {
+    create?: XOR<UpgradeCreateWithoutUserUpgradesInput, UpgradeUncheckedCreateWithoutUserUpgradesInput>
+    connectOrCreate?: UpgradeCreateOrConnectWithoutUserUpgradesInput
+    upsert?: UpgradeUpsertWithoutUserUpgradesInput
+    connect?: UpgradeWhereUniqueInput
+    update?: XOR<XOR<UpgradeUpdateToOneWithWhereWithoutUserUpgradesInput, UpgradeUpdateWithoutUserUpgradesInput>, UpgradeUncheckedUpdateWithoutUserUpgradesInput>
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -2118,6 +4884,243 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
     _max?: NestedStringFilter<$PrismaModel>
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue
+    lte?: InputJsonValue
+    gt?: InputJsonValue
+    gte?: InputJsonValue
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type UserUpgradeCreateWithoutUserInput = {
+    level: number
+    upgrade: UpgradeCreateNestedOneWithoutUserUpgradesInput
+  }
+
+  export type UserUpgradeUncheckedCreateWithoutUserInput = {
+    id?: number
+    upgradeId: number
+    level: number
+  }
+
+  export type UserUpgradeCreateOrConnectWithoutUserInput = {
+    where: UserUpgradeWhereUniqueInput
+    create: XOR<UserUpgradeCreateWithoutUserInput, UserUpgradeUncheckedCreateWithoutUserInput>
+  }
+
+  export type UserUpgradeCreateManyUserInputEnvelope = {
+    data: UserUpgradeCreateManyUserInput | UserUpgradeCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UserUpgradeUpsertWithWhereUniqueWithoutUserInput = {
+    where: UserUpgradeWhereUniqueInput
+    update: XOR<UserUpgradeUpdateWithoutUserInput, UserUpgradeUncheckedUpdateWithoutUserInput>
+    create: XOR<UserUpgradeCreateWithoutUserInput, UserUpgradeUncheckedCreateWithoutUserInput>
+  }
+
+  export type UserUpgradeUpdateWithWhereUniqueWithoutUserInput = {
+    where: UserUpgradeWhereUniqueInput
+    data: XOR<UserUpgradeUpdateWithoutUserInput, UserUpgradeUncheckedUpdateWithoutUserInput>
+  }
+
+  export type UserUpgradeUpdateManyWithWhereWithoutUserInput = {
+    where: UserUpgradeScalarWhereInput
+    data: XOR<UserUpgradeUpdateManyMutationInput, UserUpgradeUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type UserUpgradeScalarWhereInput = {
+    AND?: UserUpgradeScalarWhereInput | UserUpgradeScalarWhereInput[]
+    OR?: UserUpgradeScalarWhereInput[]
+    NOT?: UserUpgradeScalarWhereInput | UserUpgradeScalarWhereInput[]
+    id?: IntFilter<"UserUpgrade"> | number
+    userId?: IntFilter<"UserUpgrade"> | number
+    upgradeId?: IntFilter<"UserUpgrade"> | number
+    level?: IntFilter<"UserUpgrade"> | number
+  }
+
+  export type UserUpgradeCreateWithoutUpgradeInput = {
+    level: number
+    user: UserCreateNestedOneWithoutUserUpgradesInput
+  }
+
+  export type UserUpgradeUncheckedCreateWithoutUpgradeInput = {
+    id?: number
+    userId: number
+    level: number
+  }
+
+  export type UserUpgradeCreateOrConnectWithoutUpgradeInput = {
+    where: UserUpgradeWhereUniqueInput
+    create: XOR<UserUpgradeCreateWithoutUpgradeInput, UserUpgradeUncheckedCreateWithoutUpgradeInput>
+  }
+
+  export type UserUpgradeCreateManyUpgradeInputEnvelope = {
+    data: UserUpgradeCreateManyUpgradeInput | UserUpgradeCreateManyUpgradeInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UserUpgradeUpsertWithWhereUniqueWithoutUpgradeInput = {
+    where: UserUpgradeWhereUniqueInput
+    update: XOR<UserUpgradeUpdateWithoutUpgradeInput, UserUpgradeUncheckedUpdateWithoutUpgradeInput>
+    create: XOR<UserUpgradeCreateWithoutUpgradeInput, UserUpgradeUncheckedCreateWithoutUpgradeInput>
+  }
+
+  export type UserUpgradeUpdateWithWhereUniqueWithoutUpgradeInput = {
+    where: UserUpgradeWhereUniqueInput
+    data: XOR<UserUpgradeUpdateWithoutUpgradeInput, UserUpgradeUncheckedUpdateWithoutUpgradeInput>
+  }
+
+  export type UserUpgradeUpdateManyWithWhereWithoutUpgradeInput = {
+    where: UserUpgradeScalarWhereInput
+    data: XOR<UserUpgradeUpdateManyMutationInput, UserUpgradeUncheckedUpdateManyWithoutUpgradeInput>
+  }
+
+  export type UserCreateWithoutUserUpgradesInput = {
+    wallet: string
+    highestScore?: number
+    fishes?: number
+  }
+
+  export type UserUncheckedCreateWithoutUserUpgradesInput = {
+    id?: number
+    wallet: string
+    highestScore?: number
+    fishes?: number
+  }
+
+  export type UserCreateOrConnectWithoutUserUpgradesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutUserUpgradesInput, UserUncheckedCreateWithoutUserUpgradesInput>
+  }
+
+  export type UpgradeCreateWithoutUserUpgradesInput = {
+    name: string
+    description: string
+    levels: JsonNullValueInput | InputJsonValue
+  }
+
+  export type UpgradeUncheckedCreateWithoutUserUpgradesInput = {
+    id?: number
+    name: string
+    description: string
+    levels: JsonNullValueInput | InputJsonValue
+  }
+
+  export type UpgradeCreateOrConnectWithoutUserUpgradesInput = {
+    where: UpgradeWhereUniqueInput
+    create: XOR<UpgradeCreateWithoutUserUpgradesInput, UpgradeUncheckedCreateWithoutUserUpgradesInput>
+  }
+
+  export type UserUpsertWithoutUserUpgradesInput = {
+    update: XOR<UserUpdateWithoutUserUpgradesInput, UserUncheckedUpdateWithoutUserUpgradesInput>
+    create: XOR<UserCreateWithoutUserUpgradesInput, UserUncheckedCreateWithoutUserUpgradesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutUserUpgradesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutUserUpgradesInput, UserUncheckedUpdateWithoutUserUpgradesInput>
+  }
+
+  export type UserUpdateWithoutUserUpgradesInput = {
+    wallet?: StringFieldUpdateOperationsInput | string
+    highestScore?: IntFieldUpdateOperationsInput | number
+    fishes?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type UserUncheckedUpdateWithoutUserUpgradesInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    wallet?: StringFieldUpdateOperationsInput | string
+    highestScore?: IntFieldUpdateOperationsInput | number
+    fishes?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type UpgradeUpsertWithoutUserUpgradesInput = {
+    update: XOR<UpgradeUpdateWithoutUserUpgradesInput, UpgradeUncheckedUpdateWithoutUserUpgradesInput>
+    create: XOR<UpgradeCreateWithoutUserUpgradesInput, UpgradeUncheckedCreateWithoutUserUpgradesInput>
+    where?: UpgradeWhereInput
+  }
+
+  export type UpgradeUpdateToOneWithWhereWithoutUserUpgradesInput = {
+    where?: UpgradeWhereInput
+    data: XOR<UpgradeUpdateWithoutUserUpgradesInput, UpgradeUncheckedUpdateWithoutUserUpgradesInput>
+  }
+
+  export type UpgradeUpdateWithoutUserUpgradesInput = {
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    levels?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type UpgradeUncheckedUpdateWithoutUserUpgradesInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    levels?: JsonNullValueInput | InputJsonValue
+  }
+
+  export type UserUpgradeCreateManyUserInput = {
+    id?: number
+    upgradeId: number
+    level: number
+  }
+
+  export type UserUpgradeUpdateWithoutUserInput = {
+    level?: IntFieldUpdateOperationsInput | number
+    upgrade?: UpgradeUpdateOneRequiredWithoutUserUpgradesNestedInput
+  }
+
+  export type UserUpgradeUncheckedUpdateWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    upgradeId?: IntFieldUpdateOperationsInput | number
+    level?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type UserUpgradeUncheckedUpdateManyWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    upgradeId?: IntFieldUpdateOperationsInput | number
+    level?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type UserUpgradeCreateManyUpgradeInput = {
+    id?: number
+    userId: number
+    level: number
+  }
+
+  export type UserUpgradeUpdateWithoutUpgradeInput = {
+    level?: IntFieldUpdateOperationsInput | number
+    user?: UserUpdateOneRequiredWithoutUserUpgradesNestedInput
+  }
+
+  export type UserUpgradeUncheckedUpdateWithoutUpgradeInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    level?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type UserUpgradeUncheckedUpdateManyWithoutUpgradeInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    userId?: IntFieldUpdateOperationsInput | number
+    level?: IntFieldUpdateOperationsInput | number
   }
 
 
