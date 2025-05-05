@@ -131,6 +131,9 @@ exports.Prisma.UpgradeScalarFieldEnum = {
   id: 'id',
   name: 'name',
   description: 'description',
+  unit: 'unit',
+  upgradeLabel: 'upgradeLabel',
+  iconPath: 'iconPath',
   levels: 'levels'
 };
 
@@ -167,7 +170,10 @@ exports.Prisma.QueryMode = {
 
 exports.Prisma.UpgradeOrderByRelevanceFieldEnum = {
   name: 'name',
-  description: 'description'
+  description: 'description',
+  unit: 'unit',
+  upgradeLabel: 'upgradeLabel',
+  iconPath: 'iconPath'
 };
 
 

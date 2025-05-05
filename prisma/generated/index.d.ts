@@ -2098,18 +2098,27 @@ export namespace Prisma {
     id: number | null
     name: string | null
     description: string | null
+    unit: string | null
+    upgradeLabel: string | null
+    iconPath: string | null
   }
 
   export type UpgradeMaxAggregateOutputType = {
     id: number | null
     name: string | null
     description: string | null
+    unit: string | null
+    upgradeLabel: string | null
+    iconPath: string | null
   }
 
   export type UpgradeCountAggregateOutputType = {
     id: number
     name: number
     description: number
+    unit: number
+    upgradeLabel: number
+    iconPath: number
     levels: number
     _all: number
   }
@@ -2127,18 +2136,27 @@ export namespace Prisma {
     id?: true
     name?: true
     description?: true
+    unit?: true
+    upgradeLabel?: true
+    iconPath?: true
   }
 
   export type UpgradeMaxAggregateInputType = {
     id?: true
     name?: true
     description?: true
+    unit?: true
+    upgradeLabel?: true
+    iconPath?: true
   }
 
   export type UpgradeCountAggregateInputType = {
     id?: true
     name?: true
     description?: true
+    unit?: true
+    upgradeLabel?: true
+    iconPath?: true
     levels?: true
     _all?: true
   }
@@ -2233,6 +2251,9 @@ export namespace Prisma {
     id: number
     name: string
     description: string
+    unit: string
+    upgradeLabel: string
+    iconPath: string
     levels: JsonValue
     _count: UpgradeCountAggregateOutputType | null
     _avg: UpgradeAvgAggregateOutputType | null
@@ -2259,6 +2280,9 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     description?: boolean
+    unit?: boolean
+    upgradeLabel?: boolean
+    iconPath?: boolean
     levels?: boolean
     userUpgrades?: boolean | Upgrade$userUpgradesArgs<ExtArgs>
     _count?: boolean | UpgradeCountOutputTypeDefaultArgs<ExtArgs>
@@ -2270,10 +2294,13 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     description?: boolean
+    unit?: boolean
+    upgradeLabel?: boolean
+    iconPath?: boolean
     levels?: boolean
   }
 
-  export type UpgradeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "levels", ExtArgs["result"]["upgrade"]>
+  export type UpgradeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "description" | "unit" | "upgradeLabel" | "iconPath" | "levels", ExtArgs["result"]["upgrade"]>
   export type UpgradeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     userUpgrades?: boolean | Upgrade$userUpgradesArgs<ExtArgs>
     _count?: boolean | UpgradeCountOutputTypeDefaultArgs<ExtArgs>
@@ -2288,6 +2315,9 @@ export namespace Prisma {
       id: number
       name: string
       description: string
+      unit: string
+      upgradeLabel: string
+      iconPath: string
       levels: Prisma.JsonValue
     }, ExtArgs["result"]["upgrade"]>
     composites: {}
@@ -2662,6 +2692,9 @@ export namespace Prisma {
     readonly id: FieldRef<"Upgrade", 'Int'>
     readonly name: FieldRef<"Upgrade", 'String'>
     readonly description: FieldRef<"Upgrade", 'String'>
+    readonly unit: FieldRef<"Upgrade", 'String'>
+    readonly upgradeLabel: FieldRef<"Upgrade", 'String'>
+    readonly iconPath: FieldRef<"Upgrade", 'String'>
     readonly levels: FieldRef<"Upgrade", 'Json'>
   }
     
@@ -4044,6 +4077,9 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     description: 'description',
+    unit: 'unit',
+    upgradeLabel: 'upgradeLabel',
+    iconPath: 'iconPath',
     levels: 'levels'
   };
 
@@ -4101,7 +4137,10 @@ export namespace Prisma {
 
   export const UpgradeOrderByRelevanceFieldEnum: {
     name: 'name',
-    description: 'description'
+    description: 'description',
+    unit: 'unit',
+    upgradeLabel: 'upgradeLabel',
+    iconPath: 'iconPath'
   };
 
   export type UpgradeOrderByRelevanceFieldEnum = (typeof UpgradeOrderByRelevanceFieldEnum)[keyof typeof UpgradeOrderByRelevanceFieldEnum]
@@ -4210,6 +4249,9 @@ export namespace Prisma {
     id?: IntFilter<"Upgrade"> | number
     name?: StringFilter<"Upgrade"> | string
     description?: StringFilter<"Upgrade"> | string
+    unit?: StringFilter<"Upgrade"> | string
+    upgradeLabel?: StringFilter<"Upgrade"> | string
+    iconPath?: StringFilter<"Upgrade"> | string
     levels?: JsonFilter<"Upgrade">
     userUpgrades?: UserUpgradeListRelationFilter
   }
@@ -4218,6 +4260,9 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    unit?: SortOrder
+    upgradeLabel?: SortOrder
+    iconPath?: SortOrder
     levels?: SortOrder
     userUpgrades?: UserUpgradeOrderByRelationAggregateInput
     _relevance?: UpgradeOrderByRelevanceInput
@@ -4230,6 +4275,9 @@ export namespace Prisma {
     NOT?: UpgradeWhereInput | UpgradeWhereInput[]
     name?: StringFilter<"Upgrade"> | string
     description?: StringFilter<"Upgrade"> | string
+    unit?: StringFilter<"Upgrade"> | string
+    upgradeLabel?: StringFilter<"Upgrade"> | string
+    iconPath?: StringFilter<"Upgrade"> | string
     levels?: JsonFilter<"Upgrade">
     userUpgrades?: UserUpgradeListRelationFilter
   }, "id">
@@ -4238,6 +4286,9 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    unit?: SortOrder
+    upgradeLabel?: SortOrder
+    iconPath?: SortOrder
     levels?: SortOrder
     _count?: UpgradeCountOrderByAggregateInput
     _avg?: UpgradeAvgOrderByAggregateInput
@@ -4253,6 +4304,9 @@ export namespace Prisma {
     id?: IntWithAggregatesFilter<"Upgrade"> | number
     name?: StringWithAggregatesFilter<"Upgrade"> | string
     description?: StringWithAggregatesFilter<"Upgrade"> | string
+    unit?: StringWithAggregatesFilter<"Upgrade"> | string
+    upgradeLabel?: StringWithAggregatesFilter<"Upgrade"> | string
+    iconPath?: StringWithAggregatesFilter<"Upgrade"> | string
     levels?: JsonWithAggregatesFilter<"Upgrade">
   }
 
@@ -4364,6 +4418,9 @@ export namespace Prisma {
   export type UpgradeCreateInput = {
     name: string
     description: string
+    unit: string
+    upgradeLabel: string
+    iconPath: string
     levels: JsonNullValueInput | InputJsonValue
     userUpgrades?: UserUpgradeCreateNestedManyWithoutUpgradeInput
   }
@@ -4372,6 +4429,9 @@ export namespace Prisma {
     id?: number
     name: string
     description: string
+    unit: string
+    upgradeLabel: string
+    iconPath: string
     levels: JsonNullValueInput | InputJsonValue
     userUpgrades?: UserUpgradeUncheckedCreateNestedManyWithoutUpgradeInput
   }
@@ -4379,6 +4439,9 @@ export namespace Prisma {
   export type UpgradeUpdateInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    upgradeLabel?: StringFieldUpdateOperationsInput | string
+    iconPath?: StringFieldUpdateOperationsInput | string
     levels?: JsonNullValueInput | InputJsonValue
     userUpgrades?: UserUpgradeUpdateManyWithoutUpgradeNestedInput
   }
@@ -4387,6 +4450,9 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    upgradeLabel?: StringFieldUpdateOperationsInput | string
+    iconPath?: StringFieldUpdateOperationsInput | string
     levels?: JsonNullValueInput | InputJsonValue
     userUpgrades?: UserUpgradeUncheckedUpdateManyWithoutUpgradeNestedInput
   }
@@ -4395,12 +4461,18 @@ export namespace Prisma {
     id?: number
     name: string
     description: string
+    unit: string
+    upgradeLabel: string
+    iconPath: string
     levels: JsonNullValueInput | InputJsonValue
   }
 
   export type UpgradeUpdateManyMutationInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    upgradeLabel?: StringFieldUpdateOperationsInput | string
+    iconPath?: StringFieldUpdateOperationsInput | string
     levels?: JsonNullValueInput | InputJsonValue
   }
 
@@ -4408,6 +4480,9 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    upgradeLabel?: StringFieldUpdateOperationsInput | string
+    iconPath?: StringFieldUpdateOperationsInput | string
     levels?: JsonNullValueInput | InputJsonValue
   }
 
@@ -4597,6 +4672,9 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    unit?: SortOrder
+    upgradeLabel?: SortOrder
+    iconPath?: SortOrder
     levels?: SortOrder
   }
 
@@ -4608,12 +4686,18 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    unit?: SortOrder
+    upgradeLabel?: SortOrder
+    iconPath?: SortOrder
   }
 
   export type UpgradeMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    unit?: SortOrder
+    upgradeLabel?: SortOrder
+    iconPath?: SortOrder
   }
 
   export type UpgradeSumOrderByAggregateInput = {
@@ -5014,6 +5098,9 @@ export namespace Prisma {
   export type UpgradeCreateWithoutUserUpgradesInput = {
     name: string
     description: string
+    unit: string
+    upgradeLabel: string
+    iconPath: string
     levels: JsonNullValueInput | InputJsonValue
   }
 
@@ -5021,6 +5108,9 @@ export namespace Prisma {
     id?: number
     name: string
     description: string
+    unit: string
+    upgradeLabel: string
+    iconPath: string
     levels: JsonNullValueInput | InputJsonValue
   }
 
@@ -5067,6 +5157,9 @@ export namespace Prisma {
   export type UpgradeUpdateWithoutUserUpgradesInput = {
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    upgradeLabel?: StringFieldUpdateOperationsInput | string
+    iconPath?: StringFieldUpdateOperationsInput | string
     levels?: JsonNullValueInput | InputJsonValue
   }
 
@@ -5074,6 +5167,9 @@ export namespace Prisma {
     id?: IntFieldUpdateOperationsInput | number
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
+    unit?: StringFieldUpdateOperationsInput | string
+    upgradeLabel?: StringFieldUpdateOperationsInput | string
+    iconPath?: StringFieldUpdateOperationsInput | string
     levels?: JsonNullValueInput | InputJsonValue
   }
 

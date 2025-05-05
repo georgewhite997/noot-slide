@@ -8,9 +8,9 @@ export async function POST(req: NextRequest) {
     const payload = verifyJwt(token || '');
     if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     
-    const { fish, score } = await req.json();
+    const { fishes, score } = await req.json();
 
-    if (typeof fish !== 'number' || typeof score !== 'number') {
+    if (typeof fishes !== 'number' || typeof score !== 'number') {
         return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
@@ -22,21 +22,19 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const newFish = user.fish + fish;
+    const newFishes = user.fishes + fishes;
     const newHighScore = score > user.highestScore ? score : user.highestScore;
 
     await prisma.user.update({
         where: { id: user.id },
         data: {
-            fish: newFish,
+            fishes: newFishes,
             highestScore: newHighScore,
         },
     });
 
     return NextResponse.json({
-        message: 'success',
-        userId: user.id,
-        newFish,
+        newFishes,
         newHighScore,
     });
 }

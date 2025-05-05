@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../prisma/generated"
@@ -26,8 +20,11 @@ model Upgrade {
   id           Int           @id @default(autoincrement())
   name         String
   description  String
-  levels       Json // Array of level objects
-  userUpgrades UserUpgrade[] // Back relation
+  unit         String
+  upgradeLabel String
+  iconPath     String
+  levels       Json
+  userUpgrades UserUpgrade[]
 }
 
 model UserUpgrade {
@@ -36,5 +33,5 @@ model UserUpgrade {
   userId    Int
   upgrade   Upgrade @relation(fields: [upgradeId], references: [id])
   upgradeId Int
-  level     Int // Current level user has unlocked
+  level     Int
 }

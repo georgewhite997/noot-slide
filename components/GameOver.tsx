@@ -1,5 +1,8 @@
-import { GameState } from "@/atoms";
+import { apiUserAtom, GameState } from "@/atoms";
 import PrimaryButton from "./buttons/PrimaryButton";
+import { useEffect } from "react";
+import { useAtom } from "jotai";
+import { apiClient, UserWithUpgrades } from "@/utils/auth-utils";
 
 type GameOverProps = {
     score: number;
@@ -15,40 +18,62 @@ const GameOver = ({
     setGameState,
     setCurrentFishes,
     setScore,
-}: GameOverProps) => (
-    <div className="flex justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[402px] h-full">
-        <div className={`flex flex-col items-center bg-[#C7F4FE] w-[350px] p-[24px] rounded-md border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]`}>
-            <h1 className="text-center text-[32px]">Game Over</h1>
+}: GameOverProps) => {
+    const [apiUser, setApiUser] = useAtom(apiUserAtom);
 
-            <div className="mt-[20px]"></div>
+    useEffect(() => {
+        const sendRunResults = async () => {
+            const response = await apiClient.post('send-run-results', {
+                fishes: currentFishes,
+                score
+            });
+            const data = response.data;
+            if (apiUser) {
+                setApiUser({
+                    ...apiUser,
+                    fishes: data.newFishes,
+                    highestScore: data.newHighScore
+                });
+            }
+        }
+        sendRunResults();
+    }, [])
 
-            <div className="flex w-full justify-between">
-                <div className={`flex flex-col items-center bg-[#A5DEEB] w-[49%] h-fit p-[8px] rounded-md border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]`}>
-                    <img src="/fish-collected.png" alt="fish collected" />
+    return (
+        <div className="flex justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[402px] h-full">
+            <div className={`flex flex-col items-center bg-[#C7F4FE] w-[350px] p-[24px] rounded-md border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]`}>
+                <h1 className="text-center text-[32px]">Game Over</h1>
 
-                    <div className="mt-[8px] text-[14px] text-[#7EFFFF]">FISH COLLECTED</div>
-                    <div className="text-[32px] mt-[-8px]">{currentFishes}</div>
+                <div className="mt-[20px]"></div>
+
+                <div className="flex w-full justify-between">
+                    <div className={`flex flex-col items-center bg-[#A5DEEB] w-[49%] h-fit p-[8px] rounded-md border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]`}>
+                        <img src="/fish-collected.png" alt="fish collected" />
+
+                        <div className="mt-[8px] text-[14px] text-[#7EFFFF]">FISH COLLECTED</div>
+                        <div className="text-[32px] mt-[-8px]">{currentFishes}</div>
+                    </div>
+                    <div className={`flex flex-col items-center bg-[#A5DEEB] w-[49%] h-fit p-[8px] rounded-md border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]`}>
+                        <img src="/meters-ran.png" alt="fish collected" />
+
+                        <div className="mt-[8px] text-[14px] text-[#7EFFFF]">METERS RAN</div>
+                        <div className="text-[32px] mt-[-8px]">{score}</div>
+                    </div>
                 </div>
-                <div className={`flex flex-col items-center bg-[#A5DEEB] w-[49%] h-fit p-[8px] rounded-md border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]`}>
-                    <img src="/meters-ran.png" alt="fish collected" />
 
-                    <div className="mt-[8px] text-[14px] text-[#7EFFFF]">METERS RAN</div>
-                    <div className="text-[32px] mt-[-8px]">{score}</div>
-                </div>
+                <PrimaryButton onClick={() => {
+                    setCurrentFishes(0);
+                    setScore(0);
+                    setGameState("playing");
+                }} className="mt-[24px] w-full h-[44px]" color="green">TRY AGAIN</PrimaryButton>
+
+                <PrimaryButton onClick={() => {
+                    setGameState('in-menu');
+                }} className="mt-[10px] w-full h-[44px]" color="blue">GO HOME</PrimaryButton>
+
             </div>
-
-            <PrimaryButton onClick={() => {
-                setCurrentFishes(0);
-                setScore(0);
-                setGameState("playing");
-            }} className="mt-[24px] w-full h-[44px]" color="green">TRY AGAIN</PrimaryButton>
-
-            <PrimaryButton onClick={() => {
-                setGameState('in-menu');
-            }} className="mt-[10px] w-full h-[44px]" color="blue">GO HOME</PrimaryButton>
-
         </div>
-    </div>
-);
+    )
+};
 
 export default GameOver;

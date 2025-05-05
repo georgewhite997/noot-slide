@@ -21,6 +21,7 @@
     "@react-three/rapier": "^2.0.0",
     "@sentry/node": "^8.x.x",
     "@tanstack/react-query": "^5.69.0",
+    "axios": "^1.9.0",
     "jotai": "^2.12.2",
     "jsonwebtoken": "^9.0.2",
     "next": "^15.2.4",

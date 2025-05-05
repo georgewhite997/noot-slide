@@ -1,6 +1,6 @@
 import { useLoginWithAbstract } from "@abstract-foundation/agw-react";
 import AuthPage from "./AuthPage";
-import { GameState } from "@/atoms";
+import { apiUserAtom, GameState } from "@/atoms";
 import {
     registryContractAddress,
     registryAbi,
@@ -27,6 +27,7 @@ import { useState } from "react";
 import { ItemShop } from "./ItemShop";
 import { Upgrades } from "./Upgrades";
 import { div } from "three/src/nodes/TSL.js";
+import { useAtom } from "jotai";
 
 type Items = Array<IUserItem>;
 
@@ -56,6 +57,7 @@ const LandingPage = ({
     nootBalance,
 }: LandingProps) => {
     const [activeModal, setActiveModal] = useState<ActiveModalType>('none')
+    const [apiUser, setApiUser] = useAtom(apiUserAtom);
 
     if (!isConnected || !isRegistered) {
         return (
@@ -104,7 +106,7 @@ const LandingPage = ({
                         >
                             <div className="mx-3 flex items-center justify-center">
                                 <img src="/fish-icon.png" alt="fish icon" className="w-[30px] h-[30px]" />
-                                <span className="mx-1">0</span>
+                                <span className="mx-1">{apiUser?.fishes}</span>
                             </div>
 
                             <div className="mx-3 flex items-center justify-center">
@@ -131,7 +133,7 @@ const LandingPage = ({
                                     <span className="text-[14px] text-[#A5F0FF]">
                                         HIGH SCORE
                                     </span>
-                                    <span className="text-[24px] mt-[-9px]">432,432</span>
+                                    <span className="text-[24px] mt-[-9px]">{apiUser?.highestScore}</span>
                                 </div>
                             </div>
 

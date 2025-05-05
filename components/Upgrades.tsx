@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowDownIcon } from "./Icons";
 import PrimaryButton from "./buttons/PrimaryButton";
+import { Prisma, Upgrade, User, UserUpgrade } from "@/prisma/generated";
+import { apiClient, UpgradeLevel, UserWithUpgrades } from "@/utils/auth-utils";
+import { SetStateAction, useAtom, useAtomValue } from "jotai";
+import { apiUserAtom, upgradesAtom } from "@/atoms";
+import { userAgent } from "next/server";
 
 type UpgradesProps = {
     onClose: () => void;
@@ -11,6 +16,21 @@ export const Upgrades = ({
     onClose,
     address,
 }: UpgradesProps) => {
+    const upgrades = useAtomValue(upgradesAtom);
+    const [apiUser, setApiUser] = useAtom(apiUserAtom);
+
+    if (!apiUser) {
+        return (
+            <div className="flex justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[402px] h-full bg-[rgba(0,0,0,0.8)]">error when loading user</div>
+        )
+    }
+
+    if (!upgrades) {
+        return (
+            <div className="flex justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[402px] h-full bg-[rgba(0,0,0,0.8)]">error when loading upgrades</div>
+        )
+    }
+
     return (
         <div className="flex justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[402px] h-full bg-[rgba(0,0,0,0.8)]">
             <div className="w-[380px]">
@@ -37,14 +57,16 @@ export const Upgrades = ({
                                     <img src="/fish-icon.png" alt="eth icon" width={38} height={38} />
                                     <div className="ml-2">FISH BALANCE</div>
                                 </div>
-                                <div>512</div>
+                                <div>{apiUser.fishes}</div>
                             </div>
                         </div>
                     </div>
 
                     <div className="p-[16px] bg-[#E6FAFF] rounded-sm border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]">
                         {/* upgrade 1 */}
-                        <Upgrade />
+                        {upgrades.map((upgrade: Upgrade) =>
+                            <UpgradeMenu key={upgrade.id} apiUser={apiUser} setApiUser={setApiUser} upgrade={upgrade} />
+                        )}
                     </div>
                 </div>
             </div>
@@ -52,10 +74,24 @@ export const Upgrades = ({
     );
 };
 
-const Upgrade = () => {
+const UpgradeMenu = ({
+    upgrade,
+    apiUser,
+    setApiUser
+}: {
+    upgrade: Upgrade,
+    apiUser: UserWithUpgrades,
+    setApiUser: (user: UserWithUpgrades | undefined) => void;
+}) => {
     const [expanded, setExpanded] = useState<boolean>(false);
     const contentRef = useRef<HTMLDivElement>(null);
     const [height, setHeight] = useState(0);
+
+    const upgradeLevels: UpgradeLevel[] = upgrade.levels as UpgradeLevel[]
+    const userUpgrade: UserUpgrade | undefined = apiUser.userUpgrades.find((userUpgrade) => userUpgrade.upgradeId === upgrade.id)
+    const currentLevel: UpgradeLevel | undefined = upgradeLevels.find(level => level.level === userUpgrade?.level)
+    const nextLevel: UpgradeLevel | undefined = upgradeLevels.find(level => level.level === (userUpgrade?.level || 0) + 1)
+    const maxLevel: number = upgradeLevels.length;
 
     useEffect(() => {
         if (expanded && contentRef.current) {
@@ -65,34 +101,54 @@ const Upgrade = () => {
         }
     }, [expanded]);
 
+    if (!userUpgrade || !currentLevel) {
+        return <div>error upgrade for user not found refresh the game</div>
+    }
+
+    const handleUpgrade = async () => {
+        if (currentLevel?.upgradePrice as number > apiUser.fishes) {
+            alert('You dont have enough fish')
+            return;
+        }
+
+        const response = await apiClient.post('upgrades/buy', {
+            upgradeId: upgrade.id
+        })
+        setApiUser(response.data)
+    }
+
     return (
         <div className="mt-1 flex flex-col p-[12px] relative bg-[#7FCBDC] rounded-sm border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]">
             <div className="text-[16px] w-full flex justify-between items-center">
                 <div className="flex w-full">
-                    <img width={53} height={53} src={'/fishing-rod-upgrade.png'} alt="item icon" />
+                    <img width={53} height={53} src={upgrade.iconPath} alt="item icon" />
                     <div className="flex flex-col justify-center ml-2">
-                        <div className="uppercase text-left">FISHING ROD</div>
+                        <div className="uppercase text-left">{upgrade.name.toUpperCase()}</div>
                         <div className="flex items-center">
                             <div className="w-[131px] mt-[5px] flex items-center p-[2px] relative bg-[#1A4B55] rounded-lg border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]">
-                                <div className="shadow-[inset_0_-1.5px_0_rgba(0,0,0,0.25)] bg-[linear-gradient(to_bottom,_#60FFB1_0%,_#1EE584_21%,_#2BDD86_50%,_#00D96F_92%)] flex-grow mx-[1px] flex flex-col w-[23px] h-[10px] relative bg-[#0E2A30] rounded-lg"></div>
+                                {/* <div className="shadow-[inset_0_-1.5px_0_rgba(0,0,0,0.25)] bg-[linear-gradient(to_bottom,_#60FFB1_0%,_#1EE584_21%,_#2BDD86_50%,_#00D96F_92%)] flex-grow mx-[1px] flex flex-col w-[23px] h-[10px] relative bg-[#0E2A30] rounded-lg"></div>
                                 <div className="flex-grow mx-[1px] flex flex-col w-[23px] h-[10px] relative bg-[#0E2A30] rounded-lg"></div>
                                 <div className="flex-grow mx-[1px] flex flex-col w-[23px] h-[10px] relative bg-[#0E2A30] rounded-lg"></div>
                                 <div className="flex-grow mx-[1px] flex flex-col w-[23px] h-[10px] relative bg-[#0E2A30] rounded-lg"></div>
-                                <div className="flex-grow mx-[1px] flex flex-col w-[23px] h-[10px] relative bg-[#0E2A30] rounded-lg"></div>
+                                <div className="flex-grow mx-[1px] flex flex-col w-[23px] h-[10px] relative bg-[#0E2A30] rounded-lg"></div> */}
+                                {Array.from({ length: maxLevel }).map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className={`${userUpgrade.level > i && 'shadow-[inset_0_-1.5px_0_rgba(0,0,0,0.25)] bg-[linear-gradient(to_bottom,_#60FFB1_0%,_#1EE584_21%,_#2BDD86_50%,_#00D96F_92%)]'} flex-grow mx-[1px] flex flex-col w-[23px] h-[10px] relative bg-[#0E2A30] rounded-lg`}
+                                    ></div>
+                                ))}
                             </div>
-                            {/* {(item.type === 'one-time' || (item.type === 'permanent' && item.quantity === 0)) &&
-                            <>
-                                <img src="/eth-icon.webp" alt="eth icon" className="w-[15px] h-[15px]" />
-                                <div className="ml-1">{item.price}</div>
-                            </>}
-                        {(item.type === 'permanent' && item.quantity > 0) && <p className="text-[#5FFF7A] uppercase">owned</p>} */}
                         </div>
                     </div>
                 </div>
                 <div className="flex flex-col items-end justify-center">
                     <div className="flex items-center">
-                        <img className="mr-[4px]" src="/fish-icon.png" width={24} height={24} alt="" />
-                        <div className="text-[14px]">20</div>
+                        {userUpgrade.level !== maxLevel && (
+                            <>
+                                <img className="mr-[4px]" src={"/fish-icon.png"} width={24} height={24} alt="" />
+                                <div className="text-[14px]">{currentLevel.upgradePrice}</div>
+                            </>
+                        )}
                     </div>
                     <div className="my-[2px]"></div>
                     <button
@@ -115,15 +171,18 @@ const Upgrade = () => {
                     transition: 'max-height 0.4s ease, opacity 0.3s ease',
                 }}
             >
-                <div className="mt-2 text-[14px] text-left">Attract nearby Fish like a magnet.</div>
+                <div className="mt-2 text-[14px] text-left">{upgrade.description}</div>
                 <div className="text-[14px] mt-2 flex justify-between text-[#C7F4FE]">
-                    <div>Duration Increase</div>
-                    <div>{'15s -> 17s'}</div>
+                    <div>{upgrade.upgradeLabel}</div>
+                    {nextLevel ? (
+                        <div>{`${currentLevel.value}${upgrade.unit} -> ${nextLevel.value}${upgrade.unit}`}</div>
+                    ) : (
+                        <div>{`${currentLevel.value}${upgrade.unit}`}</div>
+                    )}
+
                 </div>
 
-                {/* <div className="h-[44px] w-full mt-2"> */}
-                <PrimaryButton className="py-2 mt-2 w-full" color="green">UPGRADE</PrimaryButton>
-                {/* </div> */}
+                <PrimaryButton onClick={handleUpgrade} className="py-2 mt-2 w-full" color="green" disabled={userUpgrade.level === maxLevel}>{userUpgrade.level === maxLevel ? 'MAXED OUT' : 'UPGRADE'}</PrimaryButton>
             </div>
         </div>
     )

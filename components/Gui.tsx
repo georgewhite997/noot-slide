@@ -1,7 +1,7 @@
 import {
   useAbstractClient
 } from "@abstract-foundation/agw-react";
-import { useAccount } from "wagmi";
+import { useAccount, useClient } from "wagmi";
 import { useAbstractSession } from "@/hooks/useAbstractSession";
 import {
   registryContractAddress,
@@ -25,7 +25,9 @@ import {
   hasLuckyCharmAtom,
   speedyStartQuantityAtom, abstractSessionAtom,
   SessionData,
-  itemsAtom
+  itemsAtom,
+  apiUserAtom,
+  upgradesAtom
 } from "@/atoms";
 import { toast, Toaster } from "react-hot-toast";
 import LandingPage from "./LandingPage";
@@ -33,6 +35,8 @@ import GameOver from "./GameOver";
 import Reviving from "./Reviving";
 import { InGameGui } from "./InGameGui";
 import NootToken from "../addresses/Noot.json";
+import axios from "axios";
+import { apiClient } from "@/utils/auth-utils";
 
 
 
@@ -64,6 +68,36 @@ export const Gui = memo(function Gui() {
   const [balance, setBalance] = useState<bigint>(BigInt(0));
   const [nootBalance, setNootBalance] = useState<bigint>(BigInt(0));
   const [isRegistered, setIsRegistered] = useState(false);
+  const [apiUser, setApiUser] = useAtom(apiUserAtom);
+  const [upgrades, setUpgrades] = useAtom(upgradesAtom);
+
+  useEffect(() => {
+    if (!address) return;
+
+    const fetchUser = async () => {
+      const response = await apiClient.get('get-me')
+      setApiUser(response.data);
+    }
+
+    const fetchUpgrades = async () => {
+      const response = await apiClient.get('upgrades')
+      setUpgrades(response.data);
+    }
+
+    const loginAndFetch = async () => {
+      const response = await axios.post('api/login', {
+        wallet: address
+      })
+      const token = response.data.token;
+      sessionStorage.setItem('apiToken', token);
+
+      fetchUser();
+      fetchUpgrades();
+    }
+
+    loginAndFetch();
+  }, [address])
+
 
   const fetchWallet = async (session?: SessionData) => {
     if (!publicClient || !address || !abstractClient) return;

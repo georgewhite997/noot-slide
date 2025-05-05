@@ -1,4 +1,4 @@
-import { gameStateAtom, settingsAtom, SettingsType } from "@/atoms";
+import { apiUserAtom, gameStateAtom, settingsAtom, SettingsType } from "@/atoms";
 import { useAtom, useSetAtom } from "jotai";
 import PrimaryButton from "./buttons/PrimaryButton";
 import { useState } from "react";
@@ -31,11 +31,14 @@ const Settings = ({ onClose, inGame = false, address }: { onClose: () => void, i
     const [settings, setSettings] = useAtom(settingsAtom);
     const [confirmingEnding, setConfirmingEnding] = useState<boolean>(false);
     const [newSettings, setNewSettings] = useState<SettingsType>(settings);
+    const [apiUser, setApiUser] = useAtom(apiUserAtom);
     const { disconnect } = useDisconnect();
     const setGameState = useSetAtom(gameStateAtom)
 
     const handleLogout = () => {
         disconnect();
+        setApiUser(undefined);
+        sessionStorage.removeItem('apiToken');
         onClose();
     };
 
