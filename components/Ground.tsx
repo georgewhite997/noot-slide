@@ -12,6 +12,7 @@ import {
   TRACK_MARK_LENGTH,
   TRACK_MARK_DEPTH,
   IObstacle,
+  DifficultyMode,
 } from "./shared";
 import { useAtom, useAtomValue } from "jotai";
 import { fishMeshesAtom, gameStateAtom, modelsGltfAtom, scoreAtom, storeAssetsGltfAtom } from "@/atoms";
@@ -120,7 +121,7 @@ export const Ground = memo(function Ground() {
       const newY = furthestY + SEGMENT_LENGTH * Math.sin(SLOPE_ANGLE);
 
       // Determine allowed difficulties based on score
-      let allowedDifficulties: ("easy" | "medium" | "hard")[];
+      let allowedDifficulties: DifficultyMode[];
       if (score > 2500) {
         allowedDifficulties = ["hard"]
       } else if (score > 1200) {
