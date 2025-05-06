@@ -28,7 +28,8 @@ import {
   hasLuckyCharmAtom,
   speedyStartQuantityAtom, abstractSessionAtom,
   SessionData,
-  itemsAtom
+  itemsAtom,
+  customMapAtom
 } from "@/atoms";
 import { toast, Toaster } from "react-hot-toast";
 import LandingPage from "./LandingPage";
@@ -37,6 +38,7 @@ import Reviving from "./Reviving";
 import { InGameGui } from "./InGameGui";
 import NootToken from "../addresses/Noot.json";
 import { skins } from "@/utils";
+import { decompressFromEncodedURIComponent } from 'lz-string';
 
 
 
@@ -67,6 +69,7 @@ export const Gui = memo(function Gui() {
   const [balance, setBalance] = useState<bigint>(BigInt(0));
   const [nootBalance, setNootBalance] = useState<bigint>(BigInt(0));
   const [isRegistered, setIsRegistered] = useState(false);
+  const setCustomMap = useSetAtom(customMapAtom)
 
   const fetchWallet = async (session?: SessionData) => {
     if (!publicClient || !address || !abstractClient) return;
@@ -426,6 +429,23 @@ export const Gui = memo(function Gui() {
     };
 
     updateDimensions();
+
+
+    if (chain.name === 'Abstract Testnet') {
+      const customMap = new window.URLSearchParams(window.location.search).get('custom-map')
+      if (customMap) {
+        const parsed = JSON.parse(decompressFromEncodedURIComponent(customMap))
+        setCustomMap(parsed.map((chunk: any) => ({
+          ...chunk,
+          obstacles: chunk.obstacles.map((obstacle: any) => ({
+            ...obstacle,
+            rotation: obstacle.rotation.map((deg: number) => deg * (Math.PI / 180)
+            ),
+          })),
+        })))
+      }
+    }
+
     window.addEventListener("resize", updateDimensions);
     return () => window.removeEventListener("resize", updateDimensions);
   }, []);

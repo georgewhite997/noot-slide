@@ -10,50 +10,10 @@ import {
   PerspectiveCamera,
 } from "@react-three/drei";
 import * as THREE from "three";
-import { useAtomValue } from "jotai";
-import { fishMeshesAtom, storeAssetsGltfAtom, settingsAtom, isGamePausedAtom } from "@/atoms";
-import { useGLTF } from '@react-three/drei';
-import { useSetAtom } from 'jotai';
-import { modelsGltfAtom } from '../atoms';
 import { MAX_MOBILE_WIDTH, MAX_MOBILE_HEIGHT } from "@/utils";
-
-export const ModelLoader = () => {
-  const modelsGltf = useGLTF('/models.glb');
-  const storeAssetsGltf = useGLTF('/store_assets.glb');
-  const fishGltf = useGLTF('/fish.glb');
-  const setModelsGltf = useSetAtom(modelsGltfAtom);
-  const setStoreAssetsGltf = useSetAtom(storeAssetsGltfAtom);
-  const setFishMeshes = useSetAtom(fishMeshesAtom);
-
-  useEffect(() => {
-    // @ts-expect-error idk why this is throwing an error
-    setModelsGltf(modelsGltf);
-    // @ts-expect-error idk why this is throwing an error
-    setStoreAssetsGltf(storeAssetsGltf);
-    const meshes = {}
-
-    // fishGltf.scene.traverse((child) => {
-    //   if (child instanceof THREE.Mesh) {
-    //     child.material = child.material.clone()
-    //     child.material.transparent = true
-    //   }
-    // })
-
-    fishGltf?.scene.traverse((obj) => {
-      // @ts-expect-error idk why this is throwing an error
-      if (obj.isMesh && obj.name) {
-        // @ts-expect-error idk why this is throwing an error
-        meshes[obj.name] = obj as THREE.Mesh
-      }
-    })
-
-
-    setFishMeshes(meshes);
-  }, []);
-
-  return null;
-};
-
+import { useAtomValue } from "jotai";
+import { settingsAtom, isGamePausedAtom } from "@/atoms";
+import { ModelLoader } from "./ModelLoader";
 
 export const ThreeCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -123,13 +83,14 @@ const Scene = () => {
     scene.fog = new THREE.FogExp2(0xd4e8f0, 0.002);
   }, []);
 
+
   return (
     <>
       <PerspectiveCamera
         makeDefault
         fov={75}
         near={0.5}
-        far={20000}
+        far={110}
         position={[0, 10, 0]}
       />
       <ambientLight color={0x787878} intensity={1} />

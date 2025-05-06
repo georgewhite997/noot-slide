@@ -49,7 +49,6 @@ export const InGameGui = ({
         return () => clearTimeout(timer);
     }, [countdown]);
 
-
     return (
         <>
             <div {...props} className={`absolute left-1/2 -translate-x-1/2 p-5 top-1/2 -translate-y-1/2 z-10 text-md text-white justify-between flex font-bold text-shadow-md ${className || ''}`}>

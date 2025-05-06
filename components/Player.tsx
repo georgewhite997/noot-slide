@@ -69,7 +69,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const [isGamePaused, setIsGamePaused] = useAtom(isGamePausedAtom);
   const isVisible = useRef(true)
 
-  const previousVelocity = useRef<{ x: number, y: number, z: number }>({ x: 0, y: 0, z: 0});
+  const previousVelocity = useRef<{ x: number, y: number, z: number }>({ x: 0, y: 0, z: 0 });
 
   const gltf = useLoader(GLTFLoader, "/animations.glb");
   const storeAssetsGltf = useAtomValue(storeAssetsGltfAtom);
@@ -610,7 +610,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
   useFrame(({ camera }, delta) => {
     if (!ref || !("current" in ref) || !ref.current || !isVisible.current) return;
-    
+
     if (isGamePaused) {
       camera.position.copy(cameraTargetRef.current);
       camera.lookAt(cameraLookAtRef.current);
@@ -853,12 +853,6 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       ccd={true}
     >
       <Halo />
-      {/*{hasFishingNet && (
-        <FishingNetIndicator />
-      )}
-      {hasMultiplier && (
-        <MultiplierIndicator />
-      )}*/}
       <primitive
         object={gltf.scene}
         scale={[10, 10, 10]}
@@ -879,21 +873,4 @@ const Halo = memo(function Halo() {
       <meshBasicMaterial color="#41f09c" />
     </mesh>
   )
-}); const FishingNetIndicator = memo(function FishingNetIndicator() {
-  return (
-    <mesh position={[0, 2, 0.2]} rotation={[Math.PI / 2, 0, 0]}>
-      <boxGeometry args={[0.2, 0.02, 0.2]} />
-      <meshBasicMaterial color="#FFD700" />
-    </mesh>
-  )
 });
-
-const MultiplierIndicator = memo(function MultiplierIndicator() {
-  return (
-    <mesh position={[0, 3.5, 0.2]} rotation={[Math.PI / 2, 0, 0]}>
-      <boxGeometry args={[0.2, 0.02, 0.2]} />
-      <meshBasicMaterial color="#00FF00" />
-    </mesh>
-  )
-})
-

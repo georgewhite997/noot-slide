@@ -18,8 +18,10 @@
     "@react-three/drei": "^10.0.5",
     "@react-three/fiber": "^9.1.0",
     "@react-three/rapier": "^2.0.0",
+    "@sentry/node": "^8.x.x",
     "@tanstack/react-query": "^5.69.0",
     "jotai": "^2.12.2",
+    "lz-string": "^1.5.0",
     "next": "^15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -27,8 +29,7 @@
     "simplex-noise": "^4.0.3",
     "three": "^0.174.0",
     "viem": "2.x",
-    "wagmi": "^2.14.15",
-    "@sentry/node": "^8.x.x"
+    "wagmi": "^2.14.15"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -56,4 +57,3 @@
     "zksync-ethers": "^6.16.2"
   }
 }
-
