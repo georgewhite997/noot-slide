@@ -28,13 +28,7 @@ const GameOver = ({
                 score
             });
             const data = response.data;
-            if (apiUser) {
-                setApiUser({
-                    ...apiUser,
-                    fishes: data.newFishes,
-                    highestScore: data.newHighScore
-                });
-            }
+            setApiUser(data);
         }
         sendRunResults();
     }, [])

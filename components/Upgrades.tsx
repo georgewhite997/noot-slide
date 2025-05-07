@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDownIcon } from "./Icons";
 import PrimaryButton from "./buttons/PrimaryButton";
 import { Prisma, Upgrade, User, UserUpgrade } from "@/prisma/generated";
@@ -19,7 +19,7 @@ export const Upgrades = ({
     const upgrades = useAtomValue(upgradesAtom);
     const [apiUser, setApiUser] = useAtom(apiUserAtom);
 
-    if (!apiUser) {
+    if (apiUser?.id == 0) {
         return (
             <div className="flex justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[402px] h-full bg-[rgba(0,0,0,0.8)]">error when loading user</div>
         )
@@ -57,7 +57,7 @@ export const Upgrades = ({
                                     <img src="/fish-icon.png" alt="eth icon" width={38} height={38} />
                                     <div className="ml-2">FISH BALANCE</div>
                                 </div>
-                                <div>{apiUser.fishes}</div>
+                                <div>{apiUser?.fishes}</div>
                             </div>
                         </div>
                     </div>
@@ -65,7 +65,7 @@ export const Upgrades = ({
                     <div className="p-[16px] bg-[#E6FAFF] rounded-sm border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]">
                         {/* upgrade 1 */}
                         {upgrades.map((upgrade: Upgrade) =>
-                            <UpgradeMenu key={upgrade.id} apiUser={apiUser} setApiUser={setApiUser} upgrade={upgrade} />
+                            <UpgradeMenu key={upgrade.id} upgrade={upgrade} />
                         )}
                     </div>
                 </div>
@@ -76,21 +76,29 @@ export const Upgrades = ({
 
 const UpgradeMenu = ({
     upgrade,
-    apiUser,
-    setApiUser
 }: {
     upgrade: Upgrade,
-    apiUser: UserWithUpgrades,
-    setApiUser: (user: UserWithUpgrades | undefined) => void;
 }) => {
+    const [apiUser, setApiUser] = useAtom(apiUserAtom)
     const [expanded, setExpanded] = useState<boolean>(false);
     const contentRef = useRef<HTMLDivElement>(null);
     const [height, setHeight] = useState(0);
+    const [isUpgrading, setIsUpgrading] = useState<boolean>(false);
 
     const upgradeLevels: UpgradeLevel[] = upgrade.levels as UpgradeLevel[]
-    const userUpgrade: UserUpgrade | undefined = apiUser.userUpgrades.find((userUpgrade) => userUpgrade.upgradeId === upgrade.id)
-    const currentLevel: UpgradeLevel | undefined = upgradeLevels.find(level => level.level === userUpgrade?.level)
-    const nextLevel: UpgradeLevel | undefined = upgradeLevels.find(level => level.level === (userUpgrade?.level || 0) + 1)
+
+    const userUpgradeLevel = useMemo(() => {
+        return apiUser.userUpgrades?.find((userUpgrade) => userUpgrade.upgradeId === upgrade.id)?.level || 1;
+    }, [apiUser, upgrade.id]);
+
+    const currentLevel = useMemo(() => {
+        return upgradeLevels?.find(level => level.level === userUpgradeLevel);
+    }, [upgradeLevels, userUpgradeLevel]);
+
+    const nextLevel = useMemo(() => {
+        return upgradeLevels?.find(level => level.level === userUpgradeLevel + 1);
+    }, [upgradeLevels, userUpgradeLevel]);
+
     const maxLevel: number = upgradeLevels.length;
 
     useEffect(() => {
@@ -101,20 +109,25 @@ const UpgradeMenu = ({
         }
     }, [expanded]);
 
-    if (!userUpgrade || !currentLevel) {
-        return <div>error upgrade for user not found refresh the game</div>
+    if (!currentLevel) {
+        return <div>error when loading upgrade</div>
     }
 
     const handleUpgrade = async () => {
-        if (currentLevel?.upgradePrice as number > apiUser.fishes) {
-            alert('You dont have enough fish')
-            return;
-        }
+        setIsUpgrading(true);
+        // if (currentLevel?.upgradePrice as number > apiUser.fishes) {
+        //     alert('You dont have enough fish')
+        //     return;
+        // }
 
-        const response = await apiClient.post('upgrades/buy', {
-            upgradeId: upgrade.id
-        })
-        setApiUser(response.data)
+        try {
+            const response = await apiClient.post('upgrades/buy', {
+                upgradeId: upgrade.id
+            })
+            setApiUser(response.data);
+        } finally {
+            setIsUpgrading(false);
+        }
     }
 
     return (
@@ -134,7 +147,7 @@ const UpgradeMenu = ({
                                 {Array.from({ length: maxLevel }).map((_, i) => (
                                     <div
                                         key={i}
-                                        className={`${userUpgrade.level > i && 'shadow-[inset_0_-1.5px_0_rgba(0,0,0,0.25)] bg-[linear-gradient(to_bottom,_#60FFB1_0%,_#1EE584_21%,_#2BDD86_50%,_#00D96F_92%)]'} flex-grow mx-[1px] flex flex-col w-[23px] h-[10px] relative bg-[#0E2A30] rounded-lg`}
+                                        className={`${userUpgradeLevel > i && 'shadow-[inset_0_-1.5px_0_rgba(0,0,0,0.25)] bg-[linear-gradient(to_bottom,_#60FFB1_0%,_#1EE584_21%,_#2BDD86_50%,_#00D96F_92%)]'} flex-grow mx-[1px] flex flex-col w-[23px] h-[10px] relative bg-[#0E2A30] rounded-lg`}
                                     ></div>
                                 ))}
                             </div>
@@ -143,7 +156,7 @@ const UpgradeMenu = ({
                 </div>
                 <div className="flex flex-col items-end justify-center">
                     <div className="flex items-center">
-                        {userUpgrade.level !== maxLevel && (
+                        {userUpgradeLevel !== maxLevel && (
                             <>
                                 <img className="mr-[4px]" src={"/fish-icon.png"} width={24} height={24} alt="" />
                                 <div className="text-[14px]">{currentLevel.upgradePrice}</div>
@@ -182,7 +195,29 @@ const UpgradeMenu = ({
 
                 </div>
 
-                <PrimaryButton onClick={handleUpgrade} className="py-2 mt-2 w-full" color="green" disabled={userUpgrade.level === maxLevel}>{userUpgrade.level === maxLevel ? 'MAXED OUT' : 'UPGRADE'}</PrimaryButton>
+                {currentLevel?.upgradePrice as number > apiUser.fishes ? (
+                    <PrimaryButton
+                        onClick={handleUpgrade}
+                        className="py-2 mt-2 w-full"
+                        color="red"
+                        disabled={false}
+                    >
+                        NOT ENOUGH FISH
+                    </PrimaryButton>
+                ) : (
+                    <PrimaryButton
+                        onClick={handleUpgrade}
+                        className="py-2 mt-2 w-full"
+                        color={isUpgrading ? "green" : "green"}
+                        disabled={userUpgradeLevel === maxLevel || isUpgrading}
+                    >
+                        {isUpgrading
+                            ? "..."
+                            : userUpgradeLevel === maxLevel
+                                ? "MAXED OUT"
+                                : "UPGRADE"}
+                    </PrimaryButton>
+                )}
             </div>
         </div>
     )

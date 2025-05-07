@@ -41,6 +41,8 @@ type LandingProps = {
     isConnected: boolean;
     balance: bigint;
     nootBalance: bigint;
+    setCurrentFishes: (n: number) => void;
+    setScore: (n: number) => void;
 };
 
 type ActiveModalType = 'none' | 'settings' | 'upgrades' | 'item-shop'
@@ -55,6 +57,8 @@ const LandingPage = ({
     balance,
     handlePurchase,
     nootBalance,
+    setCurrentFishes,
+    setScore
 }: LandingProps) => {
     const [activeModal, setActiveModal] = useState<ActiveModalType>('none')
     const [apiUser, setApiUser] = useAtom(apiUserAtom);
@@ -199,7 +203,11 @@ const LandingPage = ({
                             color='green'
                             className="w-full text-[40px]"
                             shineClassName="h-[70%]"
-                            onClick={() => setGameState('playing')}
+                            onClick={() => {
+                                setScore(0);
+                                setCurrentFishes(0);
+                                setGameState('playing');
+                            }}
                         >
                             PLAY NOW
                         </PrimaryButton>

@@ -79,6 +79,7 @@ export const Gui = memo(function Gui() {
       setApiUser(response.data);
     }
 
+
     const fetchUpgrades = async () => {
       const response = await apiClient.get('upgrades')
       setUpgrades(response.data);
@@ -421,6 +422,8 @@ export const Gui = memo(function Gui() {
                   // setMenuState={setMenuState}
                   // items={items}
                   handlePurchase={handlePurchase}
+                  setCurrentFishes={setCurrentFishes}
+                  setScore={setScore}
                 />
               </>
             )}

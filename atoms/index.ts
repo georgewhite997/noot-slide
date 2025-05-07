@@ -8,7 +8,7 @@ import { ObjectMap } from "@react-three/fiber";
 import * as THREE from "three";
 import { IUserItem } from "@/utils";
 import { Upgrade, User, UserUpgrade } from "@/prisma/generated";
-import { UserWithUpgrades } from "@/utils/auth-utils";
+import { emptyUser, UserWithUpgrades } from "@/utils/auth-utils";
 
 export type GameState = "playing" | "game-over" | "in-menu" | "reviving"
 
@@ -56,5 +56,5 @@ export const modelsGltfAtom = atom<GLTF & ObjectMap | null>(null);
 export const storeAssetsGltfAtom = atom<(GLTF & ObjectMap) | null>(null);
 export const fishMeshesAtom = atom<Record<string, THREE.Mesh>>({});
 export const isGamePausedAtom = atom<boolean>(false);
-export const apiUserAtom = atom<UserWithUpgrades | undefined>(undefined);
+export const apiUserAtom = atom<UserWithUpgrades>(emptyUser);
 export const upgradesAtom = atom<Upgrade[] | undefined>(undefined);

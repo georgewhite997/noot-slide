@@ -29,10 +29,17 @@ export async function POST(req: NextRequest) {
 
 
     const upgradeLevels = upgrade.levels as { level: number; value: number; upgradePrice?: number }[];
-    const userUpgrade = user.userUpgrades.find(userUpgrade => userUpgrade.upgradeId === upgradeId)
+    let userUpgrade = user.userUpgrades.find(userUpgrade => userUpgrade.upgradeId === upgradeId)
     //todo if user doesnt have this upgrade create it with default level of one
+
     if (!userUpgrade) {
-        return NextResponse.json({ message: 'Refresh the game' }, { status: 500 });
+        userUpgrade = await prisma.userUpgrade.create({
+            data: {
+                userId: user.id,
+                upgradeId: upgrade.id,
+                level: 1
+            }
+        })
     }
 
     if (userUpgrade.level + 1 > upgradeLevels.length) {
@@ -41,11 +48,11 @@ export async function POST(req: NextRequest) {
 
     const currentLevel = upgradeLevels.find((level) => level.level === userUpgrade.level)
 
-    const [updatedUserUpgrade] = await prisma.$transaction([
-        prisma.userUpgrade.update({
-            where: { id: userUpgrade.id },
-            data: { level: userUpgrade.level + 1 },
-        }),
+    if (currentLevel?.upgradePrice as number > user.fishes) {
+        return NextResponse.json({ message: 'Not enough fish' }, { status: 400 });
+    }
+
+    await prisma.$transaction([
         prisma.user.update({
             where: { id: user.id },
             data: {
@@ -54,13 +61,16 @@ export async function POST(req: NextRequest) {
                 },
             },
         }),
+        prisma.userUpgrade.update({
+            where: { id: userUpgrade.id },
+            data: { level: userUpgrade.level + 1 },
+        }),
     ]);
 
     user = await prisma.user.findUnique({
         where: { id: payload.id },
         include: { userUpgrades: true }
-    })
-
+    });
 
     return NextResponse.json(user);
 }

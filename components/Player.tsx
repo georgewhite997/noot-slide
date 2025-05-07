@@ -1,7 +1,7 @@
 import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import * as THREE from "three";
-import { useRef, useEffect, memo, useState } from "react";
+import { useRef, useEffect, memo, useState, useCallback, useMemo } from "react";
 import {
   CollisionEnterHandler,
   IntersectionEnterHandler,
@@ -10,10 +10,11 @@ import {
 } from "@react-three/rapier";
 import { SLOPE_ANGLE, lanes } from "./shared";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
-import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, magnetCollectedAtAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, hasSlowSkisAtom, reviveCountAtom, scoreAtom, storeAssetsGltfAtom, isGamePausedAtom } from "@/atoms";
+import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, magnetCollectedAtAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, hasSlowSkisAtom, reviveCountAtom, scoreAtom, storeAssetsGltfAtom, isGamePausedAtom, apiUserAtom, upgradesAtom } from "@/atoms";
 import { useAbstractClient } from "@abstract-foundation/agw-react";
 import { chain, hasPowerup, items, powerupsContractAddress } from "@/utils";
 import { parseAbi } from "viem";
+import { UpgradeLevel } from "@/utils/auth-utils";
 
 const LANE_TRANSITION_SPEED = 2.5;
 const CAMERA_POSITION_SMOOTHING = 3; // Lower = smoother but slower
@@ -24,6 +25,8 @@ const MAX_REVIVE_COUNT = 3;
 const PLAYER_START_POSITION = new THREE.Vector3(0, 10, -20);
 
 export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved: (chunkName: string) => void }) {
+  const [apiUser, setApiUser] = useAtom(apiUserAtom);
+  const [upgrades, setUpgrades] = useAtom(upgradesAtom);
   const [score, setScore] = useAtom(scoreAtom);
   const ref = useRef<RapierRigidBody>(null);
   const lastCollided = useRef('')
@@ -69,10 +72,27 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const [isGamePaused, setIsGamePaused] = useAtom(isGamePausedAtom);
   const isVisible = useRef(true)
 
-  const previousVelocity = useRef<{ x: number, y: number, z: number }>({ x: 0, y: 0, z: 0});
+  const previousVelocity = useRef<{ x: number, y: number, z: number }>({ x: 0, y: 0, z: 0 });
 
   const gltf = useLoader(GLTFLoader, "/animations.glb");
   const storeAssetsGltf = useAtomValue(storeAssetsGltfAtom);
+
+  const getUpgradeValue = (upgradeName: string): number => {
+      const upgrade = upgrades?.find(
+        (upgrade) => upgrade.name.toLowerCase() === upgradeName.toLowerCase()
+      );
+      if (!upgrade) return 0;
+
+      const upgradeLevels: UpgradeLevel[] = upgrade.levels as UpgradeLevel[];
+      const userUpgradeLevel = apiUser.userUpgrades?.find((userUpgrade) => userUpgrade.upgradeId === upgrade.id)?.level || 1;
+
+      const currentLevel = upgradeLevels.find(
+        (level) => level.level === userUpgradeLevel
+      );
+
+      return currentLevel?.value || 0;
+  };
+
 
   const afterDeathAnimation = () => {
     if (reviveCount < MAX_REVIVE_COUNT) {
@@ -514,15 +534,17 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
         if (!lastTakenPowerups.current.has(powerupId)) {
           lastTakenPowerups.current.add(powerupId);
 
-          let newDuration;
-          const rarity = Math.random();
-          if (rarity < 0.6) {
-            newDuration = 10_000;
-          } else if (rarity < 0.9) {
-            newDuration = 25_000;
-          } else {
-            newDuration = 75_000;
-          }
+          let newDuration = getUpgradeValue('fishing rod') * 1000;
+
+          // let newDuration;
+          // const rarity = Math.random();
+          // if (rarity < 0.6) {
+          //   newDuration = 10_000;
+          // } else if (rarity < 0.9) {
+          //   newDuration = 25_000;
+          // } else {
+          //   newDuration = 75_000;
+          // }
 
           if (hasPowerup(magnetCollectedAt, magnetDuration)) {
             setMagnetDuration(prev => prev + newDuration);
@@ -544,15 +566,17 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
         if (!lastTakenPowerups.current.has(powerupId)) {
           lastTakenPowerups.current.add(powerupId);
 
-          let newDuration;
-          const rarity = Math.random();
-          if (rarity < 0.6) {
-            newDuration = 10_000;
-          } else if (rarity < 0.9) {
-            newDuration = 25_000;
-          } else {
-            newDuration = 75_000;
-          }
+          let newDuration = getUpgradeValue('multiplier') * 1000;
+
+          // let newDuration;
+          // const rarity = Math.random();
+          // if (rarity < 0.6) {
+          //   newDuration = 10_000;
+          // } else if (rarity < 0.9) {
+          //   newDuration = 25_000;
+          // } else {
+          //   newDuration = 75_000;
+          // }
 
           if (hasPowerup(multiplierCollectedAt, multiplierDuration)) {
             setMultiplierDuration(prev => prev + newDuration);
@@ -610,7 +634,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
   useFrame(({ camera }, delta) => {
     if (!ref || !("current" in ref) || !ref.current || !isVisible.current) return;
-    
+
     if (isGamePaused) {
       camera.position.copy(cameraTargetRef.current);
       camera.lookAt(cameraLookAtRef.current);

@@ -21,12 +21,12 @@ export async function POST(req: NextRequest) {
         user = await prisma.user.create({
             data: {
                 wallet,
-                userUpgrades: {
-                    create: upgrades.map((upgrade) => ({
-                        upgrade: { connect: { id: upgrade.id } },
-                        level: 1,
-                    })),
-                },
+                // userUpgrades: {
+                //     create: upgrades.map((upgrade) => ({
+                //         upgrade: { connect: { id: upgrade.id } },
+                //         level: 1,
+                //     })),
+                // },
             },
             include: { userUpgrades: true }
         });

@@ -1,4 +1,4 @@
-import { currentFishesAtom, magnetCollectedAtAtom, isGamePausedAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, scoreAtom } from "@/atoms";
+import { currentFishesAtom, magnetCollectedAtAtom, isGamePausedAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, scoreAtom, apiUserAtom } from "@/atoms";
 import { useAtom, useSetAtom } from "jotai";
 import { HTMLAttributes, useEffect, useState } from "react"
 import { LightingIcon } from "./Icons";
@@ -25,6 +25,7 @@ export const InGameGui = ({
     const setIsGamePaused = useSetAtom(isGamePausedAtom);
     const [countdown, setCountdown] = useState<number | null>(0);
     const { address } = useAccount();
+    const [apiUser, setApiUser] = useAtom(apiUserAtom);
 
     // Update onModalClose function
     const onModalClose = () => {
@@ -74,7 +75,7 @@ export const InGameGui = ({
                                 TOP RUN
                             </span>
                             <span className="my-[2px]"></span>
-                            <span className="text-[16px] mt-[-9px]">432,432</span>
+                            <span className="text-[16px] mt-[-9px]">{apiUser.highestScore}</span>
                         </div>
                     </div>
                 </div>

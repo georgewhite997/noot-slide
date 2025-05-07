@@ -7,14 +7,14 @@ export async function POST(req: NextRequest) {
 
     const payload = verifyJwt(token || '');
     if (!payload) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    
+
     const { fishes, score } = await req.json();
 
     if (typeof fishes !== 'number' || typeof score !== 'number') {
         return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({
+    let user = await prisma.user.findUnique({
         where: { id: Number(payload.id) },
     });
 
@@ -25,16 +25,14 @@ export async function POST(req: NextRequest) {
     const newFishes = user.fishes + fishes;
     const newHighScore = score > user.highestScore ? score : user.highestScore;
 
-    await prisma.user.update({
+    user = await prisma.user.update({
         where: { id: user.id },
         data: {
             fishes: newFishes,
             highestScore: newHighScore,
         },
+        include: { userUpgrades: true }
     });
 
-    return NextResponse.json({
-        newFishes,
-        newHighScore,
-    });
+    return NextResponse.json(user);
 }

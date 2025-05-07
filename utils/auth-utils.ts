@@ -10,6 +10,14 @@ export type UpgradeLevel = {
     value: number
 }
 
+export const emptyUser = {
+    id: 0,
+    wallet: "",
+    highestScore: 0,
+    fishes: 0,
+    userUpgrades: []
+}
+
 export const apiClient = axios.create({
     baseURL: 'api/'
 });

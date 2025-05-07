@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Confirmation } from "./Confirmation";
 import { useDisconnect } from "wagmi";
 import { displayAddress } from "@/utils";
+import { emptyUser } from "@/utils/auth-utils";
 
 const ToggleSetting = ({ label, options, selected, onChange, className }: { label: string, options: [string, string], selected: 0 | 1, onChange: () => void, className?: string }) => {
     const [first, second] = options;
@@ -37,7 +38,7 @@ const Settings = ({ onClose, inGame = false, address }: { onClose: () => void, i
 
     const handleLogout = () => {
         disconnect();
-        setApiUser(undefined);
+        setApiUser(emptyUser);
         sessionStorage.removeItem('apiToken');
         onClose();
     };
