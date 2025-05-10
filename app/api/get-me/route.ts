@@ -21,5 +21,16 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    return NextResponse.json(user);
+    const leaderboardPosition = await prisma.user.count({
+        where: {
+            highestScore: {
+                gt: user.highestScore
+            }
+        }
+    }) + 1;
+
+    return NextResponse.json({
+        ...user,
+        leaderboardPosition
+    });
 }

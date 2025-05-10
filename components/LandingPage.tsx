@@ -28,6 +28,7 @@ import { ItemShop } from "./ItemShop";
 import { Upgrades } from "./Upgrades";
 import { div } from "three/src/nodes/TSL.js";
 import { useAtom } from "jotai";
+import { Leaderboard } from './Leaderboard'
 
 type Items = Array<IUserItem>;
 
@@ -45,7 +46,7 @@ type LandingProps = {
     setScore: (n: number) => void;
 };
 
-type ActiveModalType = 'none' | 'settings' | 'upgrades' | 'item-shop'
+type ActiveModalType = 'none' | 'settings' | 'upgrades' | 'item-shop' | 'leaderboard'
 
 const LandingPage = ({
     address,
@@ -63,7 +64,8 @@ const LandingPage = ({
     const [activeModal, setActiveModal] = useState<ActiveModalType>('none')
     const [apiUser, setApiUser] = useAtom(apiUserAtom);
 
-    if (!isConnected || !isRegistered) {
+
+    if (!isConnected || !isRegistered || apiUser.id == 0) {
         return (
             <AuthPage
                 isRegistered={isRegistered}
@@ -74,7 +76,7 @@ const LandingPage = ({
         );
     }
 
-    if (!address) {
+    if (!address || apiUser.id == 0) {
         // address = '0xmockupaddr'
         return <p>error, try to sign in again</p>
     }
@@ -110,7 +112,7 @@ const LandingPage = ({
                         >
                             <div className="mx-3 flex items-center justify-center">
                                 <img src="/fish-icon.png" alt="fish icon" className="w-[30px] h-[30px]" />
-                                <span className="mx-1">{apiUser?.fishes}</span>
+                                <span className="mx-1">{apiUser.fishes}</span>
                             </div>
 
                             <div className="mx-3 flex items-center justify-center">
@@ -120,7 +122,7 @@ const LandingPage = ({
 
                             <div className="mx-3 flex items-center justify-center">
                                 <img src="/eth-icon.webp" alt="fish icon" className="w-[24px] h-[24px]" />
-                                <span className="">{truncateEther(balance)} ETH</span>
+                                <span className="">{truncateEther(balance)}</span>
                             </div>
                         </div>
                     </div>
@@ -137,21 +139,24 @@ const LandingPage = ({
                                     <span className="text-[14px] text-[#A5F0FF]">
                                         HIGH SCORE
                                     </span>
-                                    <span className="text-[24px] mt-[-9px]">{apiUser?.highestScore}</span>
+                                    <span className="text-[24px] mt-[-9px]">{apiUser.highestScore}</span>
                                 </div>
                             </div>
 
                             <div className="mt-1 flex items-center">
-                                <div className="relative w-[40px] h-[40px]">
+                                <button
+                                    className="relative w-[40px] h-[40px]"
+                                    onClick={() => setActiveModal('leaderboard')}
+                                >
                                     <img src="/small-button.png" alt="bg" className="absolute top-0 left-0" />
                                     <img width={30} height={30} src="/trophy-icon.png" alt="trophy-icon" className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
-                                </div>
+                                </button>
 
                                 <div className="ml-4 flex flex-col justify-center">
                                     <span className="text-[14px] text-[#A5F0FF]">
                                         LEADERBOARD
                                     </span>
-                                    <span className="text-[24px] mt-[-9px]">#542</span>
+                                    <span className="text-[24px] mt-[-9px]">#{apiUser.leaderboardPosition}</span>
                                 </div>
                             </div>
 
@@ -281,6 +286,11 @@ const LandingPage = ({
                     onClose={onModalClose}
                     address={address}
                     handlePurchase={handlePurchase}
+                />
+            )}
+            {activeModal === 'leaderboard' && (
+                <Leaderboard
+                    onClose={onModalClose}
                 />
             )}
         </>

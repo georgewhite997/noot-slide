@@ -2,7 +2,7 @@ import { User, UserUpgrade } from "@/prisma/generated";
 import axios, { AxiosError } from 'axios';
 import { useAtomValue } from "jotai";
 
-export type UserWithUpgrades = User & { userUpgrades: UserUpgrade[] };
+export type UserWithUpgrades = User & { userUpgrades: UserUpgrade[], leaderboardPosition: number };
 
 export type UpgradeLevel = {
     level: number,
@@ -15,7 +15,8 @@ export const emptyUser = {
     wallet: "",
     highestScore: 0,
     fishes: 0,
-    userUpgrades: []
+    userUpgrades: [],
+    leaderboardPosition: -1
 }
 
 export const apiClient = axios.create({
