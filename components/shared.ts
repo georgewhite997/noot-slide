@@ -1,6 +1,6 @@
 import { possibleObstacles } from "../utils/index"
 
-export const lanes = [-3.5, 0, 3.5]; // X positions for left, middle, right lanes
+export const lanes = [-3, 0, 3]; // X positions for left, middle, right lanes
 export const TRACK_MARK_DEPTH = 0.1;
 export const TRACK_MARK_WIDTH = 0.2;
 export const TRACK_MARK_SPACING = 0.25;
