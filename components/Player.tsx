@@ -71,6 +71,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const setCurrentFishes = useSetAtom(currentFishesAtom);
   const [isGamePaused, setIsGamePaused] = useAtom(isGamePausedAtom);
   const isVisible = useRef(true)
+  const isGamePausedRef = useRef(isGamePaused);
 
   const previousVelocity = useRef<{ x: number, y: number, z: number }>({ x: 0, y: 0, z: 0 });
 
@@ -78,19 +79,19 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const storeAssetsGltf = useAtomValue(storeAssetsGltfAtom);
 
   const getUpgradeValue = (upgradeName: string): number => {
-      const upgrade = upgrades?.find(
-        (upgrade) => upgrade.name.toLowerCase() === upgradeName.toLowerCase()
-      );
-      if (!upgrade) return 0;
+    const upgrade = upgrades?.find(
+      (upgrade) => upgrade.name.toLowerCase() === upgradeName.toLowerCase()
+    );
+    if (!upgrade) return 0;
 
-      const upgradeLevels: UpgradeLevel[] = upgrade.levels as UpgradeLevel[];
-      const userUpgradeLevel = apiUser.userUpgrades?.find((userUpgrade) => userUpgrade.upgradeId === upgrade.id)?.level || 1;
+    const upgradeLevels: UpgradeLevel[] = upgrade.levels as UpgradeLevel[];
+    const userUpgradeLevel = apiUser.userUpgrades?.find((userUpgrade) => userUpgrade.upgradeId === upgrade.id)?.level || 1;
 
-      const currentLevel = upgradeLevels.find(
-        (level) => level.level === userUpgradeLevel
-      );
+    const currentLevel = upgradeLevels.find(
+      (level) => level.level === userUpgradeLevel
+    );
 
-      return currentLevel?.value || 0;
+    return currentLevel?.value || 0;
   };
 
 
@@ -202,6 +203,10 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   }
 
   useEffect(() => {
+    isGamePausedRef.current = isGamePaused;
+  }, [isGamePaused]);
+
+  useEffect(() => {
     setIsGamePaused(false);
 
     if (gameState === "playing" && reviveCount === 0) {
@@ -237,7 +242,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (deathAction.current?.isRunning() || isGamePaused) return;
+      if (deathAction.current?.isRunning() || isGamePausedRef.current) return;
 
       const key = e.key.toLowerCase();
       if (key === "a" || key === "arrowleft") {
@@ -281,7 +286,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (deathAction.current?.isRunning() || isGamePaused || !isTouchActive.current) return;
+      if (deathAction.current?.isRunning() || isGamePausedRef.current || !isTouchActive.current) return;
 
       const touchEndX = e.touches[0].clientX;
       const touchEndY = e.touches[0].clientY;
@@ -327,12 +332,6 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       isTouchActive.current = false;
     }
 
-    const handleVisibilityChange = () => {
-      isVisible.current = !document.hidden
-    }
-
-    document.addEventListener("visibilitychange", handleVisibilityChange)
-
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("touchstart", handleTouchStart);
     window.addEventListener("touchmove", handleTouchMove);
@@ -343,7 +342,6 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", handleTouchEnd);
-      document.removeEventListener("visibilitychange", handleVisibilityChange)
     };
   }, []);
 

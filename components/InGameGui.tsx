@@ -50,6 +50,30 @@ export const InGameGui = ({
         return () => clearTimeout(timer);
     }, [countdown]);
 
+    useEffect(() => {
+        const handleBlur = () => {
+            setCountdown(null);
+            setActiveModal('pause');
+            setIsGamePaused(true);
+        };
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            const key = e.key.toLowerCase();
+            if (key === 'escape') {
+                setCountdown(null);
+                setActiveModal('pause');
+                setIsGamePaused(true);
+            }
+        }
+
+        window.addEventListener("blur", handleBlur);
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            window.removeEventListener("blur", handleBlur);
+            window.removeEventListener("keydown", handleKeyDown)
+        }
+    }, [])
 
     return (
         <>
