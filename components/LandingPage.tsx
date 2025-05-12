@@ -19,6 +19,7 @@ import {
     truncateEther,
     displayAddress,
     formatNootBalance,
+    formatScore,
 } from "@/utils";
 import { ChestIcon, LightingIcon, ShoppingCartIcon, StarIcon } from "./Icons";
 import PrimaryButton from "./buttons/PrimaryButton";
@@ -139,7 +140,7 @@ const LandingPage = ({
                                     <span className="text-[14px] text-[#A5F0FF]">
                                         HIGH SCORE
                                     </span>
-                                    <span className="text-[24px] mt-[-9px]">{apiUser.highestScore}</span>
+                                    <span className="text-[24px] mt-[-9px]">{formatScore(apiUser.highestScore)}</span>
                                 </div>
                             </div>
 

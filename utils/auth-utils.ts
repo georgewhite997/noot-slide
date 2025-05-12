@@ -1,6 +1,7 @@
+import { apiUserAtom } from "@/atoms";
 import { User, UserUpgrade } from "@/prisma/generated";
 import axios, { AxiosError } from 'axios';
-import { useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 
 export type UserWithUpgrades = User & { userUpgrades: UserUpgrade[], leaderboardPosition: number };
 
@@ -24,7 +25,7 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(async (config) => {
-    const token = sessionStorage.getItem('apiToken')
+    const token = localStorage.getItem('apiToken');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -32,3 +33,16 @@ apiClient.interceptors.request.use(async (config) => {
 }, (error) => {
     return Promise.reject(error);
 });
+
+export const convertBigIntsToStrings = (obj: any): any => {
+    if (typeof obj === 'bigint') {
+        return obj.toString();
+    } else if (Array.isArray(obj)) {
+        return obj.map(convertBigIntsToStrings);
+    } else if (obj !== null && typeof obj === 'object') {
+        return Object.fromEntries(
+            Object.entries(obj).map(([key, value]) => [key, convertBigIntsToStrings(value)])
+        );
+    }
+    return obj;
+}

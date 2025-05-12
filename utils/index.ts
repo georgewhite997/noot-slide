@@ -202,3 +202,6 @@ export const formatNootBalance = (n?: bigint) => {
   }
 }
 
+export const formatScore = (number: number | bigint): string => {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}

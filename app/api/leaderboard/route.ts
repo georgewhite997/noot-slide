@@ -1,5 +1,6 @@
 import { signJwt, verifyJwt } from '@/lib/api/auth';
 import { prisma } from '@/lib/api/prisma';
+import { convertBigIntsToStrings } from '@/utils/auth-utils';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {

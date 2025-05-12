@@ -2,7 +2,10 @@ import { apiUserAtom, GameState } from "@/atoms";
 import PrimaryButton from "./buttons/PrimaryButton";
 import { useEffect } from "react";
 import { useAtom } from "jotai";
-import { apiClient, UserWithUpgrades } from "@/utils/auth-utils";
+import { apiClient, emptyUser, UserWithUpgrades } from "@/utils/auth-utils";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { formatScore } from "@/utils";
 
 type GameOverProps = {
     score: number;
@@ -23,12 +26,28 @@ const GameOver = ({
 
     useEffect(() => {
         const sendRunResults = async () => {
-            const response = await apiClient.post('send-run-results', {
-                fishes: currentFishes,
-                score
-            });
-            const data = response.data;
-            setApiUser(data);
+            try {
+                const response = await apiClient.post('send-run-results', {
+                    fishes: currentFishes,
+                    score
+                });
+                const data: Partial<UserWithUpgrades> = response.data;
+                setApiUser({
+                    ...apiUser,
+                    ...data
+                });
+            } catch (error: unknown) {
+                if (axios.isAxiosError(error)) {
+                    if (error.response?.status === 403) {
+                        setApiUser(emptyUser);
+                        toast.error('Unauthorized, sign in again!')
+                    } else {
+                        toast.error(error.response?.data.error || error.message || 'Unexpected error occurred')
+                    }
+                } else {
+                    toast.error("An unexpected error occurred:" + error);
+                }
+            }
         }
         sendRunResults();
     }, [])
@@ -51,7 +70,7 @@ const GameOver = ({
                         <img src="/meters-ran.png" alt="fish collected" />
 
                         <div className="mt-[8px] text-[14px] text-[#7EFFFF]">METERS RAN</div>
-                        <div className="text-[32px] mt-[-8px]">{score}</div>
+                        <div className="text-[32px] mt-[-8px]">{formatScore(score)}</div>
                     </div>
                 </div>
 

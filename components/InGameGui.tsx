@@ -4,7 +4,7 @@ import { HTMLAttributes, useEffect, useState } from "react"
 import { LightingIcon } from "./Icons";
 import Settings from "./Settings";
 import Pause from "./Pause";
-import { getRemainingTime, hasPowerup } from "@/utils";
+import { formatScore, getRemainingTime, hasPowerup } from "@/utils";
 import { useAccount } from "wagmi";
 
 type ActiveModalType = 'none' | 'settings' | 'pause'
@@ -75,7 +75,7 @@ export const InGameGui = ({
                                 TOP RUN
                             </span>
                             <span className="my-[2px]"></span>
-                            <span className="text-[16px] mt-[-9px]">{apiUser.highestScore}</span>
+                            <span className="text-[16px] mt-[-9px]">{formatScore(apiUser.highestScore)}</span>
                         </div>
                     </div>
                 </div>
@@ -98,7 +98,7 @@ export const InGameGui = ({
                     </div>
                     <div className="mt-2 bg-[rgba(0,0,0,0.2)] px-[8px] py-[4px] rounded-md flex items-center justify-center w-fit">
                         <LightingIcon className="w-[13px] h-[20px]" />
-                        <div className="ml-1">{score}</div>
+                        <div className="ml-1">{formatScore(score)}</div>
                     </div>
                     <div className="flex mt-2 justify-center">
                         {hasPowerup(magnetCollectedAt, magnetDuration) && (

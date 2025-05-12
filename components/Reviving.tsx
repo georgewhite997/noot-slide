@@ -1,5 +1,5 @@
 import { currentFishesAtom, GameState, reviveCountAtom, scoreAtom } from "@/atoms";
-import { nootTreasury } from "@/utils";
+import { formatScore, nootTreasury } from "@/utils";
 import { AbstractClient } from "@abstract-foundation/agw-client";
 import { useAtom, useAtomValue } from "jotai";
 import { useEffect, useState } from "react";
@@ -95,7 +95,7 @@ const Reviving = ({ setGameState, address, publicClient, abstractClient }: Reviv
                                 METERS
                             </span>
                             <span className="my-[2px]"></span>
-                            <span className="text-[18px] mt-[-9px]">{score}</span>
+                            <span className="text-[18px] mt-[-9px]">{formatScore(score)}</span>
                         </div>
                         {/* <div className="flex justify-between items-center">
                         

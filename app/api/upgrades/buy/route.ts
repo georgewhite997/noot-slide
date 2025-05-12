@@ -72,16 +72,8 @@ export async function POST(req: NextRequest) {
         include: { userUpgrades: true }
     });
 
-    const leaderboardPosition = await prisma.user.count({
-        where: {
-            highestScore: {
-                gt: user?.highestScore
-            }
-        }
-    }) + 1;
-
     return NextResponse.json({
-        ...user,
-        leaderboardPosition
+        fishes: user?.fishes,
+        userUpgrades: user?.userUpgrades,
     });
 }

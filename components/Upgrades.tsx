@@ -2,10 +2,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDownIcon } from "./Icons";
 import PrimaryButton from "./buttons/PrimaryButton";
 import { Prisma, Upgrade, User, UserUpgrade } from "@/prisma/generated";
-import { apiClient, UpgradeLevel, UserWithUpgrades } from "@/utils/auth-utils";
+import { apiClient, emptyUser, UpgradeLevel, UserWithUpgrades } from "@/utils/auth-utils";
 import { SetStateAction, useAtom, useAtomValue } from "jotai";
 import { apiUserAtom, upgradesAtom } from "@/atoms";
 import { userAgent } from "next/server";
+import toast from "react-hot-toast";
+import axios from "axios";
 
 type UpgradesProps = {
     onClose: () => void;
@@ -115,16 +117,27 @@ const UpgradeMenu = ({
 
     const handleUpgrade = async () => {
         setIsUpgrading(true);
-        // if (currentLevel?.upgradePrice as number > apiUser.fishes) {
-        //     alert('You dont have enough fish')
-        //     return;
-        // }
 
         try {
             const response = await apiClient.post('upgrades/buy', {
                 upgradeId: upgrade.id
             })
-            setApiUser(response.data);
+            const data: Partial<UserWithUpgrades> = response.data;
+            setApiUser({
+                ...apiUser,
+                ...data
+            });
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error)) {
+                if (error.response?.status === 403) {
+                    setApiUser(emptyUser);
+                    toast.error('Unauthorized, sign in again!')
+                } else {
+                    toast.error(error.response?.data.error || error.message || 'Unexpected error occurred')
+                }
+            } else {
+                toast.error("An unexpected error occurred:" + error);
+            }
         } finally {
             setIsUpgrading(false);
         }

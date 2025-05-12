@@ -1,6 +1,10 @@
-import { displayAddress } from "@/utils";
-import { apiClient } from "@/utils/auth-utils";
+import { apiUserAtom } from "@/atoms";
+import { displayAddress, formatScore } from "@/utils";
+import { apiClient, emptyUser } from "@/utils/auth-utils";
+import axios from "axios";
+import { useSetAtom } from "jotai";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 type LeaderboardProps = {
     onClose: () => void;
@@ -16,11 +20,26 @@ export const Leaderboard = ({
     onClose,
 }: LeaderboardProps) => {
     const [leaderboard, setLeaderboard] = useState<LeaderboardPosition[]>();
+    const setApiUser = useSetAtom(apiUserAtom);
 
     useEffect(() => {
         const fetchLeaderboard = async () => {
-            const response = await apiClient.get('leaderboard');
-            setLeaderboard(response.data);
+            try {
+                const response = await apiClient.get('leaderboard');
+                setLeaderboard(response.data);
+            } catch (error: unknown) {
+                if (axios.isAxiosError(error)) {
+                    if (error.response?.status === 403) {
+                        setApiUser(emptyUser);
+                        toast.error('Unauthorized, sign in again!')
+                    } else {
+                        toast.error(error.response?.data.error || error.message || 'Unexpected error occurred')
+                    }
+                } else {
+                    toast.error("An unexpected error occurred:" + error);
+                }
+            }
+
         }
 
         fetchLeaderboard();
@@ -48,19 +67,19 @@ export const Leaderboard = ({
                                 <div className="flex flex-col items-center justify-center px-[10px] pt-[6px] pb-[8px] rounded-md border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)] bg-gradient-to-b from-[#FEED88] to-[#FFAB2B]">
                                     <div className="text-[16px]">{leaderboard[0] ? displayAddress(leaderboard[0].wallet) : 'none'}</div>
                                     <img className="mt-[8px]" width={74} height={74} src="/1stplace.png" alt="1stplaceimg" />
-                                    <div className="mt-[8px] text-[14px]">{leaderboard[0] ? leaderboard[0].highestScore + 'm' : 'none'}</div>
+                                    <div className="mt-[8px] text-[14px]">{leaderboard[0] ? formatScore(leaderboard[0].highestScore) + 'm' : 'none'}</div>
                                 </div>
 
                                 <div className="flex flex-col items-center justify-center px-[10px] pt-[6px] pb-[8px] rounded-md border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)] bg-gradient-to-b from-[#FDF4FB] to-[#A8B5BD]">
                                     <div className="text-[16px]">{leaderboard[1] ? displayAddress(leaderboard[1].wallet) : 'none'}</div>
                                     <img className="mt-[8px]" width={74} height={74} src="/2ndplace.png" alt="1stplaceimg" />
-                                    <div className="mt-[8px] text-[14px]">{leaderboard[1] ? leaderboard[1].highestScore + 'm' : 'none'}</div>
+                                    <div className="mt-[8px] text-[14px]">{leaderboard[1] ? formatScore(leaderboard[1].highestScore) + 'm' : 'none'}</div>
                                 </div>
 
                                 <div className="flex flex-col items-center justify-center px-[10px] pt-[6px] pb-[8px] rounded-md border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)] bg-gradient-to-b from-[#FFC790] to-[#CB6326]">
                                     <div className="text-[16px]">{leaderboard[2] ? displayAddress(leaderboard[2].wallet) : 'none'}</div>
                                     <img className="mt-[8px]" width={74} height={74} src="/3rdplace.png" alt="1stplaceimg" />
-                                    <div className="mt-[8px] text-[14px]">{leaderboard[2] ? leaderboard[2].highestScore + 'm' : 'none'}</div>
+                                    <div className="mt-[8px] text-[14px]">{leaderboard[2] ? formatScore(leaderboard[2].highestScore) + 'm' : 'none'}</div>
                                 </div>
                             </div>
 
@@ -97,7 +116,7 @@ export const Position = (
                 <div className={`flex items-center justify-center ${leaderboardPosition.position > 10 ? 'bg-blue-500' : 'bg-green-500'} w-[33px] h-[33px] rounded-md border-[1px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)] text-[14px]`}>{leaderboardPosition.position}</div>
                 <div className="ml-[8px]">{leaderboardPosition.wallet === 'none' ? 'none' : displayAddress(leaderboardPosition.wallet)}</div>
             </div>
-            <div>{leaderboardPosition.wallet === 'none' ? 'none' : leaderboardPosition.highestScore + 'm'}</div>
+            <div>{leaderboardPosition.wallet === 'none' ? 'none' : formatScore(leaderboardPosition.highestScore) + 'm'}</div>
         </div>
     )
 }

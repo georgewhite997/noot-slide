@@ -35,8 +35,8 @@ import GameOver from "./GameOver";
 import Reviving from "./Reviving";
 import { InGameGui } from "./InGameGui";
 import NootToken from "../addresses/Noot.json";
-import axios from "axios";
-import { apiClient } from "@/utils/auth-utils";
+import axios, { AxiosError } from "axios";
+import { apiClient, emptyUser } from "@/utils/auth-utils";
 
 
 
@@ -86,14 +86,28 @@ export const Gui = memo(function Gui() {
     }
 
     const loginAndFetch = async () => {
-      const response = await axios.post('api/login', {
-        wallet: address
-      })
-      const token = response.data.token;
-      sessionStorage.setItem('apiToken', token);
+      try {
+        const response = await axios.post('api/login', {
+          wallet: address
+        })
+        const token = response.data.token;
+        localStorage.setItem('apiToken', token);
 
-      fetchUser();
-      fetchUpgrades();
+        fetchUser();
+        fetchUpgrades();
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 403) {
+            setApiUser(emptyUser);
+            toast.error('Unauthorized, sign in again!')
+          } else {
+            toast.error(error.response?.data.error || error.message || 'Unexpected error occurred')
+          }
+        } else {
+          toast.error("An unexpected error occurred:" + error);
+        }
+      }
+
     }
 
     loginAndFetch();

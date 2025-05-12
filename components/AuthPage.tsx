@@ -16,7 +16,6 @@ const AuthPage = ({
     isLoading,
     isConnected,
 }: AuthPageProps) => {
-
     return (
         <div
             className="h-full w-full flex flex-col items-center justify-between relative"

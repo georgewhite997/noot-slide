@@ -23,27 +23,43 @@ export async function POST(req: NextRequest) {
     }
 
     const newFishes = user.fishes + fishes;
-    const newHighScore = score > user.highestScore ? score : user.highestScore;
+
+    if (score > user.highestScore) {
+        user = await prisma.user.update({
+            where: { id: user.id },
+            data: {
+                fishes: newFishes,
+                highestScore: score,
+            },
+        });
+
+        const leaderboardPosition = await prisma.user.count({
+            where: {
+                highestScore: {
+                    gt: user.highestScore
+                }
+            }
+        }) + 1;
+
+
+        return NextResponse.json({
+            fishes: user.fishes,
+            highestScore: user.highestScore,
+            leaderboardPosition
+        });
+    }
+
 
     user = await prisma.user.update({
         where: { id: user.id },
         data: {
             fishes: newFishes,
-            highestScore: newHighScore,
         },
-        include: { userUpgrades: true }
     });
 
-    const leaderboardPosition = await prisma.user.count({
-        where: {
-            highestScore: {
-                gt: user.highestScore
-            }
-        }
-    }) + 1;
+
 
     return NextResponse.json({
-        ...user,
-        leaderboardPosition
+        fishes: user.fishes,
     });
 }

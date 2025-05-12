@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE `user` MODIFY `highestScore` BIGINT NOT NULL DEFAULT 0,
+    MODIFY `fishes` BIGINT NOT NULL DEFAULT 0;
