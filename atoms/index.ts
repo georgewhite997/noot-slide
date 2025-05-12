@@ -7,7 +7,7 @@ import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { ObjectMap } from "@react-three/fiber";
 import * as THREE from "three";
 import { IUserItem } from "@/utils";
-import { Upgrade, User, UserUpgrade } from "@/prisma/generated";
+import { Upgrade, User, UserUpgrade } from '@/prisma-client'
 import { emptyUser, UserWithUpgrades } from "@/utils/auth-utils";
 
 export type GameState = "playing" | "game-over" | "in-menu" | "reviving"

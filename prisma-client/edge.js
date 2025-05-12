@@ -165,7 +165,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "G:\\Sources\\noot-slide\\prisma\\generated",
+      "value": "G:\\Sources\\noot-slide\\prisma-client",
       "fromEnvVar": null
     },
     "config": {
@@ -183,26 +183,27 @@ const config = {
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../.env"
+    "rootEnvPath": "../.env",
+    "schemaEnvPath": "../.env"
   },
-  "relativePath": "..",
+  "relativePath": "../prisma",
   "clientVersion": "6.7.0",
   "engineVersion": "3cff47a7f5d65c3ea74883f1d736e41d68ce91ed",
   "datasourceNames": [
     "db"
   ],
   "activeProvider": "mysql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "mysql://root@localhost:3306/nootswipe"
+        "value": null
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../prisma/generated\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id           Int           @id @default(autoincrement())\n  wallet       String        @unique\n  highestScore Int           @default(0)\n  fishes       Int           @default(0)\n  userUpgrades UserUpgrade[] // Relation to UserUpgrade\n}\n\nmodel Upgrade {\n  id           Int           @id @default(autoincrement())\n  name         String\n  description  String\n  unit         String\n  upgradeLabel String\n  iconPath     String\n  levels       Json\n  userUpgrades UserUpgrade[]\n}\n\nmodel UserUpgrade {\n  id        Int     @id @default(autoincrement())\n  user      User    @relation(fields: [userId], references: [id])\n  userId    Int\n  upgrade   Upgrade @relation(fields: [upgradeId], references: [id])\n  upgradeId Int\n  level     Int\n}\n",
-  "inlineSchemaHash": "7ea65ce197dadd77ec8498c2a3b5cf12c916c7fe35f124ef53901491f6cf0984",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../prisma-client\"\n}\n\ndatasource db {\n  provider = \"mysql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id           Int           @id @default(autoincrement())\n  wallet       String        @unique\n  highestScore Int           @default(0)\n  fishes       Int           @default(0)\n  userUpgrades UserUpgrade[] // Relation to UserUpgrade\n}\n\nmodel Upgrade {\n  id           Int           @id @default(autoincrement())\n  name         String\n  description  String\n  unit         String\n  upgradeLabel String\n  iconPath     String\n  levels       Json\n  userUpgrades UserUpgrade[]\n}\n\nmodel UserUpgrade {\n  id        Int     @id @default(autoincrement())\n  user      User    @relation(fields: [userId], references: [id])\n  userId    Int\n  upgrade   Upgrade @relation(fields: [upgradeId], references: [id])\n  upgradeId Int\n  level     Int\n}\n",
+  "inlineSchemaHash": "65469c6e448c4f9c6e23864d2d8137f5372b9d56d115aa391afe3f11cb948612",
   "copyEngine": true
 }
 config.dirname = '/'

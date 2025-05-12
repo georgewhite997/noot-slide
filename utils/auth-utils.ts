@@ -1,5 +1,5 @@
 import { apiUserAtom } from "@/atoms";
-import { User, UserUpgrade } from "@/prisma/generated";
+import { User, UserUpgrade } from '@/prisma-client'
 import axios, { AxiosError } from 'axios';
 import { useAtomValue, useSetAtom } from "jotai";
 

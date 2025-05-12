@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDownIcon } from "./Icons";
 import PrimaryButton from "./buttons/PrimaryButton";
-import { Prisma, Upgrade, User, UserUpgrade } from "@/prisma/generated";
+import { Prisma, Upgrade, User, UserUpgrade } from '@/prisma-client'
 import { apiClient, emptyUser, UpgradeLevel, UserWithUpgrades } from "@/utils/auth-utils";
 import { SetStateAction, useAtom, useAtomValue } from "jotai";
 import { apiUserAtom, upgradesAtom } from "@/atoms";

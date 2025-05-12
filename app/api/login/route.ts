@@ -1,6 +1,6 @@
 import { signJwt } from '@/lib/api/auth';
 import { prisma } from '@/lib/api/prisma';
-import { User } from '@/prisma/generated'
+import { User } from '@/prisma-client'
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(req: NextRequest) {
