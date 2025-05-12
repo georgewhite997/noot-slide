@@ -42,3 +42,5 @@ artifacts-zk/*
 !artifacts-zk/contracts/Greeter.sol/
 !artifacts-zk/contracts/Greeter.sol/Greeter.json
 artifacts-zk/contracts/Greeter.sol/Greeter.dbg.json
+
+/prisma-client
