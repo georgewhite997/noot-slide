@@ -266,12 +266,14 @@ export const SideEnvironment = memo(
     }) {
         const modelsGltf = useAtomValue(modelsGltfAtom);
 
+        // return null
         const EnvironmentSegment = useMemo(() =>
             allEnvironments[
             Math.floor(Math.random() * allEnvironments.length)
             ],
             [allEnvironments.length]
         );
+
 
         return (
             <>

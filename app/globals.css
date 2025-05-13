@@ -12,6 +12,10 @@
   --font-mono: var(--font-geist-mono);
 }
 
+#_rht_toaster * {
+  color: white !important;
+}
+
 /* @font-face {
   font-family: 'iCiel Cadena';
   src: url('/iciel-cadena.ttf') format('truetype');
@@ -47,11 +51,11 @@ button:hover {
   outline: none;
 }
 
-
 *:not(nextjs-portal) {
   text-shadow: 0px 0px 0px #000, 1px 1px 0px #000, 2px 2px 0px #000;
   -webkit-text-stroke: 1px black;
 }
+
 
 *::-webkit-scrollbar {
   width: 8px;

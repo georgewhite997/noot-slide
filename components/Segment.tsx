@@ -1,7 +1,7 @@
 import { memo, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { RigidBody } from "@react-three/rapier";
-import { getSnowBumps, getModel } from "@/utils";
+import { getSnowBumps } from "@/utils";
 import {
     SEGMENT_LENGTH,
     SEGMENT_RESOLUTION,
@@ -9,7 +9,6 @@ import {
     SLOPE_ANGLE,
     ISegment,
 } from "./shared";
-import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import React from "react";
 
@@ -54,13 +53,13 @@ export const Segment = memo(
         colorMap,
         normalMap,
         modelsGltf,
-        isRoad,
+        // isRoad,
     }: {
         segment: ISegment;
         colorMap: THREE.Texture;
         normalMap: THREE.Texture;
         modelsGltf: GLTF;
-        isRoad: boolean;
+        // isRoad: boolean;
     }) {
         const lightRef = useRef<THREE.DirectionalLight>(null);
         const targetRef = useRef<THREE.Object3D>(null);
@@ -93,8 +92,7 @@ export const Segment = memo(
             }
         }, []);
 
-        if (!roadModel) return null;
-
+        // if (!roadModel) return null;
         return (
             <>
                 {/* Directional Light */}
@@ -113,9 +111,9 @@ export const Segment = memo(
                     shadow-mapSize-width={1024}
                     shadow-mapSize-height={1024}
                     ref={lightRef} />
-                
+
                 <ambientLight intensity={0.5} color={0xffffff} />
-                
+
                 <object3D ref={targetRef} position={targetPosition} />
                 <RigidBody type="fixed" friction={0.03} name="ground">
                     <mesh
@@ -131,33 +129,32 @@ export const Segment = memo(
                     rotation={[-Math.PI / 2 + SLOPE_ANGLE, 0, 0]}
                     receiveShadow
                 >
-                    {isRoad ? (
+                    {/*isRoad ? (
                         <primitive
                             object={clone(roadModel)}
                             scale={[0.013, 0.025, 0.001]}
                             position={[0, 0, 0]}
                             rotation={[0, 0, 0]}
                         />
-                    ) : (
-                        <mesh name={`segment-snow-${segment.index}`} receiveShadow>
-                            <GroundGeometry yOffset={segment.index * SEGMENT_LENGTH} />
-                            <meshStandardMaterial
-                                map={colorMap}
-                                normalMap={normalMap}
-                                normalScale={new THREE.Vector2(1, 1)}
-                                roughness={0.9}
-                                metalness={0}
-                                side={THREE.DoubleSide}
-                            />
-                        </mesh>
-                    )}
+                    ) : (*/}
+                    <mesh name={`segment-snow-${segment.index}`} receiveShadow>
+                        <GroundGeometry yOffset={segment.index * SEGMENT_LENGTH} />
+                        <meshStandardMaterial
+                            map={colorMap}
+                            normalMap={normalMap}
+                            normalScale={new THREE.Vector2(1, 1)}
+                            roughness={0.9}
+                            metalness={0}
+                            side={THREE.DoubleSide}
+                        />
+                    </mesh>
+                    {/*)}*/}
                     <SideEnvironment isRight={false} {...{ colorMap, normalMap }} yOffset={segment.zOffset} />
                     <SideEnvironment isRight={true} {...{ colorMap, normalMap }} yOffset={segment.zOffset} />
                 </mesh>
             </>
         );
     },
-    (prevProps, nextProps) => {
-        return prevProps.segment.yOffset === nextProps.segment.yOffset && prevProps.segment.zOffset === nextProps.segment.zOffset;
-    }
+    (prevProps, nextProps) =>
+        prevProps.segment.yOffset === nextProps.segment.yOffset && prevProps.segment.zOffset === nextProps.segment.zOffset
 );

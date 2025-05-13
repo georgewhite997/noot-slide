@@ -2,13 +2,14 @@
 import hardhat from "hardhat";
 const { ethers, network } = hardhat;
 import fs from "fs";
-import NootToken from '../addresses/Noot.json'
 
 const owner = "0x1Ed3aB46773Dd5789eC5553A7D4b4E2f34d7c7c6";
-const paymentToken = NootToken.address;
 
 async function main(CONTRACT_NAME: string) {
   const filepath = `addresses/${CONTRACT_NAME}.json`;
+
+  const paymentTokenJson = JSON.parse(fs.readFileSync('addresses/Noot.json', 'utf8'));
+  const paymentToken = paymentTokenJson.address;
 
   const args = [owner];
 
@@ -46,8 +47,8 @@ async function main(CONTRACT_NAME: string) {
 }
 
 (async () => {
-  await main("Powerups");
-  await main("Registry");
+  // await main("Powerups");
+  // await main("Registry");
   await main("Skins");
 
   process.exit(0);

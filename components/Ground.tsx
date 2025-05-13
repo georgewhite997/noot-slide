@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { Fragment, memo, useEffect, useMemo, useRef, useState } from "react";
-import { useFrame, useThree, useLoader } from "@react-three/fiber";
-import { Merged, useTexture } from "@react-three/drei";
+import { memo, useEffect, useRef, useState } from "react";
+import { useFrame, useThree } from "@react-three/fiber";
+import { useTexture } from "@react-three/drei";
 import {
   SLOPE_ANGLE,
   SEGMENT_COUNT,
@@ -11,16 +11,15 @@ import {
   TRACK_MARK_WIDTH,
   TRACK_MARK_LENGTH,
   TRACK_MARK_DEPTH,
-  IObstacle,
 } from "./shared";
-import { useAtom, useAtomValue } from "jotai";
-import { fishMeshesAtom, gameStateAtom, modelsGltfAtom, scoreAtom, storeAssetsGltfAtom } from "@/atoms";
+import { useAtomValue } from "jotai";
+import { customMapAtom, gameStateAtom, modelsGltfAtom, scoreAtom } from "@/atoms";
 import { getSnowBumps } from "@/utils";
-import { Fish, getObstacles, Obstacle } from "./Obstacles";
+import { getChunks } from "./Obstacles";
 import { Segment } from "./Segment";
 import { Player } from "./Player";
 import { ISegment } from "./shared";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { SegmentObstacles } from "./SegmentObstacles";
 
 
 const worldMatrixComponent1 = new THREE.Quaternion().setFromEuler(
@@ -37,8 +36,9 @@ const onTextureLoaded = (texture: THREE.Texture) => {
 
 export const Ground = memo(function Ground() {
   const gameState = useAtomValue(gameStateAtom);
-  const score = useAtomValue(scoreAtom);
+  // const score = useAtomValue(scoreAtom);
   const modelsGltf = useAtomValue(modelsGltfAtom)
+  const customMap = useAtomValue(customMapAtom)
 
   const [segments, setSegments] = useState<ISegment[]>([]);
   const lastPushedIndex = useRef<number | null>(null);
@@ -57,10 +57,7 @@ export const Ground = memo(function Ground() {
       const zOffset = -i * (SEGMENT_LENGTH * Math.cos(SLOPE_ANGLE));
       const yOffset = i * (SEGMENT_LENGTH * Math.sin(SLOPE_ANGLE));
 
-      const isRoad = Math.random() < 0.2 && i !== 0;
-
-      const obstacles = i === 0 ? [] : getObstacles(["easy"], isRoad);
-
+      const { chunks, overflow } = i === 0 ? { chunks: [], overflow: 0 } : getChunks(i, 0, customMap);
 
 
       const object = scene.getObjectByName(`segment-snow-${i}`) as THREE.Mesh;
@@ -82,8 +79,9 @@ export const Ground = memo(function Ground() {
         zOffset,
         yOffset,
         index: i,
-        chunks: obstacles.map((obstacles, j) => ({ obstacles, name: `chunk-${j}-segment-${i}` })),
-        isRoad
+        chunks,
+        overflow,
+        // isRoad
       });
     }
     lastPushedIndex.current = initialSegments[initialSegments.length - 1].index;
@@ -119,23 +117,7 @@ export const Ground = memo(function Ground() {
       const newZ = furthestZ - SEGMENT_LENGTH * Math.cos(SLOPE_ANGLE);
       const newY = furthestY + SEGMENT_LENGTH * Math.sin(SLOPE_ANGLE);
 
-      // Determine allowed difficulties based on score
-      let allowedDifficulties: ("easy" | "medium" | "hard")[];
-      if (score > 2500) {
-        allowedDifficulties = ["hard"]
-      } else if (score > 1200) {
-        allowedDifficulties = ["medium", "hard"];
-      } else if (score > 800) {
-        allowedDifficulties = ["medium"];
-      } else if (score > 400) {
-        allowedDifficulties = ["easy", "medium"];
-      } else {
-        allowedDifficulties = ["easy"];
-      }
-
-      const isRoad = Math.random() < 0.2;
-
-      const obstacles = getObstacles(allowedDifficulties, isRoad);
+      const { chunks, overflow } = getChunks(newIndex, lastEl.overflow, customMap);
 
       setSegments((prevSegments) => {
         const newSegments = [
@@ -144,8 +126,8 @@ export const Ground = memo(function Ground() {
             zOffset: newZ,
             yOffset: newY,
             index: newIndex,
-            isRoad,
-            chunks: obstacles.map((obstacles, j) => ({ obstacles, name: `chunk-${j}-segment-${newIndex}` })),
+            chunks,
+            overflow,
           },
         ];
         if (newSegments.length > SEGMENT_COUNT) {
@@ -238,7 +220,7 @@ export const Ground = memo(function Ground() {
           chunks: segment.chunks.map((chunk) => {
             return {
               ...chunk,
-              obstacles: chunk.name === chunkName || chunk.name === nextChunkName ? chunk.obstacles.filter((obstacle) => obstacle.type === "fish" || obstacle.type === "fishing-net" || obstacle.type === "fish-multiplier") : chunk.obstacles,
+              obstacles: chunk.name === chunkName || chunk.name === nextChunkName ? chunk.obstacles.filter((obstacle) => obstacle.type === "reward") : chunk.obstacles,
             };
           }),
         };
@@ -260,7 +242,7 @@ export const Ground = memo(function Ground() {
               colorMap={colorMap}
               normalMap={normalMap}
               modelsGltf={modelsGltf}
-              isRoad={segment.isRoad}
+            // isRoad={segment.isRoad}
             />
             <mesh
               position={[0, segment.yOffset, segment.zOffset]}
@@ -279,65 +261,3 @@ export const Ground = memo(function Ground() {
   )
 })
 
-
-const SegmentObstacles = memo(function SegmentObstacles({ segment, colorMap, normalMap }: { segment: ISegment, colorMap: THREE.Texture, normalMap: THREE.Texture }) {
-  const modelsGltf = useAtomValue(modelsGltfAtom);
-  const store_assets_gltf = useAtomValue(storeAssetsGltfAtom);
-  const fishMeshes = useAtomValue(fishMeshesAtom);
-
-  if (!modelsGltf || !store_assets_gltf) return null;
-
-  return segment.chunks.length > 0 ? (
-    segment.chunks.map((chunk) => {
-      if (chunk.obstacles.length === 0) return null
-      const chunkKey = chunk.name + segment.index + segment.yOffset
-      return (
-        <group key={chunkKey} name={chunk.name}>
-          <Merged meshes={fishMeshes} limit={20}>
-            {(model) =>
-              <group>
-                {chunk.obstacles.map((obstacle, obstacleIndex) =>
-                  <Obstacle
-                    key={`${chunkKey}-obstacle-${obstacle.type}-${obstacle.position.join('-')}-${segment.index}-${obstacleIndex}`}
-                    snowColorMap={colorMap}
-                    snowNormalMap={normalMap}
-                    obstacle={obstacle}
-                    FishModel={model.KoiFish_low}
-                    modelsGltf={modelsGltf}
-                    store_assets_gltf={store_assets_gltf}
-                  />
-                )}
-              </group>
-            }
-          </Merged >
-        </group >
-      )
-    })
-  ) : null
-}, (prevProps, nextProps) => {
-  const prevSegment = prevProps.segment as ISegment;
-  const nextSegment = nextProps.segment as ISegment;
-
-  return (
-    prevSegment.chunks.length === nextSegment.chunks.length &&
-    prevSegment.chunks.every((chunk, i) => {
-      for (let j = 0; j < Math.max(chunk.obstacles.length, nextSegment.chunks[i].obstacles.length); j++) {
-
-        if (
-          !chunk.obstacles[j] ||
-          !nextSegment.chunks[i].obstacles[j] ||
-          chunk.obstacles[j].type !== nextSegment.chunks[i].obstacles[j].type ||
-          chunk.obstacles[j].position[0] !== nextSegment.chunks[i].obstacles[j].position[0] ||
-          chunk.obstacles[j].position[1] !== nextSegment.chunks[i].obstacles[j].position[1] ||
-          chunk.obstacles[j].position[2] !== nextSegment.chunks[i].obstacles[j].position[2]
-        ) {
-          return false;
-        }
-      }
-      return true;
-    })
-
-  );
-},
-
-);

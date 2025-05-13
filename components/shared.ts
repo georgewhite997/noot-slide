@@ -1,4 +1,6 @@
-export const lanes = [-3.5, 0, 3.5]; // X positions for left, middle, right lanes
+import { possibleObstacles } from "../utils/index"
+
+export const lanes = [-3, 0, 3]; // X positions for left, middle, right lanes
 export const TRACK_MARK_DEPTH = 0.1;
 export const TRACK_MARK_WIDTH = 0.2;
 export const TRACK_MARK_SPACING = 0.25;
@@ -12,37 +14,13 @@ export const SEGMENT_RESOLUTION = [BASE_RESOLUTION, BASE_RESOLUTION * 3];
 
 export const SLOPE_ANGLE = -0.2;
 
-export type IObstacleType =
-    "low-rock" |
-    "tree" |
-    "snowman" |
-    "ramp" |
-    "lying-tree-long" |
-    "fish" |
-    "fishing-net" |
-    "fish-multiplier" |
-    "fence" |
-    "bonfire" |
-    "big-tree" |
-    'car' |
-    'winter-information-plate' |
-    'information-plate' |
-    'winter-well' |
-    'gift' |
-    'tree-trunk-winter' |
-    'hydrant' |
-    'reindeer' |
-    'sleigh' |
-    'cane' |
-    'lamp' |
-    'lamp-winter' |
-    'dumpster' |
-    'sled' |
-    'snow-shovel' |
-    'ski-flag';
+export type IObstacleType = "ramp" | "obstacle" | "reward"
 
 export interface IObstacle {
     position: [number, number, number];
+    rotation: [number, number, number];
+    scale: number;
+    name: typeof possibleObstacles[number];
     type: IObstacleType;
     rampConfig?: {
         hasSmallObstacle?: boolean;
@@ -54,19 +32,17 @@ export interface ISegment {
     zOffset: number;
     yOffset: number;
     index: number;
-    isRoad: boolean;
+    // isRoad: boolean;
     chunks: { obstacles: IObstacle[], name: string }[];
+    overflow: number;
 }
 
-export type laneType = 0 | 1 | 2;
+export type LaneType = 0 | 1 | 2;
+export type DifficultyMode = "easy" | "medium" | "hard";
 
 export interface IChunk {
-    name: string;
     length: number;
-    obstacleSpacing: number;
-    possibleDifficulties: ("easy" | "medium" | "hard")[];
-    canBeRoad: boolean;
-    get: (chunk: IChunk, entryLane: laneType, entropy: number, difficulty: "easy" | "medium" | "hard", isRoad: boolean) => IObstacle[];
+    obstacles: IObstacle[];
 }
 
 export interface IObstacleTypeWithChance {

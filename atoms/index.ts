@@ -9,6 +9,7 @@ import * as THREE from "three";
 import { IUserItem } from "@/utils";
 import { Upgrade, User, UserUpgrade } from '@/prisma-client'
 import { emptyUser, UserWithUpgrades } from "@/utils/auth-utils";
+import { IChunk } from "@/components/shared";
 
 export type GameState = "playing" | "game-over" | "in-menu" | "reviving" | 'choosing-power-ups'
 
@@ -38,6 +39,7 @@ export type SessionData = {
     sessionSigner: Account;
 } | null;
 
+export type GLTFAtomType = (GLTF & ObjectMap) | null
 
 export const itemsAtom = atom<IUserItem[]>([]);
 export const currentFishesAtom = atom<number>(0);
@@ -52,9 +54,12 @@ export const hasSlowSkisAtom = atom<boolean>(false);
 export const hasLuckyCharmAtom = atom<boolean>(false);
 export const abstractSessionAtom = atom<SessionData | null>(null);
 export const reviveCountAtom = atom<number>(0);
-export const modelsGltfAtom = atom<GLTF & ObjectMap | null>(null);
-export const storeAssetsGltfAtom = atom<(GLTF & ObjectMap) | null>(null);
+export const modelsGltfAtom = atom<GLTFAtomType>(null);
+export const storeAssetsGltfAtom = atom<GLTFAtomType>(null);
 export const fishMeshesAtom = atom<Record<string, THREE.Mesh>>({});
 export const isGamePausedAtom = atom<boolean>(false);
 export const apiUserAtom = atom<UserWithUpgrades>(emptyUser);
 export const upgradesAtom = atom<Upgrade[] | undefined>(undefined);
+export const selectedObstacleAtom = atom<string>('chunk-0-segment-0-0');
+export const segmentLengthsAtom = atom<number[][]>([]);
+export const customMapAtom = atom<IChunk[]>([])

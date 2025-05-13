@@ -8,6 +8,9 @@ import {
   registryAbi,
   powerupsContractAddress,
   powerupsAbi,
+  skinsContractAddress,
+  skinsAbi,
+  nootTokenAddress,
   usePublicClient,
   items as itemsMeta,
   IItem,
@@ -15,7 +18,7 @@ import {
   MAX_MOBILE_HEIGHT
 } from "@/utils";
 import { useEffect, useState, memo } from "react";
-import { formatEther, parseEther, parseAbi } from "viem";
+import { formatEther, parseEther, parseAbi, erc20Abi } from "viem";
 import { useAtom, useSetAtom } from "jotai";
 import {
   gameStateAtom, currentFishesAtom,
@@ -27,7 +30,8 @@ import {
   SessionData,
   itemsAtom,
   apiUserAtom,
-  upgradesAtom
+  upgradesAtom,
+  customMapAtom
 } from "@/atoms";
 import { toast, Toaster } from "react-hot-toast";
 import LandingPage from "./LandingPage";
@@ -38,13 +42,14 @@ import NootToken from "../addresses/Noot.json";
 import axios, { AxiosError } from "axios";
 import { apiClient, emptyUser } from "@/utils/auth-utils";
 import ChoosingPowerUps from "./ChoosingPowerUps";
+import { skins } from "@/utils";
+import { decompressFromEncodedURIComponent } from 'lz-string';
 
 
 
 const registryContract = { address: registryContractAddress, abi: registryAbi };
 const powerupsContract = { address: powerupsContractAddress, abi: powerupsAbi };
-
-// const skinsContract = { address: skinsContractAddress, abi: skinsAbi };
+const skinsContract = { address: skinsContractAddress, abi: skinsAbi };
 
 export const Gui = memo(function Gui() {
   const { address: _address, isConnected } = useAccount();
@@ -114,6 +119,7 @@ export const Gui = memo(function Gui() {
     loginAndFetch();
   }, [address])
 
+  const setCustomMap = useSetAtom(customMapAtom)
 
   const fetchWallet = async (session?: SessionData) => {
     if (!publicClient || !address || !abstractClient) return;
@@ -149,10 +155,8 @@ export const Gui = memo(function Gui() {
             args: [address, ids],
           },
           {
-            abi: parseAbi([
-              "function balanceOf(address account) view returns (uint256)",
-            ]),
-            address: NootToken.address as `0x${string}`,
+            abi: erc20Abi,
+            address: nootTokenAddress,
             functionName: "balanceOf",
             args: [address],
           },
@@ -264,6 +268,95 @@ export const Gui = memo(function Gui() {
       toast.error("Failed to register");
     }
   };
+
+  const handleSkinPurchase = async (skin: any) => {
+    if (!abstractClient || !publicClient) return;
+    try {
+
+      const [decimalsRes, nootBalanceRes] = await publicClient.multicall({
+        contracts: [
+          {
+            abi: erc20Abi,
+            address: nootTokenAddress,
+            functionName: "decimals",
+          },
+          {
+            abi: erc20Abi,
+            address: nootTokenAddress,
+            functionName: "balanceOf",
+            args: [address],
+          }
+        ],
+      })
+
+      const decimals = decimalsRes.result as number;
+      const nootBalance = nootBalanceRes.result as bigint;
+
+
+      // for (let i = 0; i < skins.length; i++) {
+      //   const skin = skins[i];
+      //   await abstractClient.writeContract({
+      //     address: skinsContractAddress,
+      //     abi: skinsAbi,
+      //     functionName: "setSkinPrice",
+      //     args: [skin.id, BigInt(skin.price * 10 ** Number(decimals))],
+      //   })
+      // }
+
+      // return;
+      const price = BigInt(skin.price * 10 ** Number(decimals))
+
+
+
+      if (nootBalance < price) {
+        return toast.error("You don't have enough $NOOT to purchase this skin");
+      }
+
+      // check if skin is already owned
+      const owned = await publicClient.readContract({
+        address: skinsContractAddress,
+        abi: skinsAbi,
+        functionName: "getOwnedSkins",
+        args: [address, [skin.id]],
+      }) as [number];
+
+      if (owned && owned[0]) {
+        return toast.error("You already own this skin");
+      }
+
+      const currentAllowance: bigint = await publicClient.readContract({
+        abi: erc20Abi,
+        address: nootTokenAddress,
+        functionName: "allowance",
+        args: [address, skinsContractAddress],
+      });
+
+      if (currentAllowance < price) {
+        toast.loading("Approve $NOOT for spending");
+        await abstractClient.writeContract({
+          address: nootTokenAddress,
+          abi: erc20Abi,
+          functionName: "approve",
+          args: [skinsContractAddress, price],
+        });
+        toast.dismiss();
+      }
+
+      toast.loading("Purchase skin");
+      await abstractClient.writeContract({
+        address: skinsContractAddress,
+        abi: skinsAbi,
+        functionName: "purchase",
+        args: [skin.id],
+      });
+      toast.dismiss();
+      toast.success("Skin purchased");
+    } catch (err) {
+      console.error(err);
+      toast.dismiss();
+      toast.error("Failed to purchase skin");
+    }
+  }
 
   const handlePurchase = async (item: IItem, quantity = 1) => {
     if (!abstractClient || !publicClient) return;
@@ -387,6 +480,23 @@ export const Gui = memo(function Gui() {
     };
 
     updateDimensions();
+
+
+    if (chain.name === 'Abstract Testnet') {
+      const customMap = new window.URLSearchParams(window.location.search).get('custom-map')
+      if (customMap) {
+        const parsed = JSON.parse(decompressFromEncodedURIComponent(customMap))
+        setCustomMap(parsed.map((chunk: any) => ({
+          ...chunk,
+          obstacles: chunk.obstacles.map((obstacle: any) => ({
+            ...obstacle,
+            rotation: obstacle.rotation.map((deg: number) => deg * (Math.PI / 180)
+            ),
+          })),
+        })))
+      }
+    }
+
     window.addEventListener("resize", updateDimensions);
     return () => window.removeEventListener("resize", updateDimensions);
   }, []);
@@ -446,19 +556,20 @@ export const Gui = memo(function Gui() {
                 setScore={setScore}
               />
             ) : (
-              <LandingPage
-                balance={balance}
-                isLoading={isLoadingWalletData}
-                address={address}
-                isConnected={isConnected}
-                isRegistered={isRegistered}
-                register={register}
-                setGameState={setGameState}
-                nootBalance={nootBalance}
-                handlePurchase={handlePurchase}
-                setCurrentFishes={setCurrentFishes}
-                setScore={setScore}
-              />
+              <>
+                <LandingPage
+                  handleSkinPurchase={handleSkinPurchase}
+                  balance={balance}
+                  isLoading={isLoadingWalletData}
+                  address={address}
+                  isConnected={isConnected}
+                  isRegistered={isRegistered}
+                  register={register}
+                  setGameState={setGameState}
+                  nootBalance={nootBalance}
+                  handlePurchase={handlePurchase}
+                />
+              </>
             )}
 
           </div>
