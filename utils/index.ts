@@ -412,5 +412,6 @@ export const getSmallestZ = (obstacles: { position: [number, number, number] }[]
       smallestZ = obstacle.position[2];
     }
   }
+
   return smallestZ;
 }
