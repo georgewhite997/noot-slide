@@ -92,7 +92,7 @@ export const InGameGui = ({
                     </button>
 
                     <div className="mt-3 bg-[rgba(0,0,0,0.2)] px-[8px] py-[4px] rounded-md flex items-center justify-center w-fit">
-                        <img width={40} height={41} src="/penguin-icon.png" alt="" />
+                        <img width={34} height={32} src="/star-icon.png" alt="" />
 
                         <div className="ml-2 flex flex-col justify-center">
                             <span className="text-[14px] text-[#A5F0FF]">
@@ -101,6 +101,24 @@ export const InGameGui = ({
                             <span className="my-[2px]"></span>
                             <span className="text-[16px] mt-[-9px]">{formatScore(apiUser.highestScore)}</span>
                         </div>
+                    </div>
+
+                    <div className="flex mt-2 items-center justify-left">
+                        {/* {hasPowerup(magnetCollectedAt, magnetDuration) && ( */}
+                            <PowerupIcon
+                                icon="/fishing-rod-icon-shadow.png"
+                                remaining={getRemainingTime(magnetCollectedAt, magnetDuration) / 100}
+                                duration={magnetDuration}
+                            />
+                        {/* )} */}
+
+                        {hasPowerup(multiplierCollectedAt, multiplierDuration) && (
+                            <PowerupIcon
+                                icon="/fish-icon-shadow.png"
+                                remaining={getRemainingTime(multiplierCollectedAt, multiplierDuration) / 100}
+                                duration={multiplierDuration}
+                            />
+                        )}
                     </div>
                 </div>
                 <div className="flex h-fit flex-col items-end">
@@ -118,25 +136,12 @@ export const InGameGui = ({
 
                     <div className="mt-3 bg-[rgba(0,0,0,0.2)] px-[8px] py-[4px] rounded-md flex items-center justify-center w-fit">
                         <img width={24} height={24} src="/fish-icon-shadow.png" alt="" />
-                        <div className="ml-1">{currentFishes}</div>
+                        <div className="ml-1">{formatScore(currentFishes)}</div>
                     </div>
                     <div className="mt-2 bg-[rgba(0,0,0,0.2)] px-[8px] py-[4px] rounded-md flex items-center justify-center w-fit">
-                        <LightingIcon className="w-[13px] h-[20px]" />
+                        {/* <LightingIcon className="w-[13px] h-[20px]" /> */}
+                        <img src="/meters-icon.png" alt="meters icon" width={24} height={24} />
                         <div className="ml-1">{formatScore(score)}</div>
-                    </div>
-                    <div className="flex mt-2 justify-center">
-                        {hasPowerup(magnetCollectedAt, magnetDuration) && (
-                            <div className="bg-[rgba(0,0,0,0.35)] w-fit p-2 rounded-lg flex items-center justify-center">
-                                <span>N</span>
-                                <span className="ml-1 text-xs">{getRemainingTime(magnetCollectedAt, magnetDuration)}s</span>
-                            </div>
-                        )}
-                        {hasPowerup(multiplierCollectedAt, multiplierDuration) && (
-                            <div className="ml-2 bg-[rgba(0,0,0,0.35)] w-fit p-2 rounded-lg flex items-center justify-center">
-                                <span>M</span>
-                                <span className="ml-1 text-xs">{getRemainingTime(multiplierCollectedAt, multiplierDuration)}s</span>
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>
@@ -161,3 +166,60 @@ export const InGameGui = ({
         </>
     )
 }
+
+const PowerupIcon = ({
+    icon,
+    remaining,
+    duration,
+}: {
+    icon: string;
+    remaining: number;
+    duration: number;
+}) => {
+    let percentage = Math.max(0, Math.min(100, remaining / (duration / 100)) * 100);
+
+    const interpolate = (start: number, end: number, factor: number) =>
+        Math.round(start + (end - start) * factor);
+
+    const getColorFromPercentage = (percent: number) => {
+        let r, g, b;
+
+        if (percent > 50) {
+            // Mint Green → Yellow
+            const ratio = (percent - 50) / 50; // from 0 at 50% to 1 at 100%
+            r = interpolate(255, 63, ratio);   // 255 ➝ 63
+            g = 255;
+            b = interpolate(0, 160, ratio);    // 0 ➝ 160
+        } else {
+            // Yellow → Custom Red (#FF2F2F)
+            const ratio = percent / 50; // from 0 at 0% to 1 at 50%
+            r = 255;
+            g = interpolate(47, 255, ratio); // 47 ➝ 255
+            b = interpolate(47, 0, ratio);   // 47 ➝ 0
+        }
+
+        return `rgb(${r}, ${g}, ${b})`;
+    };
+
+    const progressColor = getColorFromPercentage(percentage);
+
+    return (
+        <div className={`${icon === '/fishing-rod-icon-shadow.png' && 'mr-2'} relative w-[50px] h-[50px] flex items-center justify-center`}>
+            {/* Border wrapper with conic gradient */}
+            <div
+                className="absolute inset-0 rounded-full"
+                style={{
+                    background: `conic-gradient(${progressColor} ${percentage}%, rgba(0,0,0,0.035) ${percentage}%)`,
+                    WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 6px), black calc(100% - 5px), black 100%)',
+                    mask: 'radial-gradient(farthest-side, transparent calc(100% - 6px), black calc(100% - 5px), black 100%)',
+                    willChange: 'transform',
+                    transition: 'background 0.5s ease',
+                }}
+            />
+            {/* Icon wrapper */}
+            <div className="bg-[rgba(0,0,0,0.35)] rounded-full p-2">
+                <img src={icon} alt="icon" width={32} height={32} />
+            </div>
+        </div>
+    );
+};

@@ -113,7 +113,7 @@ const LandingPage = ({
                         >
                             <div className="mx-3 flex items-center justify-center">
                                 <img src="/fish-icon.png" alt="fish icon" className="w-[30px] h-[30px]" />
-                                <span className="mx-1">{apiUser.fishes}</span>
+                                <span className="mx-1">{formatScore(apiUser.fishes)}</span>
                             </div>
 
                             <div className="mx-3 flex items-center justify-center">

@@ -12,7 +12,7 @@ import { SLOPE_ANGLE, lanes } from "./shared";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { abstractSessionAtom, currentFishesAtom, gameStateAtom, haloQuantityAtom, magnetCollectedAtAtom, magnetDurationAtom, multiplierCollectedAtAtom, multiplierDurationAtom, hasSlowSkisAtom, reviveCountAtom, scoreAtom, storeAssetsGltfAtom, isGamePausedAtom, apiUserAtom, upgradesAtom } from "@/atoms";
 import { useAbstractClient } from "@abstract-foundation/agw-react";
-import { chain, hasPowerup, items, powerupsContractAddress } from "@/utils";
+import { chain, getRemainingTime, hasPowerup, items, powerupsContractAddress } from "@/utils";
 import { parseAbi } from "viem";
 import { UpgradeLevel } from "@/utils/auth-utils";
 
@@ -534,18 +534,10 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
           let newDuration = getUpgradeValue('fishing rod') * 1000;
 
-          // let newDuration;
-          // const rarity = Math.random();
-          // if (rarity < 0.6) {
-          //   newDuration = 10_000;
-          // } else if (rarity < 0.9) {
-          //   newDuration = 25_000;
-          // } else {
-          //   newDuration = 75_000;
-          // }
-
           if (hasPowerup(magnetCollectedAt, magnetDuration)) {
-            setMagnetDuration(prev => prev + newDuration);
+            setMagnetDuration(getRemainingTime(magnetCollectedAt, magnetDuration) + newDuration);
+            console.log(getRemainingTime(magnetCollectedAt, magnetDuration) + newDuration)
+            setMagnetCollectedAt(Date.now());
           } else {
             setMagnetCollectedAt(Date.now());
             setMagnetDuration(newDuration);
@@ -566,18 +558,11 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
           let newDuration = getUpgradeValue('multiplier') * 1000;
 
-          // let newDuration;
-          // const rarity = Math.random();
-          // if (rarity < 0.6) {
-          //   newDuration = 10_000;
-          // } else if (rarity < 0.9) {
-          //   newDuration = 25_000;
-          // } else {
-          //   newDuration = 75_000;
-          // }
-
           if (hasPowerup(multiplierCollectedAt, multiplierDuration)) {
-            setMultiplierDuration(prev => prev + newDuration);
+            // setMultiplierDuration(prev => prev + newDuration);
+            newDuration = getRemainingTime(multiplierCollectedAt, multiplierDuration) + newDuration;
+            setMultiplierDuration(newDuration);
+            setMultiplierCollectedAt(Date.now());
           } else {
             setMultiplierCollectedAt(Date.now());
             setMultiplierDuration(newDuration);

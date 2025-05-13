@@ -64,7 +64,7 @@ const GameOver = ({
                         <img src="/fish-collected.png" alt="fish collected" />
 
                         <div className="mt-[8px] text-[14px] text-[#7EFFFF]">FISH COLLECTED</div>
-                        <div className="text-[32px] mt-[-8px]">{currentFishes}</div>
+                        <div className="text-[32px] mt-[-8px]">{formatScore(currentFishes)}</div>
                     </div>
                     <div className={`flex flex-col items-center bg-[#A5DEEB] w-[49%] h-fit p-[8px] rounded-md border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]`}>
                         <img src="/meters-ran.png" alt="fish collected" />

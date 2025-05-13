@@ -8,6 +8,7 @@ import { apiUserAtom, upgradesAtom } from "@/atoms";
 import { userAgent } from "next/server";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { formatScore } from "@/utils";
 
 type UpgradesProps = {
     onClose: () => void;
@@ -59,7 +60,7 @@ export const Upgrades = ({
                                     <img src="/fish-icon.png" alt="eth icon" width={38} height={38} />
                                     <div className="ml-2">FISH BALANCE</div>
                                 </div>
-                                <div>{apiUser?.fishes}</div>
+                                <div>{formatScore(apiUser?.fishes)}</div>
                             </div>
                         </div>
                     </div>

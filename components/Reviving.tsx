@@ -82,7 +82,7 @@ const Reviving = ({ setGameState, address, publicClient, abstractClient }: Reviv
                                 FISH
                             </span>
                             <span className="my-[2px]"></span>
-                            <span className="text-[18px] mt-[-9px]">{currentFishes}</span>
+                            <span className="text-[18px] mt-[-9px]">{formatScore(currentFishes)}</span>
                         </div>
                     </div>
                     <div

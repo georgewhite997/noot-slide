@@ -176,7 +176,7 @@ export const hasPowerup = (collectedAt: number, duration: number) => {
 }
 
 export const getRemainingTime = (collectedAt: number, duration: number) => {
-  return Math.ceil((collectedAt + duration - Date.now()) / 1000);
+  return Math.ceil((collectedAt + duration - Date.now()));
 }
 
 export const MAX_MOBILE_WIDTH = 402;
