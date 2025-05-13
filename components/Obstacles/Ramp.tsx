@@ -1,12 +1,13 @@
 import { getObstacleParentName } from "@/utils";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { getSnowBumps } from "@/utils";
 import { RigidBody } from "@react-three/rapier";
-import { useSetAtom } from "jotai";
-import { selectedObstacleAtom } from "@/atoms";
+import { useAtomValue, useSetAtom } from "jotai";
+import { modelsGltfAtom, selectedObstacleAtom } from "@/atoms";
 import { IObstacle } from "../shared";
+import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
 
 const RAMP_LENGTH = 2.5;
 const RAMP_WIDTH = 3;
@@ -60,22 +61,38 @@ const SnowPlane = ({
 
 export const Ramp = ({
   obstacle,
-  snowColorMap,
-  snowNormalMap,
   index,
 }: {
   obstacle: IObstacle;
-  snowColorMap: THREE.Texture;
-  snowNormalMap: THREE.Texture;
   index?: number;
 }) => {
+  const modelsGltf = useAtomValue(modelsGltfAtom);
   const setSelectedObstacle = useSetAtom(selectedObstacleAtom);
+
+  const model = useMemo(() => {
+    if (!modelsGltf?.scene) return null;
+    const object = modelsGltf.scene.getObjectByName('tree_trunk_winter');
+    if (!object) return null;
+
+    // Reset position of all meshes in the tree
+    object.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.position.set(0, 0, 0);
+        child.updateMatrix();
+      }
+    });
+
+    object.scale.set(0.06, 0.039, 0.04);
+    return object;
+  }, [!!modelsGltf?.scene]);
+
+  if (!model) return null;
 
   const [x, , z] = obstacle.position;
 
   return (
     <>
-      <RigidBody
+      {/* <RigidBody
         type="fixed"
         name="ground"
         position={[x, z - 3.7 + RUNWAY_LENGTH / 2, 0.7]}
@@ -108,9 +125,27 @@ export const Ramp = ({
           <meshBasicMaterial visible={false} />
           <boxGeometry args={[RAMP_WIDTH, RAMP_LENGTH, RUNWAY_LENGTH]} />
         </mesh>
-      </RigidBody>
+      </RigidBody> */}
 
-      <mesh
+      <group
+        onClick={(e: any) => setSelectedObstacle(getObstacleParentName(e, index))}
+      >
+        <RigidBody
+          type="fixed"
+          name={"ground"}
+          position={[
+            obstacle.position[0],
+            obstacle.position[2] + 6.7,
+            obstacle.position[1] + 2.4,
+          ]}
+          rotation={[Math.PI / 1.63, -0.10, Math.PI]}
+
+        >
+          <primitive object={clone(model)} />
+        </RigidBody>
+      </group>
+
+      {/* <mesh
         position={[x, z - 3.7 + RUNWAY_LENGTH / 2, 0.7]}
         rotation={[Math.PI / 2 + RAMP_SLOPE, 0, 0]}
         onClick={(e) => {
@@ -153,7 +188,7 @@ export const Ramp = ({
           grooveAmplitude={0.05}
           grooveFrequency={3}
         />
-      </mesh>
+      </mesh> 
 
       <mesh
         position={[x, z + RAMP_LENGTH / 2 + RUNWAY_LENGTH / 2, 0.2]}
@@ -165,7 +200,7 @@ export const Ramp = ({
       >
         <meshStandardMaterial map={snowColorMap} side={THREE.DoubleSide} />
         <boxGeometry args={[RAMP_WIDTH, RAMP_LENGTH, RUNWAY_LENGTH]} />
-      </mesh>
+      </mesh> */}
     </>
   );
 };

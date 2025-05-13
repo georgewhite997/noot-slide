@@ -348,7 +348,7 @@ export const MapMakerThreeCanvas = () => {
           />
           <ambientLight color={0x787878} intensity={1} />
           <Suspense>
-            <Physics gravity={[0, -9.81, 0]} timeStep="vary">
+            <Physics gravity={[0, -9.81, 0]} timeStep="vary" debug>
               <MapMakerGround
                 makerSegments={segmentsWithRadians.map((segment, i) => ({
                   ...segment,

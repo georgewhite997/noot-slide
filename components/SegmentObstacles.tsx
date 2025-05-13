@@ -28,8 +28,6 @@ export const SegmentObstacles = memo(function SegmentObstacles({ segment, colorM
                                     <Obstacle
                                         key={`${chunkKey}-obstacle-${obstacle.type}-${obstacle.position.join('-')}-${segment.index}-${obstacleIndex}`}
                                         index={obstacleIndex}
-                                        snowColorMap={colorMap}
-                                        snowNormalMap={normalMap}
                                         obstacle={obstacle}
                                         FishModel={model.KoiFish_low}
                                     />
