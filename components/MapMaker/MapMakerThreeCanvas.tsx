@@ -379,19 +379,19 @@ export const MapMakerThreeCanvas = () => {
               onClick={() => {
                 if (!dropdownSelectedObstacle) return;
 
+                let type = "obstacle";
+                if (dropdownSelectedObstacle === "ramp") {
+                  type = "ramp";
+                } else if (["fish", "pickup/fish"].includes(dropdownSelectedObstacle)) {
+                  type = "reward";
+                }
+
                 const obstacle = {
                   name: dropdownSelectedObstacle,
                   position: [0, 0, 0],
-                  rotation: [0, 0, 0],
+                  rotation: [90, 0, 0],
                   scale: 1,
-                  type:
-                    dropdownSelectedObstacle === "ramp"
-                      ? "ramp"
-                      : ["fish", "pickup/fish"].includes(
-                        dropdownSelectedObstacle,
-                      )
-                        ? "reward"
-                        : "obstacle",
+                  type,
                 };
 
                 setSegments((prev) => {

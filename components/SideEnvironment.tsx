@@ -1,8 +1,8 @@
-import { memo, useRef, useEffect, useMemo, useState } from 'react';
+import { memo, useMemo } from 'react';
 import * as THREE from 'three'
 import { useAtomValue } from "jotai";
 import { modelsGltfAtom } from "@/atoms";
-import { getSnowBumps, getModel } from '@/utils';
+import { getModel } from '@/utils';
 import {
     SEGMENT_LENGTH,
     SEGMENT_WIDTH,
@@ -11,69 +11,12 @@ import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { ObjectMap } from "@react-three/fiber";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
 
-const sideHeight = 1;
+const sideHeight = 0.1;
 const sideWidth = 8.5;
 
-export const SideSnowPlane = ({
-    width,
-    length,
-    isRight = false,
-    resolutionX = 32,
-    resolutionY = 128,
-    yOffset = 0,
-    isSide = false,
-    grooveAmplitude,
-    grooveFrequency
-}: {
-    width: number;
-    length: number;
-    resolutionX?: number;
-    resolutionY?: number;
-    grooveAmplitude?: number;
-    grooveFrequency?: number;
-    yOffset?: number;
-    isRight?: boolean
-    isSide?: boolean
-}) => {
-    const geometryRef = useRef<THREE.PlaneGeometry>(null);
+const houseScale = 0.0045
 
-    useEffect(() => {
-        const geometry = geometryRef.current;
-        if (!geometry) return;
-        const positionAttribute = geometry.attributes.position;
-
-        for (let i = 0; i < positionAttribute.count; i++) {
-            const x = positionAttribute.getX(i);
-            const y = positionAttribute.getY(i) - yOffset
-            if (!isSide) {
-                const tillEnd = Math.max(0, (1.2 - (((isRight ? -x : x) + width / 2)) / width));
-                const microDetail = getSnowBumps(x, y, tillEnd * 0.3, 1);
-                positionAttribute.setZ(i, microDetail);
-            } else {
-                const microDetail = getSnowBumps(x, y, grooveAmplitude, grooveFrequency);
-                positionAttribute.setZ(i, microDetail);
-
-            }
-
-        }
-
-        positionAttribute.needsUpdate = true;
-        geometry.computeVertexNormals();
-
-        return () => {
-            geometry.dispose();
-        };
-    }, [geometryRef.current]);
-
-    return (
-        <planeGeometry
-            ref={geometryRef}
-            args={[width, length, resolutionX, resolutionY]}
-        />
-    );
-}
-
-const OBSTACLE_MODELS = new Set([
+const stonesModels = [...new Set([
     { name: "fir_tree_winter_large_2__5_", scale: 0.0045 },
     { name: "fir_tree_winter_small_2__2_001", scale: 0.0045 },
     { name: "fir_tree_winter_tilted_4", scale: 0.0045 },
@@ -109,21 +52,20 @@ const OBSTACLE_MODELS = new Set([
     { name: "snowman", scale: 0.015 },
     { name: "fairground_christmas_house_3", scale: 0.006 },
     { name: "fairground_christmas_house_4", scale: 0.006 },
-    { name: "winter_house_7", scale: 0.006 },
-    { name: "winter_house_8", scale: 0.006 },
-    { name: "wooden_winter_house_3", scale: 0.006 },
-    { name: "wooden_winter_house", scale: 0.006 },
-    { name: "winter_house_6", scale: 0.006 },
-    { name: "christmas_house_4", scale: 0.006 },
-    { name: "christmas_house001", scale: 0.006 },
-    { name: "christmas_house_2", scale: 0.006 },
-    { name: "christmas_house", scale: 0.006 },
-    { name: "christmas_house_3", scale: 0.006 },
-]);
+    { name: "winter_house_7", scale: 0.0038 },
+    { name: "winter_house_8", scale: 0.0038 },
+    { name: "wooden_winter_house_3", scale: houseScale },
+    { name: "wooden_winter_house", scale: houseScale },
+    { name: "winter_house_6", scale: houseScale },
+    { name: "christmas_house_4", scale: houseScale },
+    { name: "christmas_house001", scale: houseScale },
+    { name: "christmas_house_2", scale: houseScale },
+    { name: "christmas_house", scale: houseScale },
+    { name: "christmas_house_3", scale: houseScale + 0.001 },
+])]
 
-function getRandomObstacleModel(modelsGltf: GLTF & ObjectMap | null) {
+function getRandomObstacleModel(modelsGltf: GLTF & ObjectMap | null, modelsArray: { name: string, scale: number }[]) {
     if (!modelsGltf) return;
-    const modelsArray = Array.from(OBSTACLE_MODELS);
     const randomModel = modelsArray[Math.floor(Math.random() * modelsArray.length)];
     return getModel(randomModel.name, randomModel.scale, modelsGltf);
 }
@@ -139,7 +81,7 @@ const Stones = (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => {
     const obstacles = Array.from({ length: 20 }, () => {
         let obstacle;
         do {
-            obstacle = getRandomObstacleModel(modelsGltf);
+            obstacle = getRandomObstacleModel(modelsGltf, stonesModels);
         } while (obstacle?.name.includes("house") && Math.random() < 0.8);
         return obstacle;
     });
@@ -172,6 +114,7 @@ const Stones = (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => {
         </>
     )
 }
+
 const Stones2 = (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => {
     const model1 = useMemo(() => getModel("stone_winter_large_2001", 0.03, modelsGltf), []);
     const model2 = useMemo(() => getModel("stone_winter_large_2014", 0.03, modelsGltf), []);
@@ -249,17 +192,84 @@ const Stones2 = (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => {
     )
 }
 
-const allEnvironments = [Stones, Stones2]
+const stones3Models = [
+    { name: "Tree_Part_6006", scale: 1.8 },
+    { name: "Tree_Part_6006", scale: 1.8 },
+    { name: "Tree_Part_1014", scale: 1.8 },
+    { name: "Tree_Part_1013", scale: 1.8 },
+    { name: "Tree_Part_1011", scale: 1.8 },
+    { name: "stone_winter_small_5002", scale: 0.02 },
+    { name: "dry_tree_winter", scale: 0.01 },
+    { name: "country_fence", scale: 0.01 }
+]
 
+const Stones3 = (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => {
+    const model1 = useMemo(() => getModel("stone_winter_large_2001", 0.03, modelsGltf), []);
+    const model2 = useMemo(() => getModel("stone_winter_large_2014", 0.03, modelsGltf), []);
+    const model3 = useMemo(() => getModel("stone_winter_large_2003", 0.03, modelsGltf), []);
+    const model4 = useMemo(() => getModel("stone_winter_small_8__2_002", 0.09, modelsGltf), []);
+
+    const iglo = useMemo(() => getModel("igloo_house", 0.025, modelsGltf), []);
+    const house = useMemo(() => getModel("fairground_christmas_house_3", 0.02, modelsGltf), []);
+    const countryFence = useMemo(() => getModel("country_fence", 0.01, modelsGltf), []);
+    const decorations = useMemo(() => Array.from({ length: 15 }, () => getRandomObstacleModel(modelsGltf, stones3Models)), [])
+
+    const arr = [model1, model2, model3, model4, iglo, countryFence]
+
+    if (!arr.every(Boolean)) {
+        console.log("missing models in 'stones3'")
+        return <></>;
+    }
+
+
+    return (
+        <>
+            <primitive object={clone(model1)} />
+            <primitive object={clone(model2)} position={[-20, 0, 0]} />
+            <primitive object={clone(model3)} position={[-40, 0, 0]} />
+            {!isRight ? <>
+                <primitive object={clone(iglo)} position={[-46, 0, 0.5]} rotation={[iglo.rotation.x, iglo.rotation.y, iglo.rotation.z + 0.3]} />
+                <primitive object={clone(house)} position={[-83, 0, -3]} rotation={[house.rotation.x, house.rotation.y, house.rotation.z + 0.25]} />
+                <primitive object={clone(model3)} position={[-98, 0, 0]} />
+                <primitive object={clone(countryFence)} position={[-78, 0, -7.5]} rotation={[countryFence.rotation.x, countryFence.rotation.y, countryFence.rotation.z + 0.25]} />
+            </> : <>
+                <primitive object={clone(model1)} position={[-40, 0, 0]} />
+                <primitive object={clone(model1)} position={[-80, 0, 0]} />
+                <primitive object={clone(model2)} position={[-90, 0, 0]} />
+            </>}
+            <primitive object={clone(model2)} position={[-60, 0, 0]} />
+            <primitive object={clone(model3)} position={[-80, 0, 0]} />
+
+            {decorations.map((model, index) => {
+                if (!model) return null;
+                const x = -6 - (index * 6.5)
+                const y = (model.name.includes("cane") ? 2 : 0) - 0.1
+                const z = (isRight ? 1 : -1) * (Math.random() < 0.5 ? 7 : 6)
+                const yRotation = (['stone_winter_small_5002', 'dry_tree_winter', 'country_fence'].includes(model.name)) ? 0 : Math.PI / 2
+                if (!isRight && index > 5 && index < 7) return null
+                if (!isRight && index > 10 && index < 13) return null
+
+                return <primitive
+                    key={index}
+                    object={clone(model)}
+                    {...(isRight ? { rotation: [model.rotation.x, model.rotation.y + yRotation, model.rotation.z] } : {})}
+                    position={[x, y, z]}
+                    castShadow
+                />
+            })}
+
+        </>
+    )
+}
+
+const allEnvironments = [Stones, Stones2, Stones3]
 
 export const SideEnvironment = memo(
     function SideEnvironment({
-        yOffset,
         isRight,
         colorMap,
         normalMap,
     }: {
-        yOffset: number
         isRight: boolean;
         colorMap: THREE.Texture;
         normalMap: THREE.Texture;
@@ -277,54 +287,7 @@ export const SideEnvironment = memo(
 
         return (
             <>
-                {/* SIDE WALL */}
-                <mesh
-                    position={[
-                        isRight ? SEGMENT_WIDTH / 2 - 0.15 : -SEGMENT_WIDTH / 2 + 0.15,
-                        0,
-                        sideHeight / 2 - 0.2,
-                    ]}
-                    rotation={[0, isRight ? -Math.PI / 2 + 0.3 : Math.PI / 2 - 0.3, 0]}
-                >
-                    <SideSnowPlane width={sideHeight} length={SEGMENT_LENGTH} yOffset={yOffset} isRight={isRight} isSide
-                        grooveAmplitude={0.1}
-                        grooveFrequency={0.5}
-                        resolutionY={128}
-                        resolutionX={128}
-                    />
-                    <meshStandardMaterial
-                        map={colorMap}
-                        normalMap={normalMap}
-                        normalScale={new THREE.Vector2(1, 1)}
-                        roughness={0.3}
-                        metalness={0}
-                    />
-
-                </mesh>
-
-                {/* TOP SNOW PLANE */}
-                <mesh
-                    position={[
-                        isRight ? SEGMENT_WIDTH / 2 + sideWidth / 2 : -SEGMENT_WIDTH / 2 - sideWidth / 2,
-                        0,
-                        sideHeight - 0.2,
-                    ]}
-                    rotation={[0, 0, 0]}
-                    receiveShadow
-                >
-                    <SideSnowPlane width={sideWidth} length={SEGMENT_LENGTH} yOffset={yOffset} isRight={isRight} />
-                    <meshStandardMaterial
-                        map={colorMap}
-                        normalMap={normalMap}
-                        normalScale={new THREE.Vector2(1, 1)}
-                        roughness={0}
-                        metalness={0}
-                        side={THREE.DoubleSide}
-                    />
-
-                </mesh>
-
-                {/* BOX UNDERNEATH SNOW PLANES TO HIDE GAPS */}
+                {/* BOX UNDERNEATH */}
                 <mesh
                     position={[
                         isRight ? SEGMENT_WIDTH / 2 + sideWidth / 2 : -SEGMENT_WIDTH / 2 - sideWidth / 2,
@@ -358,6 +321,6 @@ export const SideEnvironment = memo(
         );
     },
     (prevProps, nextProps) => {
-        return prevProps.isRight === nextProps.isRight && prevProps.yOffset === nextProps.yOffset
+        return prevProps.isRight === nextProps.isRight
     },
 );

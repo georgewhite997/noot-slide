@@ -129,14 +129,6 @@ export const Segment = memo(
                     rotation={[-Math.PI / 2 + SLOPE_ANGLE, 0, 0]}
                     receiveShadow
                 >
-                    {/*isRoad ? (
-                        <primitive
-                            object={clone(roadModel)}
-                            scale={[0.013, 0.025, 0.001]}
-                            position={[0, 0, 0]}
-                            rotation={[0, 0, 0]}
-                        />
-                    ) : (*/}
                     <mesh name={`segment-snow-${segment.index}`} receiveShadow>
                         <GroundGeometry yOffset={segment.index * SEGMENT_LENGTH} />
                         <meshStandardMaterial
@@ -148,9 +140,8 @@ export const Segment = memo(
                             side={THREE.DoubleSide}
                         />
                     </mesh>
-                    {/*)}*/}
-                    <SideEnvironment isRight={false} {...{ colorMap, normalMap }} yOffset={segment.zOffset} />
-                    <SideEnvironment isRight={true} {...{ colorMap, normalMap }} yOffset={segment.zOffset} />
+                    <SideEnvironment isRight={false} {...{ colorMap, normalMap }} />
+                    <SideEnvironment isRight={true} {...{ colorMap, normalMap }} />
                 </mesh>
             </>
         );
