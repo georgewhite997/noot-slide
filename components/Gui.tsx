@@ -568,6 +568,8 @@ export const Gui = memo(function Gui() {
                   setGameState={setGameState}
                   nootBalance={nootBalance}
                   handlePurchase={handlePurchase}
+                  setCurrentFishes={setCurrentFishes}
+                  setScore={setScore}
                 />
               </>
             )}
