@@ -210,9 +210,11 @@ const LandingPage = ({
                             className="w-full text-[40px]"
                             shineClassName="h-[70%]"
                             onClick={() => {
-                                setScore(0);
-                                setCurrentFishes(0);
-                                setGameState('playing');
+                                // setScore(0);
+                                // setCurrentFishes(0);
+                                // setGameState('playing');
+                                setGameState('choosing-power-ups')
+                                
                             }}
                         >
                             PLAY NOW

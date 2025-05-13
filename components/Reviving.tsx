@@ -103,8 +103,8 @@ const Reviving = ({ setGameState, address, publicClient, abstractClient }: Reviv
                     </div>
                 </div>
 
-                <div className="relative mt-2">
-                    <img width={290} height={280} src="/revive.png" alt="revive img" />
+                <div className="relative mt-2 w-full">
+                    <img src="/revive.png" alt="revive img" />
                     <div className="text-[20px] absolute top-8 left-1/2 -translate-x-1/2 w-full text-center"><span className="text-[#A5F0FF]">{3 - reviveCount + 1}/3</span> REVIVES LEFT</div>
                 </div>
 

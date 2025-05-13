@@ -628,7 +628,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     // const clampedDelta = Math.min(delta, maxDelta);
     const clampedDelta = delta;
 
-    if (mixer.current && gameState !== "in-menu") {
+    if (mixer.current && gameState !== "in-menu" && gameState !== 'choosing-power-ups') {
       mixer.current.update(clampedDelta); // Delta is the time between frames
     }
 
@@ -682,7 +682,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     const skiingTime = skiingAction.current?.time || 0;
 
 
-    if (gameState === "game-over" || gameState === "in-menu") {
+    if (gameState === "game-over" || gameState === "in-menu" || gameState === 'choosing-power-ups') {
       ref.current.setLinvel({ x: 0, y: 0, z: 0 }, true);
 
       setReviveCount(0)

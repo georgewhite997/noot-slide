@@ -63,7 +63,7 @@ export const ItemShop = ({
   const oneTimeItems = items.filter(item => item.type === 'one-time');
 
   return (
-    <div style={{ background: "radial-gradient(circle, #0CBED2 0%, #0A94BC 100%)" }} className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[402px] z-10 p-5 max-h-screen overflow-y-auto">
+    <div style={{ background: "radial-gradient(circle, #0CBED2 0%, #0A94BC 100%)" }} className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[402px] z-10 px-[16px] pt-[20px] max-h-screen overflow-y-auto">
       <div className="relative flex items-center justify-center">
         <button
           className="absolute left-0 w-[40px] h-[40px]"

@@ -93,7 +93,7 @@ export const Ground = memo(function Ground() {
 
   const prevGameState = useRef('in-menu')
   useEffect(() => {
-    if ((gameState === "playing" && prevGameState.current !== 'reviving') || (gameState === "in-menu" && segments.length === 0)) {
+    if ((gameState === "playing" && prevGameState.current !== 'reviving') || ((gameState === "in-menu" || gameState === 'choosing-power-ups') && segments.length === 0)) {
       getInitialSegments();
     }
     prevGameState.current = gameState;

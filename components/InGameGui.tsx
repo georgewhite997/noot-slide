@@ -104,13 +104,13 @@ export const InGameGui = ({
                     </div>
 
                     <div className="flex mt-2 items-center justify-left">
-                        {/* {hasPowerup(magnetCollectedAt, magnetDuration) && ( */}
+                        {hasPowerup(magnetCollectedAt, magnetDuration) && (
                             <PowerupIcon
                                 icon="/fishing-rod-icon-shadow.png"
                                 remaining={getRemainingTime(magnetCollectedAt, magnetDuration) / 100}
                                 duration={magnetDuration}
                             />
-                        {/* )} */}
+                        )}
 
                         {hasPowerup(multiplierCollectedAt, multiplierDuration) && (
                             <PowerupIcon
@@ -209,7 +209,7 @@ const PowerupIcon = ({
             <div
                 className="absolute inset-0 rounded-full"
                 style={{
-                    background: `conic-gradient(${progressColor} ${percentage}%, rgba(0,0,0,0.035) ${percentage}%)`,
+                    background: `conic-gradient(${progressColor} ${percentage}%, rgba(0,0,0,0.02) ${percentage}%)`,
                     WebkitMask: 'radial-gradient(farthest-side, transparent calc(100% - 6px), black calc(100% - 5px), black 100%)',
                     mask: 'radial-gradient(farthest-side, transparent calc(100% - 6px), black calc(100% - 5px), black 100%)',
                     willChange: 'transform',
@@ -217,7 +217,7 @@ const PowerupIcon = ({
                 }}
             />
             {/* Icon wrapper */}
-            <div className="bg-[rgba(0,0,0,0.35)] rounded-full p-2">
+            <div className="bg-[rgba(0,0,0,0.2)] rounded-full p-2">
                 <img src={icon} alt="icon" width={32} height={32} />
             </div>
         </div>

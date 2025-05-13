@@ -37,6 +37,7 @@ import { InGameGui } from "./InGameGui";
 import NootToken from "../addresses/Noot.json";
 import axios, { AxiosError } from "axios";
 import { apiClient, emptyUser } from "@/utils/auth-utils";
+import ChoosingPowerUps from "./ChoosingPowerUps";
 
 
 
@@ -375,7 +376,8 @@ export const Gui = memo(function Gui() {
   const overlay =
     gameState === "game-over" ||
     gameState === "in-menu" ||
-    gameState === "reviving";
+    gameState === "reviving" ||
+    gameState === 'choosing-power-ups';
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -422,24 +424,41 @@ export const Gui = memo(function Gui() {
                 publicClient={publicClient}
                 abstractClient={abstractClient}
               />
+            ) : gameState === "choosing-power-ups" ? (
+              // <ChoosingPowerUps
+              //   setGameState={setGameState}
+              //   address={address}
+              //   availablePowerUps={availablePowerUps}
+              //   selectedPowerUps={selectedPowerUps}
+              //   setSelectedPowerUps={setSelectedPowerUps}
+              // />
+              <ChoosingPowerUps
+                balance={balance}
+                isLoading={isLoadingWalletData}
+                address={address}
+                isConnected={isConnected}
+                isRegistered={isRegistered}
+                register={register}
+                setGameState={setGameState}
+                nootBalance={nootBalance}
+                handlePurchase={handlePurchase}
+                setCurrentFishes={setCurrentFishes}
+                setScore={setScore}
+              />
             ) : (
-              <>
-                <LandingPage
-                  balance={balance}
-                  isLoading={isLoadingWalletData}
-                  address={address}
-                  isConnected={isConnected}
-                  isRegistered={isRegistered}
-                  register={register}
-                  setGameState={setGameState}
-                  nootBalance={nootBalance}
-                  // setMenuState={setMenuState}
-                  // items={items}
-                  handlePurchase={handlePurchase}
-                  setCurrentFishes={setCurrentFishes}
-                  setScore={setScore}
-                />
-              </>
+              <LandingPage
+                balance={balance}
+                isLoading={isLoadingWalletData}
+                address={address}
+                isConnected={isConnected}
+                isRegistered={isRegistered}
+                register={register}
+                setGameState={setGameState}
+                nootBalance={nootBalance}
+                handlePurchase={handlePurchase}
+                setCurrentFishes={setCurrentFishes}
+                setScore={setScore}
+              />
             )}
 
           </div>

@@ -10,7 +10,7 @@ import { IUserItem } from "@/utils";
 import { Upgrade, User, UserUpgrade } from '@/prisma-client'
 import { emptyUser, UserWithUpgrades } from "@/utils/auth-utils";
 
-export type GameState = "playing" | "game-over" | "in-menu" | "reviving"
+export type GameState = "playing" | "game-over" | "in-menu" | "reviving" | 'choosing-power-ups'
 
 export type SettingsType = {
     antialiasing: boolean;
