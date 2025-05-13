@@ -158,6 +158,10 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   }, [gltf]);
 
   const onAnimationFinished = (e: { action: THREE.AnimationAction }) => {
+    if(e.action === jumpAction.current) {
+      isJumping.current = false;
+      isOnGround.current = true;
+    }
     if (e.action === backflipAction.current || e.action === jumpAction.current || e.action === rightTurnAction.current) {
       mixer.current?.stopAllAction();
       if (skiingAction.current) {
@@ -355,9 +359,19 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
   const jump = () => {
     if (isJumping.current || gameState === "game-over") return;
-
+    if (slideAction.current?.isRunning()) {
+      slideAction.current.stop();
+    }
     isJumping.current = true;
-    ref.current?.applyImpulse({ x: 0, y: 10, z: 0 }, true);
+    
+    const currentVelocity = ref.current?.linvel();
+    const baseImpulse = 10;
+    const currentYVelocity = currentVelocity?.y || 0;
+    const fallMultiplier = currentYVelocity < 0 ? Math.exp(Math.abs(currentYVelocity) * 0.1) : 1;
+    const requiredImpulse = baseImpulse * fallMultiplier;
+    const impulse = { x: 0, y: requiredImpulse, z: 0 };
+    ref.current?.applyImpulse(impulse, true);
+    
     if (!isOnGround.current) {
       playBackflipAnimation();
     } else {
@@ -367,8 +381,8 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   };
 
   const slide = () => {
-    //tutaj to wiecej warunkow powinno byc ale czekam az bedzie ten slide rzeczywiscie dzialac
     if (gameState === "game-over" || gameState === "reviving") return;
+    if (slideAction.current?.isRunning()) return;
 
     if (!isOnGround.current) {
       ref.current?.applyImpulse({ x: 0, y: -6, z: 0 }, true);
@@ -444,6 +458,10 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
       if (name === "ground" || name === "obstacle-fixed") {
         // console.log({name})
+        if (jumpAction.current && jumpAction.current.isRunning()) {
+          jumpAction.current.stop();
+          onAnimationFinished({ action: jumpAction.current });
+        }
         isJumping.current = false;
       }
 
@@ -456,12 +474,9 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       ) {
         isOnGround.current = true;
 
-        backflipAction.current.stop();
-        jumpAction.current.stop();
-
-        if (!skiingAction.current?.isRunning() && !slideAction.current?.isRunning()) {
-          skiingAction.current.time = 0.517; // start skiing from the middle
-          skiingAction.current?.play();
+        if (backflipAction.current.isRunning()) {
+          backflipAction.current.stop();
+          onAnimationFinished({ action: backflipAction.current });
         }
       }
 
