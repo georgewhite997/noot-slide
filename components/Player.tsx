@@ -50,6 +50,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const hasHalo = useRef(false);
   const [reviveCount, setReviveCount] = useAtom(reviveCountAtom);
   const [hasSlowSkis, setHasSlowSkis] = useAtom(hasSlowSkisAtom);
+  const distanceTraveledPrevious = useRef<number | null>(null);
 
   const [magnetCollectedAt, setMagnetCollectedAt] = useAtom(magnetCollectedAtAtom);
   const [magnetDuration, setMagnetDuration] = useAtom(magnetDurationAtom);
@@ -594,13 +595,32 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
         if (!lastTakenFishes.current.has(fishUuid)) {
           lastTakenFishes.current.add(fishUuid);
-          // setCurrentFishes(prev => prev + 1);
           setCurrentFishes(prev => prev + (hasPowerup(multiplierCollectedAt, multiplierDuration) ? 2 : 1));
         }
 
         if (lastTakenFishes.current.size === 20) {
           const fishesToDelete = Array.from(lastTakenFishes.current.values()).slice(0, 5);
           fishesToDelete.forEach(fish => lastTakenFishes.current.delete(fish));
+        }
+      }
+
+      if (name.startsWith('meters')) {
+        const powerupId = `${name}-${event.other.rigidBodyObject.uuid}`;
+
+        if (!lastTakenPowerups.current.has(powerupId)) {
+          lastTakenPowerups.current.add(powerupId);
+
+          const percentageToIncrement = getUpgradeValue('meters')
+
+          const meters = parseInt(name.split("-")[1], 10);
+          const metersToAdd = meters + meters * (percentageToIncrement / 100);
+          console.log(metersToAdd)
+          setScore(prev => prev + metersToAdd);
+
+          if (lastTakenPowerups.current.size === 20) {
+            const powerupsToDelete = Array.from(lastTakenPowerups.current.values()).slice(0, 5);
+            powerupsToDelete.forEach(powerup => lastTakenPowerups.current.delete(powerup));
+          }
         }
       }
     }
@@ -660,13 +680,20 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       initialZPosition.current = currentPosition.z;
     }
 
+
     // Calculate and log distance traveled
-    if (initialZPosition.current !== null) {
+    if (initialZPosition.current !== null && distanceTraveledPrevious.current !== null) {
       const distanceTraveled = Math.round(Math.abs(initialZPosition.current - currentPosition.z) * 2);
+      if (distanceTraveledPrevious.current as number > distanceTraveled) {
+        distanceTraveledPrevious.current = distanceTraveled;
+      }
+
       if (score != distanceTraveled) {
-        setScore(distanceTraveled);
+        setScore(prev => prev + distanceTraveled - (distanceTraveledPrevious.current as number));
       }
     }
+
+    distanceTraveledPrevious.current = Math.round(Math.abs(initialZPosition.current - currentPosition.z) * 2);
 
     const currentVelocity = ref.current.linvel();
 

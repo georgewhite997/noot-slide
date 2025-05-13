@@ -9,7 +9,8 @@
     "lint": "next lint",
     "evm-deploy": "hardhat run ./scripts/deploy.ts",
     "evm-compile": "hardhat compile",
-    "evm-clean": "hardhat clean"
+    "evm-clean": "hardhat clean",
+    "seed-upgrades": "node prisma/seed-upgrades.js"
   },
   "dependencies": {
     "@abstract-foundation/agw-client": "^1.6.0",

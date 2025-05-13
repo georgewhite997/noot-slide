@@ -1,3 +1,8 @@
+IMPORTANT
+yarn prisma generate
+yarn seed-upgrades
+SEED UPGRADES BECAUSE THERE WILL BE NO UPGRADES AND PICKING FISHING ROD AND MULTIPLIER WONT DO NOTHING
+
 Then compile the contracts with
 
 ```bash

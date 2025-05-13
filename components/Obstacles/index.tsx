@@ -10,6 +10,7 @@ import { Ramp } from "./Ramp";
 import { TexturedObstacle } from "./TexturedObstacle";
 import { Fish } from "./Fish";
 import { getChunks } from "./utils";
+import { Meters } from "./Meters";
 
 const RandomPickup = ({
   obstacle,
@@ -21,7 +22,7 @@ const RandomPickup = ({
   FishModel: any;
 }) => {
   const hasLuckyCharm = useAtomValue(hasLuckyCharmAtom);
-  const [random1, random2] = useMemo(() => [Math.random(), Math.random()], []);
+  const [random1, random2, random3] = useMemo(() => [Math.random(), Math.random(), Math.random()], []);
 
   const chanceForPickup = 0.2 * (hasLuckyCharm ? 1.5 : 1);
   if (random1 <= chanceForPickup) {
@@ -30,7 +31,17 @@ const RandomPickup = ({
     } else if (random2 > 0.33 && random2 <= 0.66) {
       return <FishingNet obstacle={obstacle} index={index} />;
     } else {
-      return <FishingNet obstacle={obstacle} index={index} />; // TODO: Change this to METERS when implemented
+      let pickupType: '100M' | '250M' | '750M';
+
+      if (random3 <= 0.5) {
+        pickupType = '100M';
+      } else if (random3 <= 0.85) {
+        pickupType = '250M';
+      } else {
+        pickupType = '750M';
+      }
+
+      return <Meters obstacle={obstacle} index={index} pickupType={pickupType} />;
     }
   } else {
     return <Fish obstacle={obstacle} Model={FishModel} index={index} />;

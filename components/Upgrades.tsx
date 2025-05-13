@@ -214,7 +214,7 @@ const UpgradeMenu = ({
                         onClick={handleUpgrade}
                         className="py-2 mt-2 w-full"
                         color="red"
-                        disabled={false}
+                        disabled={true}
                     >
                         NOT ENOUGH FISH
                     </PrimaryButton>
