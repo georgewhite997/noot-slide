@@ -61,6 +61,7 @@ export const FishingNet = ({
         type="fixed"
         position={[x, z, y + 0.8]}
         sensor
+        name="fishing-net"
         onIntersectionEnter={({ other }) => {
           if (other.rigidBodyObject?.name === "player") {
             wasHitRef.current = true;

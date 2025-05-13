@@ -1,6 +1,6 @@
 import { useAtom } from "jotai";
 import { useFrame } from "@react-three/fiber";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { RigidBody, CuboidCollider } from "@react-three/rapier";
 import { IObstacle } from "../shared";
@@ -44,6 +44,8 @@ export const Fish = ({
   const rotation = [Math.PI / 2, -Math.PI / 2, 0] as const;
   const hitboxSize = [0.45, 0.45, 0.45] as [number, number, number];
 
+  const fishId = useMemo(() => THREE.MathUtils.generateUUID(), [])
+
   return (
     <group
       onClick={(e) => {
@@ -55,6 +57,7 @@ export const Fish = ({
         type="fixed"
         position={[x, z, y + 0.3]}
         rotation={rotation}
+        name={`fish-${fishId}`}
         sensor
         onIntersectionEnter={({ other }) => {
           if (other.rigidBodyObject?.name === "player") {
@@ -71,6 +74,7 @@ export const Fish = ({
       <RigidBody
         type="fixed"
         position={[x, z, y + 0.3]}
+        name={`fish-hitbox-${fishId}`}
         rotation={rotation}
         sensor
         onIntersectionEnter={({ other }) => {

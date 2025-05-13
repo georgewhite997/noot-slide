@@ -575,7 +575,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
         }
       }
 
-      if (name.startsWith('fish') && !hasPowerup(magnetCollectedAt, magnetDuration)) {
+      if (name.startsWith('fish') && name !== 'fish-multiplier' && name !== 'fishing-net' && !hasPowerup(magnetCollectedAt, magnetDuration)) {
         const fishUuid = name.split("-")[1];
 
         if (!lastTakenFishes.current.has(fishUuid)) {

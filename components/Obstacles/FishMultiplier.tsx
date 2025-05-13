@@ -60,6 +60,7 @@ export const FishMultiplier = ({
 
       <RigidBody
         type="fixed"
+        name="fish-multiplier"
         position={[x, z, y + 0.3]}
         rotation={[Math.PI / 2, -Math.PI / 2, 0]}
         sensor
