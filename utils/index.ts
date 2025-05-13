@@ -210,7 +210,7 @@ export const getRemainingTime = (collectedAt: number, duration: number) => {
 export const MAX_MOBILE_WIDTH = 402;
 export const MAX_MOBILE_HEIGHT = 874;
 
-export const displayAddress = (address: string) => {
+export const displayAddress = (address?: string) => {
   if (!address) return "";
 
   return address.slice(2, 4) + "..." + address.slice(-3);

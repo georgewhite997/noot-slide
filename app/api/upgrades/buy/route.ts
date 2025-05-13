@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Invalid upgradeId' }, { status: 400 });
     }
 
-    let [user, upgrade] = await Promise.all([
+    const [user, upgrade] = await Promise.all([
         prisma.user.findUnique({
             where: { id: payload.id },
             include: { userUpgrades: true }
@@ -67,13 +67,13 @@ export async function POST(req: NextRequest) {
         }),
     ]);
 
-    user = await prisma.user.findUnique({
+    const newUser = await prisma.user.findUnique({
         where: { id: payload.id },
         include: { userUpgrades: true }
     });
 
     return NextResponse.json({
-        fishes: user?.fishes,
-        userUpgrades: user?.userUpgrades,
+        fishes: newUser?.fishes,
+        userUpgrades: newUser?.userUpgrades,
     });
 }

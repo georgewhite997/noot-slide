@@ -533,7 +533,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
         if (!lastTakenPowerups.current.has(powerupId)) {
           lastTakenPowerups.current.add(powerupId);
 
-          let newDuration = getUpgradeValue('fishing rod') * 1000;
+          const newDuration = getUpgradeValue('fishing rod') * 1000;
 
           if (hasPowerup(magnetCollectedAt, magnetDuration)) {
             setMagnetDuration(getRemainingTime(magnetCollectedAt, magnetDuration) + newDuration);

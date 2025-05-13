@@ -30,6 +30,8 @@ export const SegmentObstacles = memo(function SegmentObstacles({ segment, colorM
                                         index={obstacleIndex}
                                         obstacle={obstacle}
                                         FishModel={model.KoiFish_low}
+                                        snowColorMap={colorMap}
+                                        snowNormalMap={normalMap}
                                     />
                                 )}
                             </group>

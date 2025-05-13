@@ -176,7 +176,7 @@ const PowerupIcon = ({
     remaining: number;
     duration: number;
 }) => {
-    let percentage = Math.max(0, Math.min(100, remaining / (duration / 100)) * 100);
+    const percentage = Math.max(0, Math.min(100, remaining / (duration / 100)) * 100);
 
     const interpolate = (start: number, end: number, factor: number) =>
         Math.round(start + (end - start) * factor);
