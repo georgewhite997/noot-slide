@@ -29,7 +29,7 @@ export const Meters = ({
   useEffect(() => {
     const loader = new FontLoader();
     loader.load(
-      '/helvetiker_regular.typeface.json',
+      '/titan_one.typeface.json',
       (loadedFont) => {
         setFont(loadedFont);
       },
@@ -45,7 +45,7 @@ export const Meters = ({
     const geometry = new TextGeometry(pickupType, {
       font: font,
       size: 1,
-      depth: 0.4,
+      depth: 0.5,
       curveSegments: 12,
     });
     geometry.center();
@@ -137,7 +137,7 @@ export const Meters = ({
         ref={meshRef}
         position={[x, z, y + 0.5]}
         rotation={[Math.PI / 2, 0, 0]}
-        scale={0.65}
+        scale={0.57}
         geometry={textGeometry}
         material={material}
       />
