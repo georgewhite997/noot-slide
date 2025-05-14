@@ -82,6 +82,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const storeAssetsGltf = useAtomValue(storeAssetsGltfAtom);
 
   const [isSliding, setIsSliding] = useState<boolean>(false);
+  const isSlidingRef = useRef<boolean>(false);
 
   const getUpgradeValue = (upgradeName: string): number => {
     const upgrade = upgrades?.find(
@@ -388,7 +389,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     isJumping.current = true;
 
     const currentVelocity = ref.current?.linvel();
-    const baseImpulse = 10;
+    const baseImpulse = isSlidingRef.current ? 5 : 10;
     const currentYVelocity = currentVelocity?.y || 0;
     const fallMultiplier = currentYVelocity < 0 ? Math.exp(Math.abs(currentYVelocity) * 0.1) : 1;
     const requiredImpulse = baseImpulse * fallMultiplier;
@@ -412,6 +413,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     }
 
     setIsSliding(true);
+    isSlidingRef.current = true;
 
     playSlideAnimation();
   }
@@ -661,6 +663,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     if (!slideAction.current?.isRunning()) {
       if (isSliding) {
         setIsSliding(false);
+        isSlidingRef.current = false;
       }
     }
 
