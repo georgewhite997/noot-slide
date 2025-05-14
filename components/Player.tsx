@@ -81,6 +81,8 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const gltf = useLoader(GLTFLoader, "/animations.glb");
   const storeAssetsGltf = useAtomValue(storeAssetsGltfAtom);
 
+  const [isSliding, setIsSliding] = useState<boolean>(false);
+
   const getUpgradeValue = (upgradeName: string): number => {
     const upgrade = upgrades?.find(
       (upgrade) => upgrade.name.toLowerCase() === upgradeName.toLowerCase()
@@ -409,6 +411,8 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       ref.current?.applyImpulse({ x: 0, y: -6, z: 0 }, true);
     }
 
+    setIsSliding(true);
+
     playSlideAnimation();
   }
 
@@ -419,7 +423,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
     mixer.current?.stopAllAction();
     slideAction.current.setLoop(THREE.LoopOnce, 1);
-    slideAction.current.time = 0.2;
+
     slideAction.current.play();
   }
 
@@ -653,6 +657,12 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
   useFrame(({ camera }, delta) => {
     if (!ref || !("current" in ref) || !ref.current || !isVisible.current) return;
+
+    if (!slideAction.current?.isRunning()) {
+      if (isSliding) {
+        setIsSliding(false);
+      }
+    }
 
     if (isGamePaused) {
       camera.position.copy(cameraTargetRef.current);
@@ -892,6 +902,11 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
   }, [storeAssetsGltf, hasSlowSkis]);
 
+  const colliderHeight = isSliding ? 0.4 : 0.8;
+  const colliderY = colliderHeight / 2;
+
+  const height = isSliding ? 0.4 : 0.8;
+  const centerY = height / 2;
 
   return (
     <>
@@ -908,7 +923,10 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
         rotation={[SLOPE_ANGLE, Math.PI, 0]}
         ccd={true}
       >
-        <CuboidCollider position={[0, 0.65, 0]} args={[0.6, 0.8, 0.4]}/>
+        <CuboidCollider
+          position={[0, colliderY, 0]}
+          args={[0.6, colliderHeight, 0.45]}
+        />
       </RigidBody>
       <group ref={groupRef}>
         <Halo />
