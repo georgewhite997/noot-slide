@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { useRef, useEffect, memo, useState, useCallback, useMemo } from "react";
 import {
   CollisionEnterHandler,
+  CuboidCollider,
   IntersectionEnterHandler,
   RapierRigidBody,
   RigidBody,
@@ -29,6 +30,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const [upgrades, setUpgrades] = useAtom(upgradesAtom);
   const [score, setScore] = useAtom(scoreAtom);
   const ref = useRef<RapierRigidBody>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const lastCollided = useRef('')
   // const cameraTargetRef = useRef(new THREE.Vector3(0, 15.128119638063186, -21.88320813904049));
   // const cameraLookAtRef = useRef(new THREE.Vector3(0, 4.32057135223726, -23.200149593075263));
@@ -180,7 +182,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   }, [gltf]);
 
   const onAnimationFinished = (e: { action: THREE.AnimationAction }) => {
-    if(e.action === jumpAction.current) {
+    if (e.action === jumpAction.current) {
       isJumping.current = false;
       isOnGround.current = true;
     }
@@ -382,7 +384,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       slideAction.current.stop();
     }
     isJumping.current = true;
-    
+
     const currentVelocity = ref.current?.linvel();
     const baseImpulse = 10;
     const currentYVelocity = currentVelocity?.y || 0;
@@ -390,7 +392,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     const requiredImpulse = baseImpulse * fallMultiplier;
     const impulse = { x: 0, y: requiredImpulse, z: 0 };
     ref.current?.applyImpulse(impulse, true);
-    
+
     if (!isOnGround.current) {
       playBackflipAnimation();
     } else {
@@ -688,6 +690,11 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
     // Get current position and velocity
     const currentPosition = ref.current.translation();
+    groupRef.current?.position.set(
+      currentPosition.x,
+      currentPosition.y,
+      currentPosition.z
+    )
 
     // Initialize initial position if not set
     if (initialZPosition.current === null) {
@@ -887,27 +894,33 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
 
   return (
-    <RigidBody
-      name="player"
-      // lockTranslations={gameState === "reviving" ? true : false}
-      enabledRotations={[false, false, false]}
-      ref={ref}
-      position={PLAYER_START_POSITION}
-      mass={50}
-      friction={0.1}
-      onCollisionEnter={handleCollision}
-      onIntersectionEnter={handleIntersection}
-      rotation={[SLOPE_ANGLE, Math.PI, 0]}
-      ccd={true}
-    >
-      <Halo />
-      <primitive
-        object={gltf.scene}
-        scale={[10, 10, 10]}
-        castShadow
-        receiveShadow
-      />
-    </RigidBody>
+    <>
+      <RigidBody
+        name="player"
+        // lockTranslations={gameState === "reviving" ? true : false}
+        enabledRotations={[false, false, false]}
+        ref={ref}
+        position={PLAYER_START_POSITION}
+        mass={50}
+        friction={0.1}
+        onCollisionEnter={handleCollision}
+        onIntersectionEnter={handleIntersection}
+        rotation={[SLOPE_ANGLE, Math.PI, 0]}
+        ccd={true}
+      >
+        <CuboidCollider position={[0, 0.65, 0]} args={[0.6, 0.8, 0.4]}/>
+      </RigidBody>
+      <group ref={groupRef}>
+        <Halo />
+        <primitive
+          object={gltf.scene}
+          scale={[10, 10, 10]}
+          rotation={[0, Math.PI, 0]}
+          castShadow
+          receiveShadow
+        />
+      </group>
+    </>
   );
 }, () => {
   return true;
