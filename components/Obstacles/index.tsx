@@ -31,14 +31,14 @@ const RandomPickup = ({
     } else if (random2 > 0.33 && random2 <= 0.66) {
       return <FishingNet obstacle={obstacle} index={index} />;
     } else {
-      let pickupType: '100M' | '250M' | '750M';
+      let pickupType: '100m' | '250m' | '750m';
 
       if (random3 <= 0.5) {
-        pickupType = '100M';
+        pickupType = '100m';
       } else if (random3 <= 0.85) {
-        pickupType = '250M';
+        pickupType = '250m';
       } else {
-        pickupType = '750M';
+        pickupType = '750m';
       }
 
       return <Meters obstacle={obstacle} index={index} pickupType={pickupType} />;

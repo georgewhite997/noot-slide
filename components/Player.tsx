@@ -629,7 +629,6 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
           const meters = parseInt(name.split("-")[1], 10);
           const metersToAdd = meters + meters * (percentageToIncrement / 100);
-          console.log(metersToAdd)
           setScore(prev => prev + metersToAdd);
 
           if (lastTakenPowerups.current.size === 20) {
