@@ -5,6 +5,7 @@ import { useAtomValue } from "jotai";
 import { fishMeshesAtom } from "@/atoms";
 import { ISegment, IObstacle } from "./shared";
 import { Obstacle } from "./Obstacles";
+import { OptimizedTexturedObstacles } from "./Obstacles/TexturedObstacles";
 
 interface Props {
     segment: ISegment;
@@ -22,21 +23,34 @@ export const SegmentObstacles = memo(function SegmentObstacles({ segment, colorM
             return (
                 <group key={chunkKey} name={chunk.name}>
                     <Merged meshes={fishMeshes} limit={20}>
-                        {(model) =>
-                            <group>
-                                {chunk.obstacles.map((obstacle, obstacleIndex) =>
-                                    <Obstacle
-                                        key={`${chunkKey}-obstacle-${obstacle.type}-${obstacle.position.join('-')}-${segment.index}-${obstacleIndex}`}
-                                        index={obstacleIndex}
-                                        obstacle={obstacle}
-                                        FishModel={model.KoiFish_low}
-                                        snowColorMap={colorMap}
-                                        snowNormalMap={normalMap}
-                                    />
-                                )}
-                            </group>
-                        }
-                    </Merged >
+                        {(model) => {
+                            const staticObstacles = chunk.obstacles.filter(o => o.type === "obstacle");
+                            const otherObstacles = chunk.obstacles.filter(o => o.type !== "obstacle");
+
+                            return (
+                                <group>
+                                    {/* 🎯 OPTIMIZED STATIC OBSTACLES */}
+                                    {staticObstacles.length > 0 && (
+                                        <OptimizedTexturedObstacles
+                                            obstacles={staticObstacles}
+                                        />
+                                    )}
+
+                                    {/* 🐟 FISH, REWARDS, ETC. */}
+                                    {/* {otherObstacles.map((obstacle, obstacleIndex) => (
+                                        <Obstacle
+                                            key={`${chunkKey}-obstacle-${obstacle.type}-${obstacle.position.join('-')}-${segment.index}-${obstacleIndex}`}
+                                            index={obstacleIndex}
+                                            obstacle={obstacle}
+                                            FishModel={model.KoiFish_low}
+                                            snowColorMap={colorMap}
+                                            snowNormalMap={normalMap}
+                                        />
+                                    ))} */}
+                                </group>
+                            );
+                        }}
+                    </Merged>
                 </group >
             )
         })
