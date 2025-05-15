@@ -24,8 +24,8 @@ export const SegmentObstacles = memo(function SegmentObstacles({ segment, colorM
                     <Merged meshes={fishMeshes} limit={20}>
                         {(model) =>
                             <group>
-                                {chunk.obstacles.map((obstacle, obstacleIndex) =>
-                                    <Obstacle
+                                {chunk.obstacles.map((obstacle, obstacleIndex) => {
+                                    return <Obstacle
                                         key={`${chunkKey}-obstacle-${obstacle.type}-${obstacle.position.join('-')}-${segment.index}-${obstacleIndex}`}
                                         index={obstacleIndex}
                                         obstacle={obstacle}
@@ -33,6 +33,7 @@ export const SegmentObstacles = memo(function SegmentObstacles({ segment, colorM
                                         snowColorMap={colorMap}
                                         snowNormalMap={normalMap}
                                     />
+                                }
                                 )}
                             </group>
                         }
