@@ -504,7 +504,6 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       }
 
       if (name.startsWith("deadly-obstacle")) {
-
         let current = event.other.rigidBodyObject.parent;
         let chunk = null;
         for (let i = 0; i < 6 && current; i++) {

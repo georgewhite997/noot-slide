@@ -5,76 +5,94 @@ import { useAtomValue } from "jotai";
 import { fishMeshesAtom } from "@/atoms";
 import { ISegment, IObstacle } from "./shared";
 import { Obstacle } from "./Obstacles";
-import { OptimizedTexturedObstacles } from "./Obstacles/TexturedObstacles";
+import { Obstacles } from "./Obstacles/Obstacles";
 
 interface Props {
     segment: ISegment;
     colorMap: THREE.Texture;
     normalMap: THREE.Texture;
+    optimize?: boolean,
 }
 
 export const SegmentObstacles = memo(function SegmentObstacles({
     segment,
     colorMap,
     normalMap,
+    optimize = true,
 }: Props) {
     const fishMeshes = useAtomValue(fishMeshesAtom);
 
-    // Połącz wszystkie obstacles z chunków
-    const allObstacles = useMemo(
-        () => segment.chunks.flatMap((chunk) => chunk.obstacles),
-        [segment.chunks]
-    );
+    if (optimize) {
+        const allObstacles = useMemo(
+            () => segment.chunks.flatMap((chunk) => chunk.obstacles),
+            [segment.chunks]
+        );
 
-    if (allObstacles.length === 0) return null;
+        if (allObstacles.length === 0) return null;
 
-    const staticObstacles = allObstacles.filter((o) => o.type === "obstacle");
-    const otherObstacles = allObstacles.filter((o) => o.type !== "obstacle");
-
-    return (
-        <group name={`segment-${segment.index}`}>
-            <Merged meshes={fishMeshes} limit={20}>
-                {(model) => (
-                    <group>
-                        {/* 🎯 OPTIMIZED STATIC OBSTACLES */}
-                        {staticObstacles.length > 0 && (
-                            <OptimizedTexturedObstacles obstacles={staticObstacles} />
-                        )}
-
-                        {/* 🐟 FISH, REWARDS, ETC. (jeśli odkomentujesz w przyszłości) */}
-                        {/* {otherObstacles.map((obstacle, obstacleIndex) => (
-                <Obstacle
-                  key={`obstacle-${obstacle.type}-${obstacle.position.join("-")}-${segment.index}-${obstacleIndex}`}
-                  index={obstacleIndex}
-                  obstacle={obstacle}
-                  FishModel={model.KoiFish_low}
-                  snowColorMap={colorMap}
-                  snowNormalMap={normalMap}
-                />
-              ))} */}
-                    </group>
-                )}
-            </Merged>
-        </group>
-    );
-},
-    // porównanie propsów
-(prevProps, nextProps) => {
-    const p = prevProps.segment, n = nextProps.segment;
-
-    if (p.index !== n.index || p.yOffset !== n.yOffset || p.zOffset !== n.zOffset)
-        return false;
-
-    if (p.chunks.length !== n.chunks.length) return false;
-
-    for (let i = 0; i < p.chunks.length; i++) {
-        const pc = p.chunks[i], nc = n.chunks[i];
-        if (pc.name !== nc.name) return false;
-        if (haveObstaclesChanged(pc.obstacles, nc.obstacles)) return false;
+        return (
+            <group name={`segment-${segment.index}`}>
+                <Merged meshes={fishMeshes} limit={300}>
+                    {(model) => (
+                        <group>
+                            <Obstacles
+                                obstacles={allObstacles}
+                                FishModel={model.KoiFish_low}
+                                snowColorMap={colorMap}
+                                snowNormalMap={normalMap}
+                            />
+                        </group>
+                    )}
+                </Merged>
+            </group>
+        );
+    } else {
+        return segment.chunks.length > 0 ? (
+            segment.chunks.map((chunk) => {
+                if (chunk.obstacles.length === 0) return null
+                const chunkKey = chunk.name + segment.index + segment.yOffset
+                return (
+                    <group key={chunkKey} name={chunk.name}>
+                        <Merged meshes={fishMeshes} limit={20}>
+                            {(model) =>
+                                <group>
+                                    {chunk.obstacles.map((obstacle, obstacleIndex) =>
+                                        <Obstacle
+                                            key={`${chunkKey}-obstacle-${obstacle.type}-${obstacle.position.join('-')}-${segment.index}-${obstacleIndex}`}
+                                            index={obstacleIndex}
+                                            obstacle={obstacle}
+                                            FishModel={model.KoiFish_low}
+                                            snowColorMap={colorMap}
+                                            snowNormalMap={normalMap}
+                                        />
+                                    )}
+                                </group>
+                            }
+                        </Merged >
+                    </group >
+                )
+            })
+        ) : null
     }
 
-    return true;
-});
+},
+    // porównanie propsów
+    (prevProps, nextProps) => {
+        const p = prevProps.segment, n = nextProps.segment;
+
+        if (p.index !== n.index || p.yOffset !== n.yOffset || p.zOffset !== n.zOffset)
+            return false;
+
+        if (p.chunks.length !== n.chunks.length) return false;
+
+        for (let i = 0; i < p.chunks.length; i++) {
+            const pc = p.chunks[i], nc = n.chunks[i];
+            if (pc.name !== nc.name) return false;
+            if (haveObstaclesChanged(pc.obstacles, nc.obstacles)) return false;
+        }
+
+        return true;
+    });
 
 
 
