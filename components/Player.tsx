@@ -25,6 +25,35 @@ const MAX_REVIVE_COUNT = 3;
 
 const PLAYER_START_POSITION = new THREE.Vector3(0, 10, -20);
 
+const trimAnimation = (clip: THREE.AnimationClip, trimAmount: number): THREE.AnimationClip => {
+  const newTracks = clip.tracks.map((track) => {
+    const times = track.times as Float32Array;
+    const values = track.values as Float32Array;
+    const valueSize = values.length / times.length;
+
+    const lastTime = times[times.length - 1];
+    const trimmedTime = lastTime - trimAmount;
+
+    // Find the index where time exceeds the trimmed duration
+    let trimIndex = times.findIndex((t) => t > trimmedTime);
+    if (trimIndex === -1) trimIndex = times.length;
+
+    const newTimes = times.slice(0, trimIndex);
+    const newValues = values.slice(0, trimIndex * valueSize);
+
+    // Recreate the same type of KeyframeTrack
+    const TrackConstructor = (track as any).constructor;
+    return new TrackConstructor(track.name, newTimes, newValues);
+  });
+
+  return new THREE.AnimationClip(
+    clip.name,
+    clip.duration - trimAmount,
+    newTracks
+  );
+};
+
+
 export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved: (chunkName: string) => void }) {
   const [apiUser, setApiUser] = useAtom(apiUserAtom);
   const [upgrades, setUpgrades] = useAtom(upgradesAtom);
@@ -53,6 +82,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const [reviveCount, setReviveCount] = useAtom(reviveCountAtom);
   const [hasSlowSkis, setHasSlowSkis] = useAtom(hasSlowSkisAtom);
   const distanceTraveledPrevious = useRef<number | null>(null);
+  const skipGroundHit = useRef<boolean>(false);
 
   const [magnetCollectedAt, setMagnetCollectedAt] = useAtom(magnetCollectedAtAtom);
   const [magnetDuration, setMagnetDuration] = useAtom(magnetDurationAtom);
@@ -154,6 +184,8 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     animations.backflip!.tracks = animations.backflip!.tracks.filter(
       (track) => !track.name.includes(".position"),
     );
+
+    animations.slide = trimAnimation(animations.slide!, 0.6);
 
     // Create actions
     skiingAction.current = mixer.current.clipAction(animations.skiing!);
@@ -387,9 +419,12 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       slideAction.current.stop();
     }
     isJumping.current = true;
+    if (isSlidingRef.current) {
+      skipGroundHit.current = true;
+    }
 
     const currentVelocity = ref.current?.linvel();
-    const baseImpulse = isSlidingRef.current ? 5 : 10;
+    const baseImpulse = isSlidingRef.current ? 6 : 12;
     const currentYVelocity = currentVelocity?.y || 0;
     const fallMultiplier = currentYVelocity < 0 ? Math.exp(Math.abs(currentYVelocity) * 0.1) : 1;
     const requiredImpulse = baseImpulse * fallMultiplier;
@@ -409,7 +444,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     if (slideAction.current?.isRunning()) return;
 
     if (!isOnGround.current) {
-      ref.current?.applyImpulse({ x: 0, y: -6, z: 0 }, true);
+      ref.current?.applyImpulse({ x: 0, y: -8, z: 0 }, true);
     }
 
     setIsSliding(true);
@@ -485,11 +520,17 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
       if (name === "ground" || name === "obstacle-fixed") {
         // console.log({name})
-        if (jumpAction.current && jumpAction.current.isRunning()) {
-          jumpAction.current.stop();
-          onAnimationFinished({ action: jumpAction.current });
+
+        if (skipGroundHit.current) {
+          skipGroundHit.current = false;
+         
+        } else {
+          isJumping.current = false;
+          if (jumpAction.current && jumpAction.current.isRunning()) {
+            jumpAction.current.stop();
+            onAnimationFinished({ action: jumpAction.current });
+          }
         }
-        isJumping.current = false;
       }
 
       if (
@@ -927,8 +968,8 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
         ccd={true}
       >
         <CuboidCollider
-          position={[0, colliderY, 0]}
-          args={[0.6, colliderHeight, 0.45]}
+          position={[0, colliderY, + 0.3]}
+          args={[0.6, colliderHeight, 0.60]}
         />
       </RigidBody>
       <group ref={groupRef}>
