@@ -4,6 +4,7 @@ import * as THREE from "three";
 import { useRef, useEffect, memo, useState, useCallback, useMemo } from "react";
 import {
   CollisionEnterHandler,
+  CuboidCollider,
   IntersectionEnterHandler,
   RapierRigidBody,
   RigidBody,
@@ -24,11 +25,41 @@ const MAX_REVIVE_COUNT = 3;
 
 const PLAYER_START_POSITION = new THREE.Vector3(0, 10, -20);
 
+const trimAnimation = (clip: THREE.AnimationClip, trimAmount: number): THREE.AnimationClip => {
+  const newTracks = clip.tracks.map((track) => {
+    const times = track.times as Float32Array;
+    const values = track.values as Float32Array;
+    const valueSize = values.length / times.length;
+
+    const lastTime = times[times.length - 1];
+    const trimmedTime = lastTime - trimAmount;
+
+    // Find the index where time exceeds the trimmed duration
+    let trimIndex = times.findIndex((t) => t > trimmedTime);
+    if (trimIndex === -1) trimIndex = times.length;
+
+    const newTimes = times.slice(0, trimIndex);
+    const newValues = values.slice(0, trimIndex * valueSize);
+
+    // Recreate the same type of KeyframeTrack
+    const TrackConstructor = (track as any).constructor;
+    return new TrackConstructor(track.name, newTimes, newValues);
+  });
+
+  return new THREE.AnimationClip(
+    clip.name,
+    clip.duration - trimAmount,
+    newTracks
+  );
+};
+
+
 export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved: (chunkName: string) => void }) {
   const [apiUser, setApiUser] = useAtom(apiUserAtom);
   const [upgrades, setUpgrades] = useAtom(upgradesAtom);
   const [score, setScore] = useAtom(scoreAtom);
   const ref = useRef<RapierRigidBody>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const lastCollided = useRef('')
   // const cameraTargetRef = useRef(new THREE.Vector3(0, 15.128119638063186, -21.88320813904049));
   // const cameraLookAtRef = useRef(new THREE.Vector3(0, 4.32057135223726, -23.200149593075263));
@@ -51,6 +82,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const [reviveCount, setReviveCount] = useAtom(reviveCountAtom);
   const [hasSlowSkis, setHasSlowSkis] = useAtom(hasSlowSkisAtom);
   const distanceTraveledPrevious = useRef<number | null>(null);
+  const skipGroundHit = useRef<boolean>(false);
 
   const [magnetCollectedAt, setMagnetCollectedAt] = useAtom(magnetCollectedAtAtom);
   const [magnetDuration, setMagnetDuration] = useAtom(magnetDurationAtom);
@@ -78,6 +110,9 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
   const gltf = useLoader(GLTFLoader, "/animations.glb");
   const storeAssetsGltf = useAtomValue(storeAssetsGltfAtom);
+
+  const [isSliding, setIsSliding] = useState<boolean>(false);
+  const isSlidingRef = useRef<boolean>(false);
 
   const getUpgradeValue = (upgradeName: string): number => {
     const upgrade = upgrades?.find(
@@ -150,6 +185,8 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       (track) => !track.name.includes(".position"),
     );
 
+    animations.slide = trimAnimation(animations.slide!, 0.6);
+
     // Create actions
     skiingAction.current = mixer.current.clipAction(animations.skiing!);
     jumpAction.current = mixer.current.clipAction(animations.jump!);
@@ -180,7 +217,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   }, [gltf]);
 
   const onAnimationFinished = (e: { action: THREE.AnimationAction }) => {
-    if(e.action === jumpAction.current) {
+    if (e.action === jumpAction.current) {
       isJumping.current = false;
       isOnGround.current = true;
     }
@@ -382,15 +419,18 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       slideAction.current.stop();
     }
     isJumping.current = true;
-    
+    if (isSlidingRef.current) {
+      skipGroundHit.current = true;
+    }
+
     const currentVelocity = ref.current?.linvel();
-    const baseImpulse = 10;
+    const baseImpulse = isSlidingRef.current ? 6 : 12;
     const currentYVelocity = currentVelocity?.y || 0;
     const fallMultiplier = currentYVelocity < 0 ? Math.exp(Math.abs(currentYVelocity) * 0.1) : 1;
     const requiredImpulse = baseImpulse * fallMultiplier;
     const impulse = { x: 0, y: requiredImpulse, z: 0 };
     ref.current?.applyImpulse(impulse, true);
-    
+
     if (!isOnGround.current) {
       playBackflipAnimation();
     } else {
@@ -404,8 +444,11 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     if (slideAction.current?.isRunning()) return;
 
     if (!isOnGround.current) {
-      ref.current?.applyImpulse({ x: 0, y: -6, z: 0 }, true);
+      ref.current?.applyImpulse({ x: 0, y: -8, z: 0 }, true);
     }
+
+    setIsSliding(true);
+    isSlidingRef.current = true;
 
     playSlideAnimation();
   }
@@ -417,7 +460,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
     mixer.current?.stopAllAction();
     slideAction.current.setLoop(THREE.LoopOnce, 1);
-    slideAction.current.time = 0.2;
+
     slideAction.current.play();
   }
 
@@ -477,11 +520,17 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
       if (name === "ground" || name === "obstacle-fixed") {
         // console.log({name})
-        if (jumpAction.current && jumpAction.current.isRunning()) {
-          jumpAction.current.stop();
-          onAnimationFinished({ action: jumpAction.current });
+
+        if (skipGroundHit.current) {
+          skipGroundHit.current = false;
+         
+        } else {
+          isJumping.current = false;
+          if (jumpAction.current && jumpAction.current.isRunning()) {
+            jumpAction.current.stop();
+            onAnimationFinished({ action: jumpAction.current });
+          }
         }
-        isJumping.current = false;
       }
 
       if (
@@ -652,6 +701,13 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   useFrame(({ camera }, delta) => {
     if (!ref || !("current" in ref) || !ref.current || !isVisible.current) return;
 
+    if (!slideAction.current?.isRunning()) {
+      if (isSliding) {
+        setIsSliding(false);
+        isSlidingRef.current = false;
+      }
+    }
+
     if (isGamePaused) {
       camera.position.copy(cameraTargetRef.current);
       camera.lookAt(cameraLookAtRef.current);
@@ -688,6 +744,11 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
     // Get current position and velocity
     const currentPosition = ref.current.translation();
+    groupRef.current?.position.set(
+      currentPosition.x,
+      currentPosition.y,
+      currentPosition.z
+    )
 
     // Initialize initial position if not set
     if (initialZPosition.current === null) {
@@ -885,29 +946,43 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
 
   }, [storeAssetsGltf, hasSlowSkis]);
 
+  const colliderHeight = isSliding ? 0.4 : 0.8;
+  const colliderY = colliderHeight / 2;
+
+  const height = isSliding ? 0.4 : 0.8;
+  const centerY = height / 2;
 
   return (
-    <RigidBody
-      name="player"
-      // lockTranslations={gameState === "reviving" ? true : false}
-      enabledRotations={[false, false, false]}
-      ref={ref}
-      position={PLAYER_START_POSITION}
-      mass={50}
-      friction={0.1}
-      onCollisionEnter={handleCollision}
-      onIntersectionEnter={handleIntersection}
-      rotation={[SLOPE_ANGLE, Math.PI, 0]}
-      ccd={true}
-    >
-      <Halo />
-      <primitive
-        object={gltf.scene}
-        scale={[10, 10, 10]}
-        castShadow
-        receiveShadow
-      />
-    </RigidBody>
+    <>
+      <RigidBody
+        name="player"
+        // lockTranslations={gameState === "reviving" ? true : false}
+        enabledRotations={[false, false, false]}
+        ref={ref}
+        position={PLAYER_START_POSITION}
+        mass={50}
+        friction={0.1}
+        onCollisionEnter={handleCollision}
+        onIntersectionEnter={handleIntersection}
+        rotation={[SLOPE_ANGLE, Math.PI, 0]}
+        ccd={true}
+      >
+        <CuboidCollider
+          position={[0, colliderY, + 0.3]}
+          args={[0.6, colliderHeight, 0.60]}
+        />
+      </RigidBody>
+      <group ref={groupRef}>
+        <Halo />
+        <primitive
+          object={gltf.scene}
+          scale={[10, 10, 10]}
+          rotation={[0, Math.PI, 0]}
+          castShadow
+          receiveShadow
+        />
+      </group>
+    </>
   );
 }, () => {
   return true;
