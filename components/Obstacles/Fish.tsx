@@ -67,9 +67,7 @@ export const Fish = ({
       >
         <CuboidCollider args={hitboxSize} />
       </RigidBody>
-      <mesh ref={meshRef} position={[x, z, y + 0.3]} rotation={rotation}>
-        <Model />
-      </mesh>
+      <Model ref={meshRef} position={[x, z, y + 0.3]} rotation={rotation} />
 
       <RigidBody
         type="fixed"

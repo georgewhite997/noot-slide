@@ -20,30 +20,23 @@ export const SegmentObstacles = memo(function SegmentObstacles({
     normalMap,
     optimize = true,
 }: Props) {
-    const fishMeshes = useAtomValue(fishMeshesAtom);
+    const allObstacles = useMemo(
+        () => segment.chunks.flatMap((chunk) => chunk.obstacles),
+        [segment.chunks]
+    );
+
+
 
     if (optimize) {
-        const allObstacles = useMemo(
-            () => segment.chunks.flatMap((chunk) => chunk.obstacles),
-            [segment.chunks]
-        );
-
         if (allObstacles.length === 0) return null;
 
         return (
             <group name={`segment-${segment.index}`}>
-                <Merged meshes={fishMeshes} limit={300}>
-                    {(model) => (
-                        <group>
-                            <Obstacles
-                                obstacles={allObstacles}
-                                FishModel={model.KoiFish_low}
-                                snowColorMap={colorMap}
-                                snowNormalMap={normalMap}
-                            />
-                        </group>
-                    )}
-                </Merged>
+                <Obstacles
+                    obstacles={allObstacles}
+                    snowColorMap={colorMap}
+                    snowNormalMap={normalMap}
+                />
             </group>
         );
     } else {
@@ -80,15 +73,19 @@ export const SegmentObstacles = memo(function SegmentObstacles({
     (prevProps, nextProps) => {
         const p = prevProps.segment, n = nextProps.segment;
 
-        if (p.index !== n.index || p.yOffset !== n.yOffset || p.zOffset !== n.zOffset)
+        if (p.index !== n.index || p.yOffset !== n.yOffset || p.zOffset !== n.zOffset) {
             return false;
+        }
 
-        if (p.chunks.length !== n.chunks.length) return false;
+        if (p.chunks.length !== n.chunks.length) {
+            return false;
+        }
 
         for (let i = 0; i < p.chunks.length; i++) {
             const pc = p.chunks[i], nc = n.chunks[i];
-            if (pc.name !== nc.name) return false;
-            if (haveObstaclesChanged(pc.obstacles, nc.obstacles)) return false;
+            if (haveObstaclesChanged(pc.obstacles, nc.obstacles)) {
+                return false;
+            }
         }
 
         return true;

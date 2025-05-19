@@ -1,7 +1,14 @@
-import { useState, useEffect, useMemo, useRef } from "react";
-import * as THREE from 'three'
+import { useState, useMemo, useRef, useEffect } from "react";
+import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
 import { Obstacle } from ".";
 import { IObstacle } from "../shared";
+import { fishMeshesAtom } from "@/atoms";
+import { useAtomValue } from "jotai";
+import { Merged } from "@react-three/drei";
+
+
+const OBSTACLES_PER_FRAME = 1;
 
 interface ObstaclesProps {
     obstacles: IObstacle[];
@@ -10,49 +17,43 @@ interface ObstaclesProps {
     snowNormalMap: THREE.Texture;
 }
 
-const OBSTACLES_PER_FRAME = 1
-
 export const Obstacles = ({
     obstacles,
-    FishModel,
     snowColorMap,
     snowNormalMap,
 }: ObstaclesProps) => {
+    const fishMeshes = useAtomValue(fishMeshesAtom);
+    const mergedRef = useRef<THREE.Group>(null);
     const [renderedCount, setRenderedCount] = useState(0);
-    const requestRef = useRef<number>(0);
 
-    useEffect(() => {
-        const total = obstacles.length;
-
-        const step = () => {
-            setRenderedCount((prev) => {
-                const next = Math.min(prev + OBSTACLES_PER_FRAME, total);
-                if (next < total) requestRef.current = requestAnimationFrame(step);
-                return next;
-            });
-        };
-
-        setRenderedCount(0); // Reset on obstacles change
-        requestRef.current = requestAnimationFrame(step);
-
-        return () => cancelAnimationFrame(requestRef.current);
+    // reset when the list identity changes
+    useMemo(() => {
+        setRenderedCount(0);
     }, [obstacles]);
 
+    useFrame(() => {
+        setRenderedCount((c) =>
+            c < obstacles.length ? Math.min(c + OBSTACLES_PER_FRAME, obstacles.length) : c
+        );
+    });
+
+    useEffect(() => {
+        if (mergedRef.current) mergedRef.current.frustumCulled = false;
+    }, []);
+
     return (
-        <>
-            {obstacles.map((obstacle, index) => {
-                if (index >= renderedCount) return null;
-                return (
-                    <Obstacle
-                        key={`obstacle-${obstacle.type}-${obstacle.position.join("-")}-${index}`}
-                        index={index}
-                        obstacle={obstacle}
-                        FishModel={FishModel}
-                        snowColorMap={snowColorMap}
-                        snowNormalMap={snowNormalMap}
-                    />
-                );
-            })}
-        </>
+        <Merged meshes={fishMeshes} limit={300} ref={mergedRef} frustumCulled={false}>
+            {(model) => obstacles.slice(0, renderedCount).map((obstacle, index) => (
+                <Obstacle
+                    key={`obstacle-${obstacle.type}-${obstacle.position.join("-")}-${index}`}
+                    index={index}
+                    obstacle={obstacle}
+                    FishModel={model.KoiFish_low}
+                    snowColorMap={snowColorMap}
+                    snowNormalMap={snowNormalMap}
+                />
+            ))
+            }
+        </Merged>
     );
 };
