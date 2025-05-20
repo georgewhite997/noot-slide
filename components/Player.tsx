@@ -259,6 +259,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       startMovingAnimation();
       lane.current = 1;
       isJumping.current = false;
+      skipGroundHit.current = false;
     }
 
     if (reviveCount > 0 && gameState === "playing") {
@@ -425,7 +426,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     }
 
     const currentVelocity = ref.current?.linvel();
-    const baseImpulse = isSlidingRef.current ? 6 : 12;
+    const baseImpulse = isSlidingRef.current ? 6.5 : 13;
     const currentYVelocity = currentVelocity?.y || 0;
     const fallMultiplier = currentYVelocity < 0 ? Math.exp(Math.abs(currentYVelocity) * 0.1) : 1;
     const requiredImpulse = baseImpulse * fallMultiplier;
@@ -824,7 +825,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
         targetZVelocity.current = THREE.MathUtils.lerp(
           targetZVelocity.current,
           -9,
-          (0.05 * (hasSlowSkis ? 0.85 : 1)) * clampedDelta,
+          (0.08 * (hasSlowSkis ? 0.85 : 1)) * clampedDelta,
         );
         const zVelocity = THREE.MathUtils.lerp(
           currentVelocity.z,
