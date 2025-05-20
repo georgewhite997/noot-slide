@@ -12,7 +12,6 @@ const OBSTACLES_PER_FRAME = 1;
 
 interface ObstaclesProps {
     obstacles: IObstacle[];
-    FishModel: any;
     snowColorMap: THREE.Texture;
     snowNormalMap: THREE.Texture;
 }

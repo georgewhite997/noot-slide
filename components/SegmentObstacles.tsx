@@ -20,6 +20,8 @@ export const SegmentObstacles = memo(function SegmentObstacles({
     normalMap,
     optimize = true,
 }: Props) {
+    const fishMeshes = useAtomValue(fishMeshesAtom);
+
     const allObstacles = useMemo(
         () => segment.chunks.flatMap((chunk) => chunk.obstacles),
         [segment.chunks]
