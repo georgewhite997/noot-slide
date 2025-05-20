@@ -24,7 +24,7 @@ const MAX_REVIVE_COUNT = 3;
 
 const PLAYER_START_POSITION = new THREE.Vector3(0, 10, -20);
 
-export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved: (chunkName: string) => void }) {
+export const Player = memo(function Player({ removeNextObstacles }: { removeNextObstacles: (obstacle: THREE.Object3D<THREE.Object3DEventMap>) => void }) {
   const [apiUser, setApiUser] = useAtom(apiUserAtom);
   const [upgrades, setUpgrades] = useAtom(upgradesAtom);
   const [score, setScore] = useAtom(scoreAtom);
@@ -51,6 +51,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   const [reviveCount, setReviveCount] = useAtom(reviveCountAtom);
   const [hasSlowSkis, setHasSlowSkis] = useAtom(hasSlowSkisAtom);
   const distanceTraveledPrevious = useRef<number | null>(null);
+  const lastHitObstacle = useRef<THREE.Object3D<THREE.Object3DEventMap> | undefined>(undefined);
 
   const [magnetCollectedAt, setMagnetCollectedAt] = useAtom(magnetCollectedAtAtom);
   const [magnetDuration, setMagnetDuration] = useAtom(magnetDurationAtom);
@@ -180,7 +181,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
   }, [gltf]);
 
   const onAnimationFinished = (e: { action: THREE.AnimationAction }) => {
-    if(e.action === jumpAction.current) {
+    if (e.action === jumpAction.current) {
       isJumping.current = false;
       isOnGround.current = true;
     }
@@ -224,8 +225,10 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     }
 
     if (reviveCount > 0 && gameState === "playing") {
-      onChunkRemoved(lastCollided.current)
-      lastCollided.current = ''
+      // onChunkRemoved(lastCollided.current)
+      if (lastHitObstacle.current) {
+        removeNextObstacles(lastHitObstacle.current)
+      }
       startMovingAnimation();
     }
 
@@ -382,7 +385,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       slideAction.current.stop();
     }
     isJumping.current = true;
-    
+
     const currentVelocity = ref.current?.linvel();
     const baseImpulse = 10;
     const currentYVelocity = currentVelocity?.y || 0;
@@ -390,7 +393,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     const requiredImpulse = baseImpulse * fallMultiplier;
     const impulse = { x: 0, y: requiredImpulse, z: 0 };
     ref.current?.applyImpulse(impulse, true);
-    
+
     if (!isOnGround.current) {
       playBackflipAnimation();
     } else {
@@ -504,33 +507,55 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       }
 
       if (name.startsWith("deadly-obstacle")) {
-        let current = event.other.rigidBodyObject.parent;
-        let chunk = null;
-        for (let i = 0; i < 6 && current; i++) {
-          if (current.name?.startsWith('chunk-')) {
-            chunk = current;
-            break;
-          }
-          current = current.parent;
+        let current = event.other.rigidBodyObject;
+
+        console.log(current.name);
+
+
+        if (lastHitObstacle.current && current.name === lastHitObstacle.current.name) {
+          return;
         }
 
+
+        lastHitObstacle.current = current
         if (hasHalo.current) {
-          setHaloQuantity(prev => prev - 1);
+          hasHalo.current = false;
           utilizeHalo();
-
-          hasHalo.current = false
-          if (chunk) {
-            onChunkRemoved(chunk.name);
-            lastRemovedName.current = chunk.name;
-          }
-        } else if (!(chunk?.name) ? true : chunk?.name !== lastRemovedName.current) {
-          if (chunk) {
-            if (lastCollided.current !== chunk.name) {
-              lastCollided.current = chunk.name
-              endGame();
-            }
-          }
+          removeNextObstacles(current);
+        } else {
+          endGame();
         }
+
+
+        // console.log(current.position.z)
+
+        // let current = event.other.rigidBodyObject.parent;
+        // let chunk = null;
+        // for (let i = 0; i < 6 && current; i++) {
+        //   if (current.name?.startsWith('chunk-')) {
+        //     chunk = current;
+        //     break;
+        //   }
+        //   current = current.parent;
+        // }
+
+        // if (hasHalo.current) {
+        //   setHaloQuantity(prev => prev - 1);
+        //   utilizeHalo();
+
+        //   hasHalo.current = false
+        //   if (chunk) {
+        //     onChunkRemoved(chunk.name);
+        //     lastRemovedName.current = chunk.name;
+        //   }
+        // } else if (!(chunk?.name) ? true : chunk?.name !== lastRemovedName.current) {
+        //   if (chunk) {
+        //     if (lastCollided.current !== chunk.name) {
+        //       lastCollided.current = chunk.name
+        //       endGame();
+        //     }
+        //   }
+        // }
       }
     }
   };
@@ -733,6 +758,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
       hasHalo.current = haloQuantity > 0;
       lastRemovedName.current = '';
       lastCollided.current = ''
+      lastHitObstacle.current = undefined;
       targetZVelocity.current = -3;
     } else {
       if (
