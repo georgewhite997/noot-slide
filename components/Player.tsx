@@ -252,6 +252,7 @@ export const Player = memo(function Player({ onChunkRemoved }: { onChunkRemoved:
     setIsGamePaused(false);
 
     if (gameState === "playing" && reviveCount === 0) {
+      cameraTargetRef.current.set(PLAYER_START_POSITION.x, PLAYER_START_POSITION.y, PLAYER_START_POSITION.z + 20);
       ref.current?.setTranslation(PLAYER_START_POSITION, true);
       ref.current?.setLinvel({ x: 0, y: 0, z: -0.5 }, true);
       ref.current?.lockTranslations(false, false);
