@@ -18,6 +18,7 @@ export const TexturedObstacle = ({
   scale?: number;
   index?: number;
 }) => {
+
   const modelsGltf = useAtomValue(modelsGltfAtom);
   const setSelectedObstacle = useSetAtom(selectedObstacleAtom);
 
@@ -25,6 +26,8 @@ export const TexturedObstacle = ({
     if (!modelsGltf?.scene) return null;
     const object = modelsGltf.scene.getObjectByName(objectName);
     if (!object) return null;
+    object.position.set(0, 0, 0);
+
 
     // Reset position of all meshes in the tree
     object.traverse((child) => {
@@ -33,7 +36,6 @@ export const TexturedObstacle = ({
         child.updateMatrix();
       }
     });
-
     object.scale.set(scale, scale, scale);
     return object;
   }, [!!modelsGltf?.scene, objectName, scale]);

@@ -1,12 +1,13 @@
 import { getObstacleParentName } from "@/utils";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { getSnowBumps } from "@/utils";
 import { RigidBody } from "@react-three/rapier";
-import { useSetAtom } from "jotai";
-import { selectedObstacleAtom } from "@/atoms";
+import { useAtomValue, useSetAtom } from "jotai";
+import { modelsGltfAtom, selectedObstacleAtom } from "@/atoms";
 import { IObstacle } from "../shared";
+import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
 
 const RAMP_LENGTH = 2.5;
 const RAMP_WIDTH = 3;
@@ -69,13 +70,51 @@ export const Ramp = ({
   snowNormalMap: THREE.Texture;
   index?: number;
 }) => {
+  const modelsGltf = useAtomValue(modelsGltfAtom);
   const setSelectedObstacle = useSetAtom(selectedObstacleAtom);
 
-  const [x, , z] = obstacle.position;
+  const model = useMemo(() => {
+    if (!modelsGltf?.scene) return null;
+    const object = modelsGltf.scene.getObjectByName("Cube004");
+    if (!object) return null;
+    object.position.set(0, 0, 0);
+
+    // Reset position of all meshes in the tree
+    object.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.position.set(0, 0, 0);
+        child.updateMatrix();
+      }
+    });
+    object.scale.set(1.3, 1.3, 1.3);
+    return object;
+  }, [!!modelsGltf?.scene]);
+
+  if (!model) return null;
+
+  const [x, y, z] = obstacle.position;
 
   return (
     <>
-      <RigidBody
+      <group onClick={(e) => {
+        if (index === undefined) return;
+        setSelectedObstacle(getObstacleParentName(e, index));
+      }}
+      >
+        <RigidBody
+          type="fixed"
+          name="ground"
+          colliders='hull'
+          position={[x, z + 6, y + 1.2]}
+          rotation={[Math.PI / 2, -Math.PI / 2, 0]}
+          friction={0.3}
+
+        >
+          <primitive object={clone(model)} />
+        </RigidBody>
+      </group>
+
+      {/* <RigidBody
         type="fixed"
         name="ground"
         position={[x, z - 3.7 + RUNWAY_LENGTH / 2, 0.7]}
@@ -165,7 +204,7 @@ export const Ramp = ({
       >
         <meshStandardMaterial map={snowColorMap} side={THREE.DoubleSide} />
         <boxGeometry args={[RAMP_WIDTH, RAMP_LENGTH, RUNWAY_LENGTH]} />
-      </mesh>
+      </mesh> */}
     </>
   );
 };

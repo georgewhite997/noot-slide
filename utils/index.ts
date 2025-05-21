@@ -276,7 +276,9 @@ export const possibleObstacles = [
   "snow_shovel_yellow__1_",
   "sled_green001",
   "sled_green",
-  "ski_flag_red__1_",
+  "ski_flag_red",
+  "ski_flag_red001",
+  "ski_flag_blue001",
   "santa_claus_sleigh",
   "rhombus_gift_box_white",
   "reindeer",
@@ -334,6 +336,7 @@ export const possibleObstacles = [
   "car_SUV_large_body_1",
   "car_SUV_large_body",
   "bonfire",
+  "Cube004"
 ]
 
 export const OBSTACLE_SCALE_PRESET = {
@@ -350,7 +353,10 @@ export const OBSTACLE_SCALE_PRESET = {
   "dumpster_green_winter": 0.008,
   "sled_green": 0.012,
   "sled_green001": 0.012,
-  "ski_flag_red__1_": 0.012,
+  "ski_flag_red": 0.025,
+  "ski_flag_blue001": 0.025,
+  "ski_flag_red001": 0.025,
+  "Cube004": 1,
   "snow_shovel_yellow__1_": 0.02,
   "santa_claus_sleigh": 0.008,
   "hydrant": 0.012,
