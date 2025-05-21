@@ -95,13 +95,12 @@ export const Ramp = ({
   const [x, y, z] = obstacle.position;
 
   return (
-    <>
-      <group onClick={(e) => {
-        if (index === undefined) return;
-        setSelectedObstacle(getObstacleParentName(e, index));
-      }}
-      >
-        <RigidBody
+    <group onClick={(e) => {
+      if (index === undefined) return;
+      setSelectedObstacle(getObstacleParentName(e, index));
+    }}
+    >
+      {/* <RigidBody
           type="fixed"
           name="ground"
           colliders='hull'
@@ -112,9 +111,9 @@ export const Ramp = ({
         >
           <primitive object={clone(model)} />
         </RigidBody>
-      </group>
+      </group> */}
 
-      {/* <RigidBody
+      <RigidBody
         type="fixed"
         name="ground"
         position={[x, z - 3.7 + RUNWAY_LENGTH / 2, 0.7]}
@@ -204,7 +203,7 @@ export const Ramp = ({
       >
         <meshStandardMaterial map={snowColorMap} side={THREE.DoubleSide} />
         <boxGeometry args={[RAMP_WIDTH, RAMP_LENGTH, RUNWAY_LENGTH]} />
-      </mesh> */}
-    </>
+      </mesh>
+    </group>
   );
 };
