@@ -19,6 +19,7 @@
     "@privy-io/cross-app-connect": "^0.1.8",
     "@react-three/drei": "^10.0.5",
     "@react-three/fiber": "^9.1.0",
+    "@react-three/postprocessing": "^3.0.4",
     "@react-three/rapier": "^2.0.0",
     "@sentry/node": "^8.x.x",
     "@tanstack/react-query": "^5.69.0",

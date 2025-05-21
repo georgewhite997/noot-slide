@@ -14,6 +14,13 @@ import { MAX_MOBILE_WIDTH, MAX_MOBILE_HEIGHT } from "@/utils";
 import { useAtomValue } from "jotai";
 import { settingsAtom, isGamePausedAtom } from "@/atoms";
 import { ModelLoader } from "./ModelLoader";
+import {
+  EffectComposer,
+  SMAA,        // Subpixel Morphological AA  ── czyste krawędzie
+  FXAA,        // lub Fast Approximate AA ── lżejsza alternatywa
+  Bloom,        // (opcjonalnie) subtelny bloom jak na nagraniu
+  HueSaturation
+} from '@react-three/postprocessing'
 
 export const ThreeCanvas = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -99,11 +106,18 @@ const Scene = () => {
           gravity={[0, -9.81, 0]}
           timeStep="vary"
           paused={isGamePaused}
-          // debug
+        // debug
         >
           <Ground />
         </Physics>
       </Suspense>
+
+      <EffectComposer>
+        <FXAA />
+        {/* <Bloom mipmapBlur luminanceThreshold={0.75} intensity={1.1} /> */}
+        <HueSaturation saturation={0.3} />
+      </EffectComposer>
+
 
       <OrbitControls
         makeDefault
