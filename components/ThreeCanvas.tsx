@@ -6,8 +6,8 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Ground } from "./Ground";
 import {
   OrbitControls,
-  PerformanceMonitor,
   PerspectiveCamera,
+  Stats,
 } from "@react-three/drei";
 import * as THREE from "three";
 import { MAX_MOBILE_WIDTH, MAX_MOBILE_HEIGHT } from "@/utils";
@@ -55,11 +55,7 @@ export const ThreeCanvas = () => {
               dpr={settings.dpr}
               shadows={settings.shadows}
             >
-              <PerformanceMonitor
-                onChange={(api) => {
-                  console.log("FPS:", api.fps);
-                }}
-              />
+              {process.env.NODE_ENV === "development" && <Stats />}
               <ModelLoader />
               <Scene />
             </Canvas>

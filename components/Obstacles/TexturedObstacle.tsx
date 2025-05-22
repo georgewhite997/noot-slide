@@ -58,7 +58,7 @@ export const TexturedObstacle = ({
     >
       <RigidBody
         type="fixed"
-        name={"deadly-obstacle-" + obstacle.type + "-" + index}
+        name={"deadly-obstacle-" + obstacle.type + "-" + obstacle.position.join('-')}
         position={[
           obstacle.position[0],
           obstacle.position[2],

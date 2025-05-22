@@ -149,6 +149,7 @@ export const MapMakerGround = ({
                 segment={segment}
                 colorMap={colorMap}
                 normalMap={normalMap}
+                optimize={false}
               />
               {displayChunkBoundaries && segment.chunks.length > 0
                 ? segment.chunks.map((chunk, i) => (
