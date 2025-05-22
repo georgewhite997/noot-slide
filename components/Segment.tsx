@@ -98,8 +98,8 @@ export const Segment = memo(
                 {/* Directional Light */}
                 <directionalLight
                     rotation={[0, 0, 0.5]}
-                    color={0xe8e8e8}
-                    intensity={1.5}
+                    color={0xffffff}
+                    intensity={0.6}
                     position={[2, 100, -segment.index * SEGMENT_LENGTH]}
                     castShadow
                     shadow-camera-left={-70}
@@ -112,7 +112,7 @@ export const Segment = memo(
                     shadow-mapSize-height={1024}
                     ref={lightRef} />
 
-                <ambientLight intensity={0.5} color={0xe8e8e8} />
+                <ambientLight intensity={0.5} color={0xffffff} />
 
                 <object3D ref={targetRef} position={targetPosition} />
                 <RigidBody type="fixed" friction={0.03} name="ground">
