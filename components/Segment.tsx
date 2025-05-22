@@ -13,6 +13,7 @@ import { GLTF } from "three/examples/jsm/loaders/GLTFLoader.js";
 import React from "react";
 
 import { SideEnvironment } from "./SideEnvironment";
+import { useControls } from "leva";
 
 const GroundGeometry = memo(function GroundGeometry({ yOffset }: { yOffset: number }) {
     const ref = useRef<THREE.PlaneGeometry>(null);
@@ -85,6 +86,26 @@ export const Segment = memo(
             return object;
         }, [modelsGltf.scene]);
 
+        const dirLight = useControls(
+            "Directional Light",
+            {
+                enabled: true,
+                intensity: 0.6,
+                position: { x: 0, y: 0, z: 0 },
+                rotation: { x: 0, y: 0, z: 0 },
+                color: '0xffffff',
+            }
+        )
+
+        const ambLight = useControls(
+            "Ambient Light",
+            {
+                enabled: true,
+                intensity: 0.5,
+                color: '0xffffff',
+            }
+        )
+
 
         useEffect(() => {
             if (lightRef.current && targetRef.current) {
@@ -95,24 +116,27 @@ export const Segment = memo(
         // if (!roadModel) return null;
         return (
             <>
-                {/* Directional Light */}
-                <directionalLight
-                    rotation={[0, 0, 0.5]}
-                    color={0xffffff}
-                    intensity={0.6}
-                    position={[2, 100, -segment.index * SEGMENT_LENGTH]}
-                    castShadow
-                    shadow-camera-left={-70}
-                    shadow-camera-right={70}
-                    shadow-camera-top={50}
-                    shadow-camera-bottom={-50}
-                    shadow-camera-far={200}
-                    shadow-intensity={0.7}
-                    shadow-mapSize-width={1024}
-                    shadow-mapSize-height={1024}
-                    ref={lightRef} />
+                {dirLight.enabled && (
+                    <directionalLight
+                        rotation={[dirLight.rotation.x, dirLight.rotation.y, dirLight.rotation.z + 0.5]}
+                        color={dirLight.color}
+                        intensity={dirLight.intensity}
+                        position={[2 + dirLight.position.x, 100 + dirLight.position.y, -segment.index * SEGMENT_LENGTH + dirLight.position.z]}
+                        castShadow
+                        shadow-camera-left={-70}
+                        shadow-camera-right={70}
+                        shadow-camera-top={50}
+                        shadow-camera-bottom={-50}
+                        shadow-camera-far={200}
+                        shadow-intensity={0.7}
+                        shadow-mapSize-width={1024}
+                        shadow-mapSize-height={1024}
+                        ref={lightRef} />
+                )}
 
-                <ambientLight intensity={0.5} color={0xffffff} />
+                {ambLight.enabled && (
+                    <ambientLight intensity={ambLight.intensity} color={ambLight.color} />
+                )}
 
                 <object3D ref={targetRef} position={targetPosition} />
                 <RigidBody type="fixed" friction={0.03} name="ground">
