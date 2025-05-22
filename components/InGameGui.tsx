@@ -52,9 +52,9 @@ export const InGameGui = ({
 
     useEffect(() => {
         const handleBlur = () => {
-            // setCountdown(null);
-            // setActiveModal('pause');
-            // setIsGamePaused(true);
+            setCountdown(null);
+            setActiveModal('pause');
+            setIsGamePaused(true);
         };
 
         const handleKeyDown = (e: KeyboardEvent) => {
