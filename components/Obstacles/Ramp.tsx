@@ -21,7 +21,7 @@ export const Ramp = ({
 
   const model = useMemo(() => {
     if (!modelsGltf?.scene) return null;
-    const object = modelsGltf.scene.getObjectByName("Cube004");
+    const object = modelsGltf.scene.getObjectByName("Cube001");
     if (!object) return null;
     object.position.set(0, 0, 0);
 
