@@ -19,6 +19,7 @@ export type SettingsType = {
     dpr: number;
     music: boolean;
     sounds: boolean;
+    enabledPostProcessing: boolean;
 }
 
 export const gameStateAtom = atom<GameState>(
@@ -32,6 +33,7 @@ export const settingsAtom = atom<SettingsType>({
     shadows: true,
     music: true,
     sounds: true,
+    enabledPostProcessing: true,
 });
 
 export type SessionData = {

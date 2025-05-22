@@ -37,6 +37,7 @@ import {
 } from "lz-string";
 import toast from "react-hot-toast";
 import { IChunk } from "../shared";
+import { PostProcessingEffects, PostProcessingMenu } from "../PostProcessing";
 
 const radToDeg = (rad: number) => rad * (180 / Math.PI);
 const degToRad = (deg: number) => deg * (Math.PI / 180);
@@ -318,6 +319,7 @@ export const MapMakerThreeCanvas = () => {
       ref={containerRef}
       className="w-full h-full flex justify-between absolute inset-0 overflow-hidden bg-black"
     >
+      <PostProcessingMenu collapsed />
       {dimensions.width > 0 && dimensions.height > 0 && (
         <Canvas
           style={{
@@ -349,7 +351,6 @@ export const MapMakerThreeCanvas = () => {
               -0.4549245505405106, 0.018360238206654656, 0.008980040698515523,
             ]}
           />
-          <ambientLight color={0x787878} intensity={1} />
           <Suspense>
             <Physics gravity={[0, -9.81, 0]} timeStep="vary">
               <MapMakerGround
@@ -368,6 +369,7 @@ export const MapMakerThreeCanvas = () => {
           <OrbitControls makeDefault enablePan enableZoom enableRotate />
 
           <Environment backgroundRotation={[-0.2, 0, 0]} background files={'/sky.hdr'} />
+          <PostProcessingEffects />
         </Canvas>
       )}
 
