@@ -12,6 +12,12 @@
   --font-mono: var(--font-geist-mono);
 }
 
+.leva-c-hBtFDW * {
+  color: white !important;
+  text-shadow: none !important;
+  -webkit-text-stroke-color: white !important;
+}
+
 #_rht_toaster * {
   color: white !important;
 }
