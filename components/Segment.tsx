@@ -93,7 +93,7 @@ export const Segment = memo(
                 intensity: 0.6,
                 position: { x: 0, y: 0, z: 0 },
                 rotation: { x: 0, y: 0, z: 0 },
-                color: '0xffffff',
+                color: '#ffffff',
             }
         )
 
@@ -102,7 +102,7 @@ export const Segment = memo(
             {
                 enabled: true,
                 intensity: 0.5,
-                color: '0xffffff',
+                color: '#ffffff',
             }
         )
 
