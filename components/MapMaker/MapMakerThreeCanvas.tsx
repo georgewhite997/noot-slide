@@ -61,14 +61,16 @@ const getSegmentsWithRadians = (
 ) =>
   segments.map((segment, i) => ({
     ...segment,
-    chunks: segment.chunks.map((chunk, j) => ({
-      ...chunk,
-      length: segmentLengths?.[i]?.[j] || 0,
-      obstacles: chunk.obstacles.map((obstacle) => ({
-        ...obstacle,
-        rotation: obstacle.rotation.map(degToRad),
-      })),
-    })),
+    chunks: segment.chunks.map((chunk, j) => {
+      return {
+        ...chunk,
+        length: segmentLengths?.[i]?.[j] || 0,
+        obstacles: chunk.obstacles.map((obstacle) => ({
+          ...obstacle,
+          rotation: obstacle.rotation.map(degToRad),
+        })),
+      }
+    })
   }));
 
 const getSegmentsWithLengths = (
@@ -448,11 +450,11 @@ export const MapMakerThreeCanvas = () => {
                         selectedObstacleObject.position[2] + 1,
                       ],
                     };
-                    next[selectedSegment].chunks[selectedChunk].obstacles.push(
+                    const newIndex = next[selectedSegment].chunks[selectedChunk].obstacles.push(
                       newObstacle,
                     );
                     setSelectedObstacle(
-                      `chunk-${selectedChunk}-segment-${selectedSegment}-${next[selectedSegment].chunks[selectedChunk].obstacles.length - 1}`,
+                      `chunk-${selectedChunk}-segment-${selectedSegment}-${newIndex - 1}`,
                     );
                     return next;
                   })

@@ -208,26 +208,6 @@ export const Ground = memo(function Ground() {
     }
   });
 
-  // const onChunkRemoved = (chunkName: string) => {
-  //   const arr = chunkName.split('-');
-  //   const nextChunkIndex = parseInt(arr[1]) + 1;
-  //   const nextChunkName = `chunk-${nextChunkIndex}-segment-${arr[arr.length - 1]}`;
-
-  //   setSegments((prevSegments) => {
-  //     return prevSegments.map((segment) => {
-  //       return {
-  //         ...segment,
-  //         chunks: segment.chunks.map((chunk) => {
-  //           return {
-  //             ...chunk,
-  //             obstacles: chunk.name === chunkName || chunk.name === nextChunkName ? chunk.obstacles.filter((obstacle) => obstacle.type === "reward") : chunk.obstacles,
-  //           };
-  //         }),
-  //       };
-  //     });
-  //   });
-  // }
-
   const removeNextObstacles = (
     obstacle: THREE.Object3D<THREE.Object3DEventMap>
   ) => {

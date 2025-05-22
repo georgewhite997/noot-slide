@@ -558,15 +558,12 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       }
 
       if (name.startsWith("deadly-obstacle")) {
-        let current = event.other.rigidBodyObject;
-
-        console.log(current.name);
+        const current = event.other.rigidBodyObject;
 
 
         if (lastHitObstacle.current && current.name === lastHitObstacle.current.name) {
           return;
         }
-
 
         lastHitObstacle.current = current
         if (hasHalo.current) {
@@ -993,6 +990,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
         onIntersectionEnter={handleIntersection}
         rotation={[SLOPE_ANGLE, Math.PI, 0]}
         ccd={true}
+      // type="fixed"
       >
         <CuboidCollider
           position={[0, colliderY, + 0.3]}

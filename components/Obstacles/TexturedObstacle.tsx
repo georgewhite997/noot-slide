@@ -18,7 +18,6 @@ export const TexturedObstacle = ({
   scale?: number;
   index?: number;
 }) => {
-
   const modelsGltf = useAtomValue(modelsGltfAtom);
   const setSelectedObstacle = useSetAtom(selectedObstacleAtom);
 

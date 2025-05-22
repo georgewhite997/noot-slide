@@ -9,8 +9,6 @@ import { Obstacles } from "./Obstacles/Obstacles";
 
 interface Props {
     segment: ISegment;
-    colorMap: THREE.Texture;
-    normalMap: THREE.Texture;
     optimize?: boolean,
 }
 
@@ -20,12 +18,21 @@ export const SegmentObstacles = memo(function SegmentObstacles({
 }: Props) {
     const fishMeshes = useAtomValue(fishMeshesAtom);
 
-    const allObstacles = useMemo(
-        () => segment.chunks.flatMap((chunk) => chunk.obstacles),
+    const [allObstacles, fishCount] = useMemo(
+        () => {
+            let fish = 0;
+            const obstacles = segment.chunks.flatMap((chunk) => {
+                chunk.obstacles.forEach((obstacle) => {
+                    if (obstacle.type === "reward") {
+                        fish++
+                    }
+                })
+                return chunk.obstacles
+            })
+            return [obstacles, fish]
+        },
         [segment.chunks]
     );
-
-
 
     if (optimize) {
         if (allObstacles.length === 0) return null;
@@ -34,6 +41,7 @@ export const SegmentObstacles = memo(function SegmentObstacles({
             <group name={`segment-${segment.index}`}>
                 <Obstacles
                     obstacles={allObstacles}
+                    fishCount={fishCount}
                 />
             </group>
         );
@@ -44,12 +52,12 @@ export const SegmentObstacles = memo(function SegmentObstacles({
                 const chunkKey = chunk.name + segment.index + segment.yOffset
                 return (
                     <group key={chunkKey} name={chunk.name}>
-                        <Merged meshes={fishMeshes} limit={20}>
+                        <Merged meshes={fishMeshes} limit={fishCount}>
                             {(model) =>
                                 <group>
                                     {chunk.obstacles.map((obstacle, obstacleIndex) =>
                                         <Obstacle
-                                            key={`${chunkKey}-obstacle-${obstacle.type}-${obstacle.position.join('-')}-${segment.index}-${obstacleIndex}`}
+                                            key={[chunkKey, obstacle.type, obstacle.position.join('-'), obstacle.rotation.join('-'), segment.index, obstacleIndex].join('-')}
                                             index={obstacleIndex}
                                             obstacle={obstacle}
                                             FishModel={model.KoiFish_low}

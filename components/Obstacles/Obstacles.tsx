@@ -12,10 +12,12 @@ const OBSTACLES_PER_FRAME = 1;
 
 interface ObstaclesProps {
     obstacles: IObstacle[];
+    fishCount: number;
 }
 
 export const Obstacles = ({
     obstacles,
+    fishCount,
 }: ObstaclesProps) => {
     const fishMeshes = useAtomValue(fishMeshesAtom);
     const mergedRef = useRef<THREE.Group>(null);
@@ -37,7 +39,7 @@ export const Obstacles = ({
     }, []);
 
     return (
-        <Merged meshes={fishMeshes} limit={300} ref={mergedRef} frustumCulled={false}>
+        <Merged meshes={fishMeshes} limit={fishCount} ref={mergedRef} frustumCulled={false}>
             {(model) => obstacles.slice(0, renderedCount).map((obstacle, index) => (
                 <Obstacle
                     key={`obstacle-${obstacle.type}-${obstacle.position.join("-")}-${index}`}

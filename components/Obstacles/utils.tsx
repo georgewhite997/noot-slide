@@ -64,10 +64,10 @@ export const getChunks = (
 
   while (true) {
     const chunk = chunkPresets[Math.floor(Math.random() * chunkPresets.length)];
+    // const chunk = chunkPresets[j % chunkPresets.length];
     const firstObstacleZ = getSmallestZ(chunk.obstacles);
     const chunkLength = chunk.length + firstObstacleZ;
-    const previousChunkLengths = totalLength;
-    const beginningOfChunk = middleOfSegment + previousChunkLengths;
+    const beginningOfChunk = middleOfSegment + totalLength;
 
     chunks.push({
       ...chunk,

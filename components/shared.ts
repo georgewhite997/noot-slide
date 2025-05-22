@@ -8,7 +8,7 @@ export const TRACK_MARK_LENGTH = 0.02;
 
 export const SEGMENT_LENGTH = 100;
 export const SEGMENT_WIDTH = 10;
-export const SEGMENT_COUNT = 2;
+export const SEGMENT_COUNT = 3;
 export const BASE_RESOLUTION = 75;
 export const SEGMENT_RESOLUTION = [BASE_RESOLUTION, BASE_RESOLUTION * 3];
 

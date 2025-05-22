@@ -147,8 +147,6 @@ export const MapMakerGround = ({
             >
               <SegmentObstacles
                 segment={segment}
-                colorMap={colorMap}
-                normalMap={normalMap}
                 optimize={false}
               />
               {displayChunkBoundaries && segment.chunks.length > 0
