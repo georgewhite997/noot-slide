@@ -53,14 +53,10 @@ const Obstacle = memo(
     obstacle,
     index,
     FishModel,
-    snowColorMap,
-    snowNormalMap,
   }: {
     obstacle: IObstacle;
     index?: number;
     FishModel: any;
-    snowColorMap: THREE.Texture;
-    snowNormalMap: THREE.Texture;
   }) {
     switch (obstacle.type) {
       case "reward":
@@ -94,8 +90,6 @@ const Obstacle = memo(
           <Ramp
             obstacle={obstacle}
             index={index}
-            snowColorMap={snowColorMap}
-            snowNormalMap={snowNormalMap}
           />
         );
       default:

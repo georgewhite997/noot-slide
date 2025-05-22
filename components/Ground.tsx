@@ -250,8 +250,6 @@ export const Ground = memo(function Ground() {
             >
               <SegmentObstacles
                 segment={segment}
-                colorMap={colorMap}
-                normalMap={normalMap}
               />
             </mesh>
           </group>

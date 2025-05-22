@@ -8,11 +8,9 @@ import { Obstacle } from "./Obstacles";
 
 interface Props {
     segment: ISegment;
-    colorMap: THREE.Texture;
-    normalMap: THREE.Texture;
 }
 
-export const SegmentObstacles = memo(function SegmentObstacles({ segment, colorMap, normalMap }: Props) {
+export const SegmentObstacles = memo(function SegmentObstacles({ segment }: Props) {
     const fishMeshes = useAtomValue(fishMeshesAtom);
 
     return segment.chunks.length > 0 ? (
@@ -30,8 +28,6 @@ export const SegmentObstacles = memo(function SegmentObstacles({ segment, colorM
                                         index={obstacleIndex}
                                         obstacle={obstacle}
                                         FishModel={model.KoiFish_low}
-                                        snowColorMap={colorMap}
-                                        snowNormalMap={normalMap}
                                     />
                                 }
                                 )}
