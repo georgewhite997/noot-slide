@@ -20,7 +20,7 @@ import { UpgradeLevel } from "@/utils/auth-utils";
 const LANE_TRANSITION_SPEED = 2.5;
 const CAMERA_POSITION_SMOOTHING = 3; // Lower = smoother but slower
 const CAMERA_LOOKAT_SMOOTHING = 5; // Lower = smoother but slower
-const SWAY_AMPLITUDE = 0.035;
+const SWAY_AMPLITUDE = 0.03;
 const MAX_REVIVE_COUNT = 3;
 
 const PLAYER_START_POSITION = new THREE.Vector3(0, 10, -20);
@@ -994,7 +994,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       >
         <CuboidCollider
           position={[0, colliderY, + 0.3]}
-          args={[0.6, colliderHeight, 0.60]}
+          args={[0.45, colliderHeight, 0.60]}
         />
       </RigidBody>
       <group ref={groupRef}>
