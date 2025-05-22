@@ -18,7 +18,6 @@ export const TexturedObstacle = ({
   scale?: number;
   index?: number;
 }) => {
-
   const modelsGltf = useAtomValue(modelsGltfAtom);
   const setSelectedObstacle = useSetAtom(selectedObstacleAtom);
 
@@ -58,14 +57,14 @@ export const TexturedObstacle = ({
     >
       <RigidBody
         type="fixed"
-        name={"deadly-obstacle-" + obstacle.type + "-" + index}
+        name={"deadly-obstacle-" + obstacle.type + "-" + obstacle.position.join('-')}
         position={[
           obstacle.position[0],
           obstacle.position[2],
           obstacle.position[1],
         ]}
         rotation={obstacle.rotation}
-        colliders="hull"
+        colliders={obstacle.name.includes("flag") ? "trimesh" : 'hull'}
       >
         <primitive object={clone(model)} />
       </RigidBody>

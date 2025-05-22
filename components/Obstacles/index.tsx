@@ -24,6 +24,8 @@ const RandomPickup = ({
   const hasLuckyCharm = useAtomValue(hasLuckyCharmAtom);
   const [random1, random2, random3] = useMemo(() => [Math.random(), Math.random(), Math.random()], []);
 
+  // return <FishingNet obstacle={obstacle} index={index} />;
+
   const chanceForPickup = 0.2 * (hasLuckyCharm ? 1.5 : 1);
   if (random1 <= chanceForPickup) {
     if (random2 >= 0 && random2 <= 0.33) {
@@ -53,14 +55,10 @@ const Obstacle = memo(
     obstacle,
     index,
     FishModel,
-    snowColorMap,
-    snowNormalMap,
   }: {
     obstacle: IObstacle;
     index?: number;
     FishModel: any;
-    snowColorMap: THREE.Texture;
-    snowNormalMap: THREE.Texture;
   }) {
     switch (obstacle.type) {
       case "reward":
@@ -94,8 +92,6 @@ const Obstacle = memo(
           <Ramp
             obstacle={obstacle}
             index={index}
-            snowColorMap={snowColorMap}
-            snowNormalMap={snowNormalMap}
           />
         );
       default:

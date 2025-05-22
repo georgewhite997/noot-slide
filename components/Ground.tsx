@@ -208,32 +208,84 @@ export const Ground = memo(function Ground() {
     }
   });
 
-  const onChunkRemoved = (chunkName: string) => {
-    const arr = chunkName.split('-');
-    const nextChunkIndex = parseInt(arr[1]) + 1;
-    const nextChunkName = `chunk-${nextChunkIndex}-segment-${arr[arr.length - 1]}`;
+  const removeNextObstacles = (
+    obstacle: THREE.Object3D<THREE.Object3DEventMap>
+  ) => {
+    const segmentName = obstacle.parent?.parent?.parent?.parent?.parent?.name ?? "";
+    const [, indexStr] = segmentName.split("-");
+    const currentIndex = Number(indexStr);
+    if (Number.isNaN(currentIndex)) return;
 
-    setSegments((prevSegments) => {
-      return prevSegments.map((segment) => {
-        return {
-          ...segment,
-          chunks: segment.chunks.map((chunk) => {
-            return {
+    const startZ = obstacle.position.y - 2;
+    const endZGlobal = startZ + 30;
+
+    setSegments(prevSegments => {
+      const currSeg = prevSegments.find(s => s.index === currentIndex);
+      const nextSeg = prevSegments.find(s => s.index === currentIndex + 1);
+
+      const currLastZ = currSeg
+        ? Math.max(
+          ...currSeg.chunks.flatMap(c =>
+            c.obstacles.map(o => o.position[2])
+          )
+        )
+        : startZ;
+
+      const nextFirstZ = nextSeg
+        ? Math.min(
+          ...nextSeg.chunks.flatMap(c =>
+            c.obstacles.map(o => o.position[2])
+          )
+        )
+        : 0;
+
+      const overflow = endZGlobal > currLastZ
+        ? endZGlobal - currLastZ
+        : 0;
+
+      return prevSegments.map(segment => {
+        if (segment.index === currentIndex) {
+          const localEndZ = overflow ? currLastZ : endZGlobal;
+
+          return {
+            ...segment,
+            chunks: segment.chunks.map(chunk => ({
               ...chunk,
-              obstacles: chunk.name === chunkName || chunk.name === nextChunkName ? chunk.obstacles.filter((obstacle) => obstacle.type === "reward") : chunk.obstacles,
-            };
-          }),
-        };
+              obstacles: chunk.obstacles.filter(o => {
+                const z = o.position[2];
+                return z < startZ || z > localEndZ;
+              }),
+            })),
+          };
+        }
+
+        if (overflow && segment.index === currentIndex + 1) {
+          const nextEndZ = nextFirstZ + overflow;
+
+          return {
+            ...segment,
+            chunks: segment.chunks.map(chunk => ({
+              ...chunk,
+              obstacles: chunk.obstacles.filter(o => {
+                const z = o.position[2];
+                return z < nextFirstZ || z > nextEndZ;
+              }),
+            })),
+          };
+        }
+
+        return segment;
       });
     });
-  }
+  };
+
 
   if (!modelsGltf) return
 
 
   return (
     <>
-      <Player onChunkRemoved={onChunkRemoved} />
+      <Player removeNextObstacles={removeNextObstacles} />
       <group>
         {segments.map((segment) => (
           <group key={`${segment.index}-${segment.zOffset}-${segment.yOffset}`}>
@@ -250,8 +302,6 @@ export const Ground = memo(function Ground() {
             >
               <SegmentObstacles
                 segment={segment}
-                colorMap={colorMap}
-                normalMap={normalMap}
               />
             </mesh>
           </group>

@@ -30,7 +30,9 @@ export const FishingNet = ({
   );
 
   useFrame(() => {
-    fadeModelOnHit(wasHitRef.current, meshRef.current);
+    if (meshRef.current?.position?.z as number > -2) {
+      fadeModelOnHit(wasHitRef.current, meshRef.current);
+    }
   });
 
   if (!model) return null;

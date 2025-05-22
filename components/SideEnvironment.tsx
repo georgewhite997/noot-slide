@@ -39,7 +39,7 @@ const stonesModels = [...new Set([
     { name: "dumpster_green_winter", scale: 0.008 },
     { name: "igloo_house", scale: 0.006 },
     { name: "snow_shovel_yellow__1_", scale: 0.02 },
-    { name: "ski_flag_red__1_", scale: 0.012 },
+    { name: "ski_flag_red", scale: 0.012 },
     { name: "sled_green", scale: 0.012 },
     { name: "sled_green001", scale: 0.012 },
     { name: "santa_claus_sleigh", scale: 0.008 },
@@ -121,7 +121,7 @@ const Stones2 = (isRight: boolean, modelsGltf: GLTF & ObjectMap | null) => {
     const model3 = useMemo(() => getModel("stone_winter_large_2003", 0.03, modelsGltf), []);
     const model4 = useMemo(() => getModel("stone_winter_small_8__2_002", 0.09, modelsGltf), []);
 
-    const redFlag = useMemo(() => getModel("ski_flag_red__1_", 0.018, modelsGltf), []);
+    const redFlag = useMemo(() => getModel("ski_flag_red", 0.018, modelsGltf), []);
     const house1 = useMemo(() => getModel("winter_house_7", 0.015, modelsGltf), []);
     const house2 = useMemo(() => getModel("winter_house_8", 0.015, modelsGltf), []);
     const house3 = useMemo(() => getModel("wooden_winter_house_3", 0.015, modelsGltf), []);

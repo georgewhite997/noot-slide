@@ -14,12 +14,12 @@ export const prepareModelForTransparency = (
 
     object.traverse((child) => {
       if (child instanceof THREE.Mesh) {
-        if (!Array.isArray(child.material)) {
-          const clonedMat = child.material.clone();
-          clonedMat.transparent = true;
-          clonedMat.opacity = 1;
-          child.material = clonedMat;
-        }
+        // if (!Array.isArray(child.material)) {
+        //   const clonedMat = child.material.clone();
+        //   clonedMat.transparent = true;
+        //   clonedMat.opacity = 1;
+        //   child.material = clonedMat;
+        // }
         child.position.set(0, 0, 0);
         child.updateMatrix();
       }
@@ -32,18 +32,21 @@ export const prepareModelForTransparency = (
 
 export const fadeModelOnHit = (wasHit: boolean, current: THREE.Mesh | null) => {
   if (wasHit && current) {
-    const opacity = Math.max(
-      0,
-      // @ts-expect-error we can expect the model to have only one material
-      current.material.opacity - 0.04,
-    );
+    // const opacity = Math.max(
+    //   0,
+    //   // @ts-expect-error we can expect the model to have only one material
+    //   current.material.opacity - 0.04,
+    // );
 
-    current.position.z += 0.04;
-    current.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        child.material.opacity = opacity;
-      }
-    });
+    if (current.position.z > -2) {
+      current.position.z -= 0.04;
+
+    }
+    // current.traverse((child) => {
+    //   if (child instanceof THREE.Mesh) {
+    //     child.material.opacity = opacity;
+    //   }
+    // });
   }
 };
 
@@ -61,10 +64,10 @@ export const getChunks = (
 
   while (true) {
     const chunk = chunkPresets[Math.floor(Math.random() * chunkPresets.length)];
+    // const chunk = chunkPresets[j % chunkPresets.length];
     const firstObstacleZ = getSmallestZ(chunk.obstacles);
     const chunkLength = chunk.length + firstObstacleZ;
-    const previousChunkLengths = totalLength;
-    const beginningOfChunk = middleOfSegment + previousChunkLengths;
+    const beginningOfChunk = middleOfSegment + totalLength;
 
     chunks.push({
       ...chunk,

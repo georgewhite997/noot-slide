@@ -1,67 +1,99 @@
 import * as THREE from "three";
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { Merged } from "@react-three/drei";
 import { useAtomValue } from "jotai";
 import { fishMeshesAtom } from "@/atoms";
 import { ISegment, IObstacle } from "./shared";
 import { Obstacle } from "./Obstacles";
+import { Obstacles } from "./Obstacles/Obstacles";
 
 interface Props {
     segment: ISegment;
-    colorMap: THREE.Texture;
-    normalMap: THREE.Texture;
+    optimize?: boolean,
 }
 
-export const SegmentObstacles = memo(function SegmentObstacles({ segment, colorMap, normalMap }: Props) {
+export const SegmentObstacles = memo(function SegmentObstacles({
+    segment,
+    optimize = true,
+}: Props) {
     const fishMeshes = useAtomValue(fishMeshesAtom);
 
-    return segment.chunks.length > 0 ? (
-        segment.chunks.map((chunk) => {
-            if (chunk.obstacles.length === 0) return null
-            const chunkKey = chunk.name + segment.index + segment.yOffset
-            return (
-                <group key={chunkKey} name={chunk.name}>
-                    <Merged meshes={fishMeshes} limit={20}>
-                        {(model) =>
-                            <group>
-                                {chunk.obstacles.map((obstacle, obstacleIndex) => {
-                                    return <Obstacle
-                                        key={`${chunkKey}-obstacle-${obstacle.type}-${obstacle.position.join('-')}-${segment.index}-${obstacleIndex}`}
-                                        index={obstacleIndex}
-                                        obstacle={obstacle}
-                                        FishModel={model.KoiFish_low}
-                                        snowColorMap={colorMap}
-                                        snowNormalMap={normalMap}
-                                    />
-                                }
-                                )}
-                            </group>
-                        }
-                    </Merged >
-                </group >
-            )
-        })
-    ) : null
-}, (prevProps, nextProps) => {
-    const p = prevProps.segment, n = nextProps.segment;
+    const [allObstacles, fishCount] = useMemo(
+        () => {
+            let fish = 0;
+            const obstacles = segment.chunks.flatMap((chunk) => {
+                chunk.obstacles.forEach((obstacle) => {
+                    if (obstacle.type === "reward") {
+                        fish++
+                    }
+                })
+                return chunk.obstacles
+            })
+            return [obstacles, fish]
+        },
+        [segment.chunks]
+    );
 
-    // top-level segment fields
-    if (p.index !== n.index ||
-        p.yOffset !== n.yOffset ||
-        p.zOffset !== n.zOffset)
-        return false;
+    if (optimize) {
+        if (allObstacles.length === 0) return null;
 
-    // chunks
-    if (p.chunks.length !== n.chunks.length) return false;
-
-    for (let i = 0; i < p.chunks.length; i++) {
-        const pc = p.chunks[i], nc = n.chunks[i];
-        if (pc.name !== nc.name) return false;
-        if (haveObstaclesChanged(pc.obstacles, nc.obstacles)) return false;
+        return (
+            <group name={`segment-${segment.index}`}>
+                <Obstacles
+                    obstacles={allObstacles}
+                    fishCount={fishCount}
+                />
+            </group>
+        );
+    } else {
+        return segment.chunks.length > 0 ? (
+            segment.chunks.map((chunk) => {
+                if (chunk.obstacles.length === 0) return null
+                const chunkKey = chunk.name + segment.index + segment.yOffset
+                return (
+                    <group key={chunkKey} name={chunk.name}>
+                        <Merged meshes={fishMeshes} limit={fishCount}>
+                            {(model) =>
+                                <group>
+                                    {chunk.obstacles.map((obstacle, obstacleIndex) =>
+                                        <Obstacle
+                                            key={[chunkKey, obstacle.type, obstacle.position.join('-'), obstacle.rotation.join('-'), segment.index, obstacleIndex].join('-')}
+                                            index={obstacleIndex}
+                                            obstacle={obstacle}
+                                            FishModel={model.KoiFish_low}
+                                        />
+                                    )}
+                                </group>
+                            }
+                        </Merged >
+                    </group >
+                )
+            })
+        ) : null
     }
-    return true;
-}
-);
+
+},
+    // porównanie propsów
+    (prevProps, nextProps) => {
+        const p = prevProps.segment, n = nextProps.segment;
+
+        if (p.index !== n.index || p.yOffset !== n.yOffset || p.zOffset !== n.zOffset) {
+            return false;
+        }
+
+        if (p.chunks.length !== n.chunks.length) {
+            return false;
+        }
+
+        for (let i = 0; i < p.chunks.length; i++) {
+            const pc = p.chunks[i], nc = n.chunks[i];
+            if (haveObstaclesChanged(pc.obstacles, nc.obstacles)) {
+                return false;
+            }
+        }
+
+        return true;
+    });
 
 
 
