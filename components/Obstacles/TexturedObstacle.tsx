@@ -64,7 +64,7 @@ export const TexturedObstacle = ({
           obstacle.position[1],
         ]}
         rotation={obstacle.rotation}
-        colliders="hull"
+        colliders={obstacle.name.includes("flag") ? "trimesh" : 'hull'}
       >
         <primitive object={clone(model)} />
       </RigidBody>
