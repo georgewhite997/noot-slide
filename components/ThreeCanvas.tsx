@@ -34,7 +34,7 @@ import {
   ToneMapping,
 } from "@react-three/postprocessing";
 import { Leva, useControls, folder, button, levaStore } from "leva";
-import { ToneMappingMode } from "postprocessing";
+import { BlendFunction, ToneMappingMode } from "postprocessing";
 
 const levaTheme = {
   colors: {
@@ -131,7 +131,7 @@ const Scene = () => {
           gravity={[0, -9.81, 0]}
           timeStep="vary"
           paused={isGamePaused}
-          // debug
+        // debug
         >
           <Ground />
         </Physics>
@@ -158,6 +158,26 @@ const PostProcessingEffects = () => {
       intensity: { value: 0.26, min: 0, max: 3 },
       radius: { value: 0, min: 0, max: 2 },
       threshold: { value: 0, min: 0, max: 1 },
+    },
+    { collapsed: true },
+  );
+
+
+  const toneMapping = useControls(
+    "Tone Mapping",
+    {
+      enabled: true,
+      mode: { value: ToneMappingMode.ACES_FILMIC, options: ToneMappingMode },
+      blendFunction: { value: BlendFunction.NORMAL, options: BlendFunction },
+      // adaptive: { value: false },
+      // resolution: { value: 256 },
+      middleGrey: { value: 0.6 },
+      minLuminance: { value: 0.01 },
+      maxLuminance: { value: 4.0 },
+      whitePoint: { value: 4.0 },
+      averageLuminance: { value: 1.0 },
+      adaptationRate: { value: 1.0 },
+      opacity: { value: 1.0 },
     },
     { collapsed: true },
   );
@@ -306,80 +326,93 @@ const PostProcessingEffects = () => {
     { collapsed: true },
   );
 
+
+
   if (!settings.antialiasing) return null;
 
   return (
     <EffectComposer enableNormalPass={false} multisampling={8}>
-      <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
+      {toneMapping.enabled ? (
+        <ToneMapping mode={toneMapping.mode}
+          blend={toneMapping.blendFunction}
+          middleGrey={toneMapping.middleGrey}
+          maxLuminance={toneMapping.maxLuminance}
+          averageLuminance={toneMapping.averageLuminance}
+          adaptationRate={toneMapping.adaptationRate}
+          minLuminance={toneMapping.minLuminance}
+          whitePoint={toneMapping.whitePoint}
+          opacity={toneMapping.opacity}
+        />
+      ) : <></>}
 
       {/* Base effects */}
-      {bloom?.enabled && (
+      {bloom.enabled ? (
         <Bloom
           intensity={bloom.intensity}
           radius={bloom.radius}
           luminanceThreshold={bloom.threshold}
         />
-      )}
-      {dof.enabled && (
+      ) : <></>}
+      {dof.enabled ? (
         <DepthOfField
           focusDistance={dof.focusDistance}
           focalLength={dof.focalLength}
           bokehScale={dof.bokehScale}
         />
-      )}
-      {chroma.enabled && (
+      ) : <></>}
+      {chroma.enabled ? (
         <ChromaticAberration
           offset={new THREE.Vector2(chroma.offset, chroma.offset)}
         />
-      )}
-      {vignette.enabled && (
+      ) : <></>}
+      {vignette.enabled ? (
         <Vignette
           eskil={vignette.eskil}
           offset={vignette.offset}
           darkness={vignette.darkness}
         />
-      )}
+      ) : <></>}
 
       {/* ————— extra FX ———— */}
-      {noise.enabled && (
+      {noise.enabled ? (
         <Noise premultiply={noise.premultiply} opacity={noise.opacity} />
-      )}
+      ) : <></>}
 
-      {ssao.enabled && (
+      {ssao.enabled ? (
         <SSAO
           samples={ssao.samples}
           radius={ssao.radius}
           intensity={ssao.intensity}
         />
-      )}
+      ) : <></>}
 
-      {hueSat.enabled && (
+      {hueSat.enabled ? (
         <HueSaturation hue={hueSat.hue} saturation={hueSat.saturation} />
-      )}
+      ) : <></>}
 
-      {brCon.enabled && (
+      {brCon.enabled ? (
         <BrightnessContrast
           brightness={brCon.brightness}
           contrast={brCon.contrast}
         />
-      )}
+      ) : <></>}
 
-      {pixel.enabled && <Pixelation granularity={pixel.granularity} />}
+      {pixel.enabled ? <Pixelation granularity={pixel.granularity} /> : <></>}
 
-      {dot.enabled && <DotScreen scale={dot.scale} angle={dot.angle} />}
+      {dot.enabled ? <DotScreen scale={dot.scale} angle={dot.angle} /> : <></>}
 
-      {scan.enabled && <Scanline density={scan.density} blend={scan.blend} />}
+      {scan.enabled ? <Scanline density={scan.density} blend={scan.blend} /> : <></>}
 
-      {glitch.enabled && (
+      {glitch.enabled ? (
         <Glitch
-          delay={[glitch.minDelay, glitch.maxDelay]}
-          duration={[glitch.minDuration, glitch.maxDuration]}
-          strength={glitch.strength}
-          mode={glitch.mode}
+          delay={new THREE.Vector2(glitch.minDelay, glitch.maxDelay)}
+          duration={new THREE.Vector2(glitch.minDuration, glitch.maxDuration)}
+          strength={new THREE.Vector2(glitch.strength, glitch.strength)}
+          mode={glitch.mode as any}
         />
-      )}
+      ) : <></>}
 
-      {smaa.enabled && <SMAA />}
+      {smaa.enabled ? <SMAA /> : <></>}
     </EffectComposer>
   );
 };

@@ -18,6 +18,10 @@
   -webkit-text-stroke-color: white !important;
 }
 
+.leva-c-hBtFDW * select option {
+  color: black !important;
+}
+
 #_rht_toaster * {
   color: white !important;
 }
