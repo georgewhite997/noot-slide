@@ -328,7 +328,7 @@ const PostProcessingEffects = () => {
   if (!settings.antialiasing) return null;
 
   return (
-    <EffectComposer multisampling={8} enableNormalPass>
+    <EffectComposer multisampling={8}>
       {/* Base effects */}
       {bloom.enabled && <Bloom intensity={bloom.intensity} radius={bloom.radius} luminanceThreshold={bloom.threshold} />}
       {dof.enabled && <DepthOfField focusDistance={dof.focusDistance} focalLength={dof.focalLength} bokehScale={dof.bokehScale} />}
