@@ -12,6 +12,7 @@ import {
 } from "react";
 import { MapMakerGround } from "@/components/MapMaker/MapMakerGround";
 import {
+  Environment,
   OrbitControls,
   PerformanceMonitor,
   PerspectiveCamera,
@@ -365,6 +366,8 @@ export const MapMakerThreeCanvas = () => {
           </Suspense>
 
           <OrbitControls makeDefault enablePan enableZoom enableRotate />
+
+          <Environment backgroundRotation={[-0.2, 0, 0]} background files={'/sky.hdr'} />
         </Canvas>
       )}
 

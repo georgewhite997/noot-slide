@@ -5,6 +5,7 @@ import { Physics } from "@react-three/rapier";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Ground } from "./Ground";
 import {
+  Environment,
   OrbitControls,
   PerspectiveCamera,
   Stats,
@@ -57,6 +58,7 @@ export const ThreeCanvas = () => {
             >
               {process.env.NODE_ENV === "development" && <Stats />}
               <ModelLoader />
+              <Environment backgroundRotation={[-0.2, 0, 0]} background files={'/sky.hdr'} />
               <Scene />
             </Canvas>
           </>
