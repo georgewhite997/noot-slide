@@ -6,6 +6,7 @@ import {
   CollisionEnterHandler,
   CuboidCollider,
   IntersectionEnterHandler,
+  RapierCollider,
   RapierRigidBody,
   RigidBody,
 } from "@react-three/rapier";
@@ -59,6 +60,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
   const [upgrades, setUpgrades] = useAtom(upgradesAtom);
   const [score, setScore] = useAtom(scoreAtom);
   const ref = useRef<RapierRigidBody>(null);
+  const colliderRef = useRef<RapierCollider>(null)
   const groupRef = useRef<THREE.Group>(null);
   const lastCollided = useRef('')
   // const cameraTargetRef = useRef(new THREE.Vector3(0, 15.128119638063186, -21.88320813904049));
@@ -91,6 +93,8 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
   const [multiplierDuration, setMultiplierDuration] = useAtom(multiplierDurationAtom);
   const [haloQuantity, setHaloQuantity] = useAtom(haloQuantityAtom);
   const [jumpPending, setJumpPending] = useState<boolean>(false);
+  const jumpPendingRef = useRef<boolean>(false);
+  
 
   const touchStartX = useRef<number>(0);
   const touchStartY = useRef<number>(0);
@@ -429,6 +433,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       setIsSliding(false);
       isSlidingRef.current = false;
       setJumpPending(true);
+      jumpPendingRef.current = true;
       return;
     }
 
@@ -443,7 +448,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
     const currentYVelocity = currentVelocity?.y || 0;
     const fallMultiplier = currentYVelocity < 0 ? Math.exp(Math.abs(currentYVelocity) * 0.1) : 1;
     const requiredImpulse = baseImpulse * fallMultiplier;
-    const impulse = { x: 0, y: baseImpulse, z: 0 };
+    const impulse = { x: 0, y: requiredImpulse, z: 0 };
     ref.current?.applyImpulse(impulse, true);
 
     if (!isOnGround.current) {
@@ -732,11 +737,16 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
   useFrame(({ camera }, delta) => {
     if (!ref || !("current" in ref) || !ref.current || !isVisible.current) return;
 
-    if (jumpPending) {
-      performJump();
-      setJumpPending(false);
+    if (jumpPending && jumpPendingRef.current && colliderRef.current) {
+      setCurrentFishes(prev => prev += 10)
+      const halfExtents = colliderRef.current.halfExtents()
+      if (halfExtents.y > 0.8) {
+        performJump();
+        setJumpPending(false);
+        jumpPendingRef.current = false;
+      }
     }
-
+ 
     if (!slideAction.current?.isRunning()) {
       if (isSlidingRef.current) {
         setIsSliding(false);
@@ -1007,6 +1017,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       // type="fixed"
       >
         <CuboidCollider
+          ref={colliderRef}
           position={[0, colliderY, 0]}
           args={[0.45, colliderHeight, 0.60]}
         />
