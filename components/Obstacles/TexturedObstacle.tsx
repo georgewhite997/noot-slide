@@ -75,7 +75,7 @@ export const TexturedObstacle = ({
           name={"obstacle-fixed"}
           position={[
             obstacle.position[0],
-            obstacle.position[2],
+            obstacle.position[2] + 0.02,
             obstacle.position[1] + 0.2,
           ]}
           rotation={obstacle.rotation}

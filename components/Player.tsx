@@ -335,7 +335,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (deathAction.current?.isRunning() || isGamePausedRef.current || !isTouchActive.current) return;
+      if (deathAction.current?.isRunning() || isGamePausedRef.current || !isTouchActive.current || gameState !== 'playing') return;
 
       const touchEndX = e.touches[0].clientX;
       const touchEndY = e.touches[0].clientY;
@@ -443,7 +443,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
         playBackflipAnimation();
       } else {
         isOnGround.current = false;
-        playJumpAnimation();
+        Math.random() < 0.9 ? playJumpAnimation() : playBackflipAnimation();
       }
     }, 1);
 
