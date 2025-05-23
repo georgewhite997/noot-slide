@@ -49,8 +49,18 @@ body {
   width: 100vw;
 }
 
-button:hover {
+button {
   cursor: pointer;
+}
+
+
+img {
+  user-select: none;
+  /* no text highlight */
+  -webkit-user-drag: none;
+  /* Safari/old WebKit */
+  /* user-drag: none; */
+  /* spec draft, used by some browsers */
 }
 
 .button {

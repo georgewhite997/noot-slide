@@ -165,9 +165,43 @@ const LandingPage = ({
                             </div>
 
                             <div className="mt-1 flex items-center">
-                                <div className="relative w-[40px] h-[40px]">
+                                {/* <button className="relative w-[40px] h-[40px] !cursor-not-allowed">
                                     <img src="/small-button.png" alt="bg" className="absolute top-0 left-0" />
                                     <ChestIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                                </button> */}
+                                <div className="relative inline-block group">
+                                    {/* tooltip */}
+                                    <span
+                                        className="
+                                            text-[14px]
+                                            pointer-events-none
+                                            absolute left-1/2 
+                                            -translate-x-1/2
+                                            bottom-full mb-1
+                                            ml-10
+                                            whitespace-nowrap
+                                            rounded-md bg-gray-900 px-4 py-2 text-xs text-white
+                                            opacity-0 scale-95 transition
+                                            group-hover:opacity-100 group-hover:scale-100
+                                            z-40
+                                        "
+                                    >
+                                        Coming Soon
+                                    </span>
+
+                                    {/* the button */}
+                                    <button
+                                        className="relative w-[40px] h-[40px] !cursor-not-allowed"
+                                        disabled
+                                        aria-label="Coming soon"
+                                    >
+                                        <img
+                                            src="/small-button.png"
+                                            alt=""
+                                            className="absolute inset-0"
+                                        />
+                                        <ChestIcon className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                                    </button>
                                 </div>
 
                                 <div className="ml-4 flex flex-col justify-center">
@@ -219,7 +253,7 @@ const LandingPage = ({
                                 // setCurrentFishes(0);
                                 // setGameState('playing');
                                 setGameState('choosing-power-ups')
-                                
+
                             }}
                         >
                             PLAY NOW
@@ -234,7 +268,7 @@ const LandingPage = ({
                             onClick={() => setActiveModal('upgrades')}
                         >
                             <div className="flex flex-col justify-center items-center">
-                                <img width={44} height={44} src="/upgrade-icon.png" alt="coming soon icon" />
+                                <img width={44} height={44} src="/upgrade-icon.png" alt="upgrade icon" />
 
                                 UPGRADE
                             </div>
@@ -248,24 +282,62 @@ const LandingPage = ({
                             onClick={() => setActiveModal('item-shop')}
                         >
                             <div className="flex flex-col justify-center items-center">
-                                <img width={44} height={44} src="/shop-icon.png" alt="coming soon icon" />
+                                <img width={44} height={44} src="/shop-icon.png" alt="shop icon" />
                                 SHOP
                             </div>
 
                         </PrimaryButton>
 
-                        <PrimaryButton
+                        {/* <PrimaryButton
                             color='blue'
-                            className="w-[calc(33%-6.5px)]"
+                            className="w-[calc(33%-6.5px)] !cursor-not-allowed"
                             shineClassName="h-[50%]"
                             onClick={() => setActiveModal('skin-shop')}
+                            disabled
                         >
                             <div className="flex flex-col justify-center items-center">
                                 <img width={44} height={44} src="/coming-soon-icon.png" alt="coming soon icon" />
                                 SKINS
                             </div>
 
-                        </PrimaryButton>
+                        </PrimaryButton> */}
+                        <div className="relative group w-[calc(33%-6.5px)]">
+                            <span
+                                className="
+                                    text-[14px]
+                                    pointer-events-none
+                                    absolute left-1/2 
+                                    -translate-x-1/2
+                                    bottom-full mb-1
+                                    whitespace-nowrap
+                                    rounded-md bg-gray-900 px-4 py-2 text-xs text-white
+                                    opacity-0 scale-95 transition
+                                    group-hover:opacity-100 group-hover:scale-100
+                                    z-40
+                                "
+                            >
+                                Coming Soon
+                            </span>
+
+                            {/* your button */}
+                            <PrimaryButton
+                                color="blue"
+                                className="!cursor-not-allowed w-full"
+                                shineClassName="h-[50%]"
+                                onClick={() => setActiveModal('skin-shop')}
+                                disabled
+                            >
+                                <div className="flex flex-col items-center justify-center">
+                                    <img
+                                        width={44}
+                                        height={44}
+                                        src="/coming-soon-icon.png"
+                                        alt="coming soon icon"
+                                    />
+                                    SKINS
+                                </div>
+                            </PrimaryButton>
+                        </div>
                     </div>
                 </div>
             </div >

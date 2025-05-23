@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${font.className} antialiased`}>
+      <body className={`${font.className} antialiased select-none`}>
         <Container>{children}</Container>
       </body>
     </html>
