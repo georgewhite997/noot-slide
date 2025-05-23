@@ -82,7 +82,6 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
   const [reviveCount, setReviveCount] = useAtom(reviveCountAtom);
   const [hasSlowSkis, setHasSlowSkis] = useAtom(hasSlowSkisAtom);
   const distanceTraveledPrevious = useRef<number | null>(null);
-  const skipGroundHit = useRef<boolean>(false);
   const lastHitObstacle = useRef<THREE.Object3D<THREE.Object3DEventMap> | undefined>(undefined);
 
   const [magnetCollectedAt, setMagnetCollectedAt] = useAtom(magnetCollectedAtAtom);
@@ -222,6 +221,10 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       isJumping.current = false;
       isOnGround.current = true;
     }
+    if (e.action == slideAction.current) {
+      setIsSliding(false);
+      isSlidingRef.current = false;
+    }
     if (e.action === backflipAction.current || e.action === jumpAction.current || e.action === rightTurnAction.current) {
       mixer.current?.stopAllAction();
       if (skiingAction.current) {
@@ -260,7 +263,6 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       startMovingAnimation();
       lane.current = 1;
       isJumping.current = false;
-      skipGroundHit.current = false;
     }
 
     if (reviveCount > 0 && gameState === "playing") {
@@ -422,26 +424,29 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
     if (isJumping.current || gameState === "game-over") return;
     if (slideAction.current?.isRunning()) {
       slideAction.current.stop();
-    }
-    isJumping.current = true;
-    if (isSlidingRef.current) {
-      skipGroundHit.current = true;
+      setIsSliding(false);
+      isSlidingRef.current = false;
     }
 
-    const currentVelocity = ref.current?.linvel();
-    const baseImpulse = isSlidingRef.current ? 6.5 : 13;
-    const currentYVelocity = currentVelocity?.y || 0;
-    const fallMultiplier = currentYVelocity < 0 ? Math.exp(Math.abs(currentYVelocity) * 0.1) : 1;
-    const requiredImpulse = baseImpulse * fallMultiplier;
-    const impulse = { x: 0, y: requiredImpulse, z: 0 };
-    ref.current?.applyImpulse(impulse, true);
+    setTimeout(() => {
+      isJumping.current = true;
 
-    if (!isOnGround.current) {
-      playBackflipAnimation();
-    } else {
-      isOnGround.current = false;
-      playJumpAnimation();
-    }
+      const currentVelocity = ref.current?.linvel();
+      const baseImpulse = isSlidingRef.current ? 5 : 10;
+      const currentYVelocity = currentVelocity?.y || 0;
+      const fallMultiplier = currentYVelocity < 0 ? Math.exp(Math.abs(currentYVelocity) * 0.1) : 1;
+      const requiredImpulse = baseImpulse * fallMultiplier;
+      const impulse = { x: 0, y: requiredImpulse, z: 0 };
+      ref.current?.applyImpulse(impulse, true);
+
+      if (!isOnGround.current) {
+        playBackflipAnimation();
+      } else {
+        isOnGround.current = false;
+        playJumpAnimation();
+      }
+    }, 1);
+
   };
 
   const slide = () => {
@@ -456,6 +461,8 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
     isSlidingRef.current = true;
 
     playSlideAnimation();
+
+
   }
 
   const playSlideAnimation = () => {
@@ -526,16 +533,12 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       if (name === "ground" || name === "obstacle-fixed") {
         // console.log({name})
 
-        if (skipGroundHit.current) {
-          skipGroundHit.current = false;
-
-        } else {
-          isJumping.current = false;
-          if (jumpAction.current && jumpAction.current.isRunning()) {
-            jumpAction.current.stop();
-            onAnimationFinished({ action: jumpAction.current });
-          }
+        isJumping.current = false;
+        if (jumpAction.current && jumpAction.current.isRunning()) {
+          jumpAction.current.stop();
+          onAnimationFinished({ action: jumpAction.current });
         }
+
       }
 
       if (
@@ -725,7 +728,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
     if (!ref || !("current" in ref) || !ref.current || !isVisible.current) return;
 
     if (!slideAction.current?.isRunning()) {
-      if (isSliding) {
+      if (isSlidingRef.current) {
         setIsSliding(false);
         isSlidingRef.current = false;
       }
@@ -993,7 +996,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       // type="fixed"
       >
         <CuboidCollider
-          position={[0, colliderY, + 0.3]}
+          position={[0, colliderY, 0]}
           args={[0.45, colliderHeight, 0.60]}
         />
       </RigidBody>
@@ -1016,7 +1019,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
 
 const Halo = memo(function Halo() {
   return (
-    <mesh name="halo" visible={false} position={[0, 1.7, 0.2]} rotation={[Math.PI / 2, 0, 0]}>
+    <mesh name="haloo" visible={true} position={[0, 1.7, -0.2]} rotation={[Math.PI / 2, 0, 0]}>
       <torusGeometry args={[0.2, 0.02]} />
       <meshBasicMaterial color="#41f09c" />
     </mesh>
