@@ -48,7 +48,7 @@ export const Ramp = ({
     >
       <RigidBody
         type="fixed"
-        name="ground"
+        name="obstacle-fixed"
         colliders='hull'
         position={[x, z + 6, y + 1.2]}
         rotation={[Math.PI / 2, -Math.PI / 2, 0]}
