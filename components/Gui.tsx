@@ -15,7 +15,9 @@ import {
   items as itemsMeta,
   IItem,
   chain, MAX_MOBILE_WIDTH,
-  MAX_MOBILE_HEIGHT
+  MAX_MOBILE_HEIGHT,
+  graphicPresets,
+  detectDefaultPreset
 } from "@/utils";
 import { useEffect, useState, memo } from "react";
 import { formatEther, parseEther, parseAbi, erc20Abi } from "viem";
@@ -31,7 +33,9 @@ import {
   itemsAtom,
   apiUserAtom,
   upgradesAtom,
-  customMapAtom
+  customMapAtom,
+  SettingsType,
+  settingsAtom
 } from "@/atoms";
 import { toast, Toaster } from "react-hot-toast";
 import LandingPage from "./LandingPage";
@@ -76,6 +80,28 @@ export const Gui = memo(function Gui() {
   const [isRegistered, setIsRegistered] = useState(false);
   const [apiUser, setApiUser] = useAtom(apiUserAtom);
   const [upgrades, setUpgrades] = useAtom(upgradesAtom);
+  const [settings, setSettings] = useAtom(settingsAtom);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('settings');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as SettingsType;
+        setSettings(parsed);
+      } catch (e) {
+        console.error('Invalid settings in localStorage:', e);
+      }
+    } else {
+      const defaultSettings: SettingsType = {
+        ...graphicPresets.low,
+        music: true,
+        sounds: true,
+      };
+      const defaultPreset = detectDefaultPreset();
+      setSettings(defaultSettings);
+      localStorage.setItem('settings', JSON.stringify(defaultSettings));
+    }
+  }, []);
 
   useEffect(() => {
     if (!address) return;

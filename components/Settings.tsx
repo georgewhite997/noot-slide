@@ -4,7 +4,7 @@ import PrimaryButton from "./buttons/PrimaryButton";
 import { useState } from "react";
 import { Confirmation } from "./Confirmation";
 import { useDisconnect } from "wagmi";
-import { displayAddress } from "@/utils";
+import { applyPreset, displayAddress, getPresetMatch, PresetName } from "@/utils";
 import { emptyUser } from "@/utils/auth-utils";
 
 const ToggleSetting = ({ label, options, selected, onChange, className }: { label: string, options: [string, string], selected: 0 | 1, onChange: () => void, className?: string }) => {
@@ -28,29 +28,38 @@ const ToggleSetting = ({ label, options, selected, onChange, className }: { labe
     )
 }
 
-const Settings = ({ onClose, inGame = false, address }: { onClose: () => void, inGame?: boolean, address?: string }) => {
+
+const Settings = ({ onClose, inGame = false, address }: { onClose: () => void; inGame?: boolean; address?: string }) => {
     const [settings, setSettings] = useAtom(settingsAtom);
     const [confirmingEnding, setConfirmingEnding] = useState<boolean>(false);
     const [newSettings, setNewSettings] = useState<SettingsType>(settings);
     const [apiUser, setApiUser] = useAtom(apiUserAtom);
     const { disconnect } = useDisconnect();
-    const setGameState = useSetAtom(gameStateAtom)
+    const setGameState = useSetAtom(gameStateAtom);
+
+    const [selectedPreset, setSelectedPreset] = useState<PresetName>(() => getPresetMatch(settings));
 
     const handleLogout = () => {
         disconnect();
-        setApiUser(emptyUser);
+        setApiUser({} as any); // emptyUser
         sessionStorage.removeItem('apiToken');
         onClose();
+    };
+
+    const handleGraphicsChange = (changes: Partial<SettingsType>) => {
+        const updated = { ...newSettings, ...changes };
+        setNewSettings(updated);
+        setSelectedPreset(getPresetMatch(updated));
     };
 
     return (
         <>
             {!confirmingEnding ? (
                 <div className="flex justify-center items-center absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[402px] h-full bg-[rgba(0,0,0,0.8)]">
-                    <div className={`bg-[#C7F4FE] w-[350px] h-fit p-[24px] rounded-md border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]`}>
+                    <div className="bg-[#C7F4FE] w-[350px] h-fit p-[24px] rounded-md border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]">
                         <h1 className="text-center text-[32px]">Settings</h1>
 
-                        <div className="mt-[20px]"></div>
+                        <div className="mt-[20px]" />
 
                         {!inGame && (
                             <div className="mt-[8px] bg-[#E6FAFF] w-full border-[2px] border-[#030303] rounded-sm p-[8px] flex items-center justify-between shadow-[0px_2px_0px_rgba(0,0,0,0.45)]">
@@ -58,21 +67,44 @@ const Settings = ({ onClose, inGame = false, address }: { onClose: () => void, i
                                     <img width={39} height={39} src="/wallet-icon.png" alt="" />
                                     <div className="ml-1">{displayAddress(address)}</div>
                                 </div>
-                                <PrimaryButton className="w-[100px]" color="red" onClick={handleLogout}>LOG OUT</PrimaryButton>
+                                <PrimaryButton className="w-[100px]" color="red" onClick={handleLogout}>
+                                    LOG OUT
+                                </PrimaryButton>
                             </div>
                         )}
+
+                        <div className="flex w-full gap-1 mt-[8px]">
+                            {(['low', 'mid', 'high'] as PresetName[]).map((preset) => (
+                                <button
+                                    key={preset}
+                                    onClick={() => {
+                                        const updated = applyPreset(preset, newSettings);
+                                        setNewSettings(updated);
+                                        setSelectedPreset(preset);
+                                    }}
+                                    className={`text-center flex-1 rounded-sm p-[8px] border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)] ${selectedPreset === preset ? 'bg-[#7FCBDC]' : 'bg-[#E6FAFF]'
+                                        }`}
+                                >
+                                    {preset.toUpperCase()}
+                                </button>
+                            ))}
+                            {selectedPreset === 'custom' && (
+                                <div
+                                    className={`text-center flex-1 rounded-sm p-[8px] border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)] ${selectedPreset === 'custom' ? 'bg-[#7FCBDC]' : 'bg-[#E6FAFF]'
+                                        } cursor-default select-none`}
+                                >
+                                    CUSTOM
+                                </div>
+                            )}
+
+                        </div>
 
                         <div className="py-[16px] pl-[16px] px-[8px] mt-[8px] bg-[#7FCBDC] rounded-sm p-[8px] border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]">
                             <ToggleSetting
                                 label="MUSIC"
                                 options={['ON', 'OFF']}
                                 selected={newSettings.music ? 0 : 1}
-                                onChange={() => {
-                                    setNewSettings((prev) => ({
-                                        ...prev,
-                                        music: !prev.music,
-                                    }))
-                                }}
+                                onChange={() => setNewSettings((prev) => ({ ...prev, music: !prev.music }))}
                             />
 
                             <ToggleSetting
@@ -80,12 +112,7 @@ const Settings = ({ onClose, inGame = false, address }: { onClose: () => void, i
                                 label="SOUNDS"
                                 options={['ON', 'OFF']}
                                 selected={newSettings.sounds ? 0 : 1}
-                                onChange={() => {
-                                    setNewSettings((prev) => ({
-                                        ...prev,
-                                        sounds: !prev.sounds,
-                                    }))
-                                }}
+                                onChange={() => setNewSettings((prev) => ({ ...prev, sounds: !prev.sounds }))}
                             />
 
                             <ToggleSetting
@@ -93,12 +120,7 @@ const Settings = ({ onClose, inGame = false, address }: { onClose: () => void, i
                                 label="ANTI ALIASING"
                                 options={['ON', 'OFF']}
                                 selected={newSettings.antialiasing ? 0 : 1}
-                                onChange={() => {
-                                    setNewSettings((prev) => ({
-                                        ...prev,
-                                        antialiasing: !prev.antialiasing,
-                                    }))
-                                }}
+                                onChange={() => handleGraphicsChange({ antialiasing: !newSettings.antialiasing })}
                             />
 
                             <ToggleSetting
@@ -106,12 +128,7 @@ const Settings = ({ onClose, inGame = false, address }: { onClose: () => void, i
                                 label="POST PROCESSING"
                                 options={['ON', 'OFF']}
                                 selected={newSettings.postProcessing ? 0 : 1}
-                                onChange={() => {
-                                    setNewSettings((prev) => ({
-                                        ...prev,
-                                        postProcessing: !prev.postProcessing,
-                                    }))
-                                }}
+                                onChange={() => handleGraphicsChange({ postProcessing: !newSettings.postProcessing })}
                             />
 
                             <ToggleSetting
@@ -119,12 +136,7 @@ const Settings = ({ onClose, inGame = false, address }: { onClose: () => void, i
                                 label="SHADOWS"
                                 options={['ON', 'OFF']}
                                 selected={newSettings.shadows ? 0 : 1}
-                                onChange={() => {
-                                    setNewSettings((prev) => ({
-                                        ...prev,
-                                        shadows: !prev.shadows,
-                                    }))
-                                }}
+                                onChange={() => handleGraphicsChange({ shadows: !newSettings.shadows })}
                             />
 
                             <ToggleSetting
@@ -132,34 +144,33 @@ const Settings = ({ onClose, inGame = false, address }: { onClose: () => void, i
                                 label="PIXEL RATIO"
                                 options={['1x', '2x']}
                                 selected={newSettings.dpr === 1 ? 0 : 1}
-                                onChange={() => {
-                                    setNewSettings((prev) => {
-                                        return ({
-                                            ...prev,
-                                            dpr: prev.dpr === 1 ? 2 : 1,
-                                        })
-                                    })
-                                }}
+                                onChange={() => handleGraphicsChange({ dpr: newSettings.dpr === 1 ? 2 : 1 })}
                             />
                         </div>
 
                         <div className="flex flex-col justify-between w-full mt-[8px]">
                             <div className="flex justify-between">
-                                <PrimaryButton className="w-[49%] h-[44px]" onClick={onClose} color="blue">BACK</PrimaryButton>
+                                <PrimaryButton className="w-[49%] h-[44px]" onClick={onClose} color="blue">
+                                    BACK
+                                </PrimaryButton>
 
-                                <PrimaryButton className='w-[49%] h-[44px]' color="green"
+                                <PrimaryButton
+                                    className="w-[49%] h-[44px]"
+                                    color="green"
                                     onClick={() => {
-                                        setSettings(newSettings)
-                                        onClose()
+                                        setSettings(newSettings);
+                                        localStorage.setItem('settings', JSON.stringify(newSettings));
+                                        onClose();
                                     }}
                                 >
                                     SAVE
                                 </PrimaryButton>
                             </div>
 
-
                             {inGame && (
-                                <PrimaryButton className='mt-2 w-full h-[44px]' color="red"
+                                <PrimaryButton
+                                    className="mt-2 w-full h-[44px]"
+                                    color="red"
                                     onClick={() => {
                                         setConfirmingEnding(true);
                                     }}
@@ -168,12 +179,14 @@ const Settings = ({ onClose, inGame = false, address }: { onClose: () => void, i
                                 </PrimaryButton>
                             )}
                         </div>
-                    </div >
+                    </div>
                 </div>
             ) : (
                 <Confirmation
                     onBack={() => setConfirmingEnding(false)}
-                    onYes={() => { setGameState('game-over') }}
+                    onYes={() => {
+                        setGameState('game-over');
+                    }}
                 />
             )}
         </>

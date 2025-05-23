@@ -14,6 +14,7 @@ import registryAddress from "../addresses/Registry.json";
 import powerupsAddress from "../addresses/Powerups.json";
 import skinsAddress from "../addresses/Skins.json";
 import NootToken from "../addresses/Noot.json";
+import { SettingsType } from "@/atoms";
 
 const dockerizedNode = defineChain({
   id: 270,
@@ -420,4 +421,57 @@ export const getSmallestZ = (obstacles: { position: [number, number, number] }[]
   }
 
   return smallestZ;
+}
+
+export const graphicPresets: Record<'low' | 'mid' | 'high', Omit<SettingsType, 'music' | 'sounds'>> = {
+  low: {
+    antialiasing: false,
+    postProcessing: false,
+    shadows: false,
+    dpr: 1,
+  },
+  mid: {
+    antialiasing: true,
+    postProcessing: true,
+    shadows: true,
+    dpr: 1,
+  },
+  high: {
+    antialiasing: true,
+    postProcessing: true,
+    shadows: true,
+    dpr: 2,
+  },
+};
+
+export type PresetName = keyof typeof graphicPresets | 'custom';
+
+export const getPresetMatch = (settings: SettingsType): PresetName => {
+  const { music, sounds, ...graphicsOnly } = settings;
+  for (const [name, preset] of Object.entries(graphicPresets)) {
+    const match = Object.entries(preset).every(
+      ([key, value]) => (graphicsOnly as any)[key] === value
+    );
+    if (match) return name as PresetName;
+  }
+  return 'custom';
+};
+
+export const applyPreset = (preset: PresetName, current: SettingsType): SettingsType => {
+  if (preset === 'custom') return current;
+  return {
+    ...current,
+    ...graphicPresets[preset],
+  };
+};
+
+export function detectDefaultPreset(): PresetName {
+  const gpuMemory = (navigator as any).deviceMemory || 4;
+  const cores = navigator.hardwareConcurrency || 4;
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const screenDPR = window.devicePixelRatio || 1;
+
+  if (gpuMemory >= 6 && cores >= 8 && screenDPR >= 2 && !isMobile) return 'high';
+  if (gpuMemory >= 4 && cores >= 4 && !isMobile) return 'mid';
+  return 'low'; // mobile or weak desktop
 }
