@@ -103,6 +103,19 @@ const Settings = ({ onClose, inGame = false, address }: { onClose: () => void, i
 
                             <ToggleSetting
                                 className="mt-[6px]"
+                                label="POST PROCESSING"
+                                options={['ON', 'OFF']}
+                                selected={newSettings.postProcessing ? 0 : 1}
+                                onChange={() => {
+                                    setNewSettings((prev) => ({
+                                        ...prev,
+                                        postProcessing: !prev.postProcessing,
+                                    }))
+                                }}
+                            />
+
+                            <ToggleSetting
+                                className="mt-[6px]"
                                 label="SHADOWS"
                                 options={['ON', 'OFF']}
                                 selected={newSettings.shadows ? 0 : 1}

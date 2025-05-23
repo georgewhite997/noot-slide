@@ -67,7 +67,9 @@ export const ThreeCanvas = () => {
               />
               <Scene />
 
-              <PostProcessingEffects />
+              {settings.postProcessing && (
+                <PostProcessingEffects />
+              )}
             </Canvas>
           </>
         )}
@@ -104,7 +106,7 @@ const Scene = () => {
           gravity={[0, -9.81, 0]}
           timeStep="vary"
           paused={isGamePaused}
-          // debug
+        // debug
         >
           <Ground />
         </Physics>

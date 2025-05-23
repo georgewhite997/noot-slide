@@ -20,7 +20,7 @@ export const SkinShop = ({
 }: SkinsProps) => {
     return (
         <div style={{ background: "radial-gradient(circle, #0CBED2 0%, #0A94BC 100%)" }} className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-[402px] z-10 p-5 max-h-screen overflow-y-auto">
-            <div className="relative flex Skins-center justify-center">
+            <div className="relative flex items-center justify-center">
                 <button
                     className="absolute left-0 w-[40px] h-[40px]"
                     onClick={onClose}
@@ -41,9 +41,13 @@ export const SkinShop = ({
                         <div
                             className="w-full text-[20px] py-3 pl-2 pr-4 rounded-sm border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)] bg-[radial-gradient(ellipse_at_center_60%,_#9E54FF_0%,_#6A00FF_100%)]"
                         >
-                            <div className="flex justify-between Skins-center">
-                                <div className="flex Skins-center">
-                                    <div className="ml-1">NOOT BALANCE</div>
+                            <div className="flex justify-between items-center">
+                                <div className="flex items-center">
+                                    <div className="flex items-center">
+                                        <img src={'/penguin-icon.png'} alt="eth icon" width={38} height={38} />
+                                        <div className="ml-2">NOOT BALANCE</div>
+                                    </div>
+                                    {/* <div className="ml-1">NOOT BALANCE</div> */}
                                 </div>
                                 <div>{formatNootBalance(nootBalance)}</div>
                             </div>
@@ -87,7 +91,7 @@ const Skin = ({
 
     return (
         <div className="mt-1 flex flex-col p-[12px] relative bg-[#7FCBDC] rounded-sm border-[2px] border-[#030303] shadow-[0px_2px_0px_rgba(0,0,0,0.45)]">
-            <div className="text-[16px] w-full flex justify-between Skins-center">
+            <div className="text-[16px] w-full flex justify-between items-center">
                 <div className="flex w-full">
                     <img width={53} height={53} src={`/skins/${skin.id}.png`} alt="Skin icon" />
                     <div className="ml-2">

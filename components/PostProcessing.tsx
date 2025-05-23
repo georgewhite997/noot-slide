@@ -225,7 +225,7 @@ export const PostProcessingEffects = () => {
 
 
 
-    if (!settings.enabledPostProcessing) return null;
+    if (!settings.postProcessing) return null;
 
     return (
         <EffectComposer enableNormalPass={false} multisampling={8}>

@@ -828,7 +828,8 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
         mixer.current &&
         isOnGround.current &&
         !leftTurnAction.current?.isRunning() &&
-        !rightTurnAction.current?.isRunning() && gameState != 'reviving'
+        !rightTurnAction.current?.isRunning() &&
+        gameState != 'reviving'
       ) {
         ref.current.setTranslation(
           {
