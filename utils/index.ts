@@ -434,7 +434,7 @@ export const graphicPresets: Record<'low' | 'mid' | 'high', Omit<SettingsType, '
     antialiasing: true,
     postProcessing: true,
     shadows: true,
-    dpr: 1,
+    dpr: 2,
   },
   high: {
     antialiasing: true,
