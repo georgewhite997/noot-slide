@@ -443,7 +443,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
     const currentYVelocity = currentVelocity?.y || 0;
     const fallMultiplier = currentYVelocity < 0 ? Math.exp(Math.abs(currentYVelocity) * 0.1) : 1;
     const requiredImpulse = baseImpulse * fallMultiplier;
-    const impulse = { x: 0, y: requiredImpulse, z: 0 };
+    const impulse = { x: 0, y: baseImpulse, z: 0 };
     ref.current?.applyImpulse(impulse, true);
 
     if (!isOnGround.current) {
