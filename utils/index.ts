@@ -471,6 +471,6 @@ export function detectDefaultPreset(): PresetName {
   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   if (gpuMemory >= 4 && cores >= 4 && !isMobile) return 'high';
-  if (gpuMemory >= 2 && cores >= 2 && !isMobile) return 'mid';
+  if ((gpuMemory >= 2 && cores >= 2) || isMobile) return 'mid';
   return 'low'; // mobile or weak desktop
 }
