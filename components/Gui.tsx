@@ -92,12 +92,12 @@ export const Gui = memo(function Gui() {
         console.error('Invalid settings in localStorage:', e);
       }
     } else {
+      const preset = detectDefaultPreset();
       const defaultSettings: SettingsType = {
-        ...graphicPresets.low,
+        ...graphicPresets[preset],
         music: true,
         sounds: true,
       };
-      const defaultPreset = detectDefaultPreset();
       setSettings(defaultSettings);
       localStorage.setItem('settings', JSON.stringify(defaultSettings));
     }

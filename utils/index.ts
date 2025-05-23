@@ -465,7 +465,7 @@ export const applyPreset = (preset: PresetName, current: SettingsType): Settings
   };
 };
 
-export function detectDefaultPreset(): PresetName {
+export function detectDefaultPreset(): keyof typeof graphicPresets {
   const gpuMemory = (navigator as any).deviceMemory || 4;
   const cores = navigator.hardwareConcurrency || 4;
   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
