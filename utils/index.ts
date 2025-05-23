@@ -469,9 +469,8 @@ export function detectDefaultPreset(): PresetName {
   const gpuMemory = (navigator as any).deviceMemory || 4;
   const cores = navigator.hardwareConcurrency || 4;
   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  const screenDPR = window.devicePixelRatio || 1;
 
-  if (gpuMemory >= 6 && cores >= 8 && screenDPR >= 2 && !isMobile) return 'high';
-  if (gpuMemory >= 4 && cores >= 4 && !isMobile) return 'mid';
+  if (gpuMemory >= 4 && cores >= 4 && !isMobile) return 'high';
+  if (gpuMemory >= 2 && cores >= 2 && !isMobile) return 'mid';
   return 'low'; // mobile or weak desktop
 }
