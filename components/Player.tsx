@@ -90,6 +90,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
   const [multiplierCollectedAt, setMultiplierCollectedAt] = useAtom(multiplierCollectedAtAtom);
   const [multiplierDuration, setMultiplierDuration] = useAtom(multiplierDurationAtom);
   const [haloQuantity, setHaloQuantity] = useAtom(haloQuantityAtom);
+  const [jumpPending, setJumpPending] = useState<boolean>(false);
 
   const touchStartX = useRef<number>(0);
   const touchStartY = useRef<number>(0);
@@ -113,6 +114,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
 
   const [isSliding, setIsSliding] = useState<boolean>(false);
   const isSlidingRef = useRef<boolean>(false);
+  const [pendingJump, setPendingJump] = useState(false);
 
   const getUpgradeValue = (upgradeName: string): number => {
     const upgrade = upgrades?.find(
@@ -426,28 +428,31 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       slideAction.current.stop();
       setIsSliding(false);
       isSlidingRef.current = false;
+      setJumpPending(true);
+      return;
     }
 
-    setTimeout(() => {
-      isJumping.current = true;
-
-      const currentVelocity = ref.current?.linvel();
-      const baseImpulse = isSlidingRef.current ? 5 : 10;
-      const currentYVelocity = currentVelocity?.y || 0;
-      const fallMultiplier = currentYVelocity < 0 ? Math.exp(Math.abs(currentYVelocity) * 0.1) : 1;
-      const requiredImpulse = baseImpulse * fallMultiplier;
-      const impulse = { x: 0, y: requiredImpulse, z: 0 };
-      ref.current?.applyImpulse(impulse, true);
-
-      if (!isOnGround.current) {
-        playBackflipAnimation();
-      } else {
-        isOnGround.current = false;
-        Math.random() < 0.9 ? playJumpAnimation() : playBackflipAnimation();
-      }
-    }, 1);
-
+    performJump();
   };
+
+  const performJump = () => {
+    isJumping.current = true;
+
+    const currentVelocity = ref.current?.linvel();
+    const baseImpulse = 10;
+    const currentYVelocity = currentVelocity?.y || 0;
+    const fallMultiplier = currentYVelocity < 0 ? Math.exp(Math.abs(currentYVelocity) * 0.1) : 1;
+    const requiredImpulse = baseImpulse * fallMultiplier;
+    const impulse = { x: 0, y: requiredImpulse, z: 0 };
+    ref.current?.applyImpulse(impulse, true);
+
+    if (!isOnGround.current) {
+      playBackflipAnimation();
+    } else {
+      isOnGround.current = false;
+      Math.random() < 0.9 ? playJumpAnimation() : playBackflipAnimation();
+    }
+  }
 
   const slide = () => {
     if (gameState === "game-over" || gameState === "reviving") return;
@@ -726,6 +731,11 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
 
   useFrame(({ camera }, delta) => {
     if (!ref || !("current" in ref) || !ref.current || !isVisible.current) return;
+
+    if (jumpPending) {
+      performJump();
+      setJumpPending(false);
+    }
 
     if (!slideAction.current?.isRunning()) {
       if (isSlidingRef.current) {
