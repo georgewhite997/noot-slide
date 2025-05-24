@@ -26,32 +26,54 @@ const MAX_REVIVE_COUNT = 3;
 
 const PLAYER_START_POSITION = new THREE.Vector3(0, 10, -20);
 
-const trimAnimation = (clip: THREE.AnimationClip, trimAmount: number): THREE.AnimationClip => {
+export const trimAnimation = (
+  clip: THREE.AnimationClip,
+  trimStart = 0,
+  trimEnd = 0
+): THREE.AnimationClip => {
+  // Łączna długość, której się pozbywamy, nie może przekroczyć czasu klipu
+  const newDuration = clip.duration - trimStart - trimEnd;
+  if (newDuration <= 0) {
+    console.warn(
+      'dsadas'
+    );
+    return clip;
+  }
+
   const newTracks = clip.tracks.map((track) => {
     const times = track.times as Float32Array;
     const values = track.values as Float32Array;
     const valueSize = values.length / times.length;
 
-    const lastTime = times[times.length - 1];
-    const trimmedTime = lastTime - trimAmount;
+    // ---- indeks początkowy -----------
+    let startIdx = trimStart > 0 ? times.findIndex((t) => t >= trimStart) : 0;
+    if (startIdx === -1) startIdx = times.length - 1; // fallback
 
-    // Find the index where time exceeds the trimmed duration
-    let trimIndex = times.findIndex((t) => t > trimmedTime);
-    if (trimIndex === -1) trimIndex = times.length;
+    // ---- indeks końcowy --------------
+    const trimEndTime = clip.duration - trimEnd;
+    let endIdx =
+      trimEnd > 0 ? times.findIndex((t) => t > trimEndTime) : times.length;
+    if (endIdx === -1) endIdx = times.length;
 
-    const newTimes = times.slice(0, trimIndex);
-    const newValues = values.slice(0, trimIndex * valueSize);
+    // Wycinamy przedział [startIdx, endIdx)
+    const slicedTimes = times.slice(startIdx, endIdx);
+    const slicedValues = values.slice(
+      startIdx * valueSize,
+      endIdx * valueSize
+    );
 
-    // Recreate the same type of KeyframeTrack
-    const TrackConstructor = (track as any).constructor;
-    return new TrackConstructor(track.name, newTimes, newValues);
+    // Przesuwamy czas tak, by zaczynał się od zera
+    const offset = slicedTimes[0];
+    const normalizedTimes = new Float32Array(
+      slicedTimes.map((t) => t - offset)
+    );
+
+    // Odtwarzamy właściwy typ KeyframeTrack
+    const TrackCtor = (track as any).constructor;
+    return new TrackCtor(track.name, normalizedTimes, slicedValues);
   });
 
-  return new THREE.AnimationClip(
-    clip.name,
-    clip.duration - trimAmount,
-    newTracks
-  );
+  return new THREE.AnimationClip(clip.name, newDuration, newTracks);
 };
 
 
@@ -94,7 +116,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
   const [haloQuantity, setHaloQuantity] = useAtom(haloQuantityAtom);
   const [jumpPending, setJumpPending] = useState<boolean>(false);
   const jumpPendingRef = useRef<boolean>(false);
-  
+
 
   const touchStartX = useRef<number>(0);
   const touchStartY = useRef<number>(0);
@@ -119,6 +141,37 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
   const [isSliding, setIsSliding] = useState<boolean>(false);
   const isSlidingRef = useRef<boolean>(false);
   const [pendingJump, setPendingJump] = useState(false);
+  const currentAction = useRef<THREE.AnimationAction | null>(null);
+
+  const playAction = (
+    next: THREE.AnimationAction,
+    fade = 0.3,
+    loop: THREE.AnimationActionLoopStyles = THREE.LoopRepeat,
+    speed?: number
+  ) => {
+    // if (currentAction.current === next && next.enabled && !next.paused) return;
+
+    const reps = loop === THREE.LoopOnce ? 1 : Infinity;
+
+    next.reset(); // time = 0, paused = false
+    next.setLoop(loop, reps);
+    next.setEffectiveWeight(1);
+    if (speed !== undefined) {
+      next.setEffectiveTimeScale(speed);
+    }
+
+    next.enabled = true;
+    next.clampWhenFinished = loop === THREE.LoopOnce;
+
+    if (currentAction.current && currentAction.current !== next) {
+      currentAction.current.crossFadeTo(next, fade, true /* warp */);
+    } else {
+      next.fadeIn(fade);
+    }
+
+    next.play();
+    currentAction.current = next;
+  };
 
   const getUpgradeValue = (upgradeName: string): number => {
     const upgrade = upgrades?.find(
@@ -159,8 +212,10 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
   const startMovingAnimation = () => {
     if (!mixer.current || !skiingAction.current) return;
 
-    mixer.current?.stopAllAction();
-    skiingAction.current?.play(); // Start the animation
+    // mixer.current?.stopAllAction();
+    // skiingAction.current?.play(); // Start the animation
+    skiingAction.current.setLoop(THREE.LoopRepeat, Infinity);
+    playAction(skiingAction.current, 0.2, THREE.LoopRepeat);
   };
 
   useEffect(() => {
@@ -191,7 +246,12 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       (track) => !track.name.includes(".position"),
     );
 
-    animations.slide = trimAnimation(animations.slide!, 0.6);
+    animations.slide = trimAnimation(animations.slide!, 0, 0.6);
+    animations.jump = trimAnimation(animations.jump!, 0.2);
+    animations.backflip = trimAnimation(animations.backflip!, 0.2);
+    animations.skiing = trimAnimation(animations.skiing!, 0.2);
+    animations.leftTurn = trimAnimation(animations.leftTurn!, 0.4);
+    animations.rightTurn = trimAnimation(animations.leftTurn!, 0.4);
 
     // Create actions
     skiingAction.current = mixer.current.clipAction(animations.skiing!);
@@ -202,10 +262,11 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
     leftTurnAction.current = mixer.current.clipAction(animations.leftTurn!);
     slideAction.current = mixer.current.clipAction(animations.slide!);
 
+    startMovingAnimation();
 
-    if (skiingAction.current) {
-      skiingAction.current.play();
-    }
+    // if (skiingAction.current) {
+    //   skiingAction.current.play();
+    // }
 
     mixer.current?.addEventListener("finished", onAnimationFinished);
 
@@ -231,22 +292,14 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       setIsSliding(false);
       isSlidingRef.current = false;
     }
-    if (e.action === backflipAction.current || e.action === jumpAction.current || e.action === rightTurnAction.current) {
-      mixer.current?.stopAllAction();
-      if (skiingAction.current) {
-        skiingAction.current.time = 0.2;
-        skiingAction.current.setLoop(THREE.LoopRepeat, Infinity);
-        skiingAction.current.play();
-      }
-    }
-
-    if (e.action === leftTurnAction.current || e.action === slideAction.current) {
-      mixer.current?.stopAllAction();
-      if (skiingAction.current) {
-        skiingAction.current.time = 1.15;
-        skiingAction.current.setLoop(THREE.LoopRepeat, Infinity);
-        skiingAction.current.play();
-      }
+    if (e.action === backflipAction.current || e.action === jumpAction.current || e.action === rightTurnAction.current || e.action === leftTurnAction.current || e.action === slideAction.current) {
+      // mixer.current?.stopAllAction();
+      // if (skiingAction.current) {
+      //   skiingAction.current.time = 0.2;
+      //   skiingAction.current.setLoop(THREE.LoopRepeat, Infinity);
+      //   skiingAction.current.play();
+      // }
+      startMovingAnimation();
     }
 
     if (e.action === deathAction.current) {
@@ -283,16 +336,27 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
   }, [gameState]);
 
   const playDeathAnimation = () => {
-    if (!deathAction.current) {
-      return;
-    }
-    // stop the current animation
-    mixer.current?.stopAllAction();
+    // if (!deathAction.current) {
+    //   return;
+    // }
+    // // stop the current animation
+    // mixer.current?.stopAllAction();
 
-    deathAction.current.setLoop(THREE.LoopOnce, 1);
-    deathAction.current.clampWhenFinished = true;
-    deathAction.current.time = 0.1;
-    deathAction.current.play();
+    // deathAction.current.setLoop(THREE.LoopOnce, 1);
+    // deathAction.current.clampWhenFinished = true;
+    // deathAction.current.time = 0.1;
+    // deathAction.current.play();
+    const action = deathAction.current;
+    if (!action) return;
+
+    action.stop();
+    action.reset();
+    action.enabled = true;
+    action.setLoop(THREE.LoopOnce, 1);
+    action.clampWhenFinished = true;
+
+
+    playAction(action, 0.2, THREE.LoopOnce);
   };
 
   useEffect(() => {
@@ -402,6 +466,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
 
   const { data: agwClient } = useAbstractClient();
 
+  
 
   const utilizeHalo = async () => {
     if (!abstractSession || !agwClient) return;
@@ -476,37 +541,54 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
   }
 
   const playSlideAnimation = () => {
-    if (!slideAction.current) {
-      return;
-    }
+    // if (!slideAction.current) {
+    //   return;
+    // }
 
-    mixer.current?.stopAllAction();
-    slideAction.current.setLoop(THREE.LoopOnce, 1);
+    // mixer.current?.stopAllAction();
+    // slideAction.current.setLoop(THREE.LoopOnce, 1);
 
-    slideAction.current.play();
+    // slideAction.current.play();
+    const action = slideAction.current;
+    if (!action) return;
+
+    action.stop();
+    action.reset();
+    action.enabled = true;
+    action.setLoop(THREE.LoopOnce, 1);
+    action.clampWhenFinished = true;
+
+
+    playAction(action, 0.2, THREE.LoopOnce);
   }
 
 
   const playBackflipAnimation = () => {
-    if (!backflipAction.current) {
-      return;
-    }
+    const action = backflipAction.current;
+    if (!action) return;
 
-    mixer.current?.stopAllAction();
-    backflipAction.current.setLoop(THREE.LoopOnce, 1);
-    backflipAction.current.time = 0.2;
-    backflipAction.current.play();
+    action.stop();
+    action.reset();
+    action.enabled = true;
+    action.setLoop(THREE.LoopOnce, 1);
+    action.clampWhenFinished = true;
+
+    playAction(action, 0.2, THREE.LoopOnce);
   };
 
   const playJumpAnimation = () => {
-    if (!jumpAction.current) {
-      return;
-    }
+    const action = jumpAction.current;
+    if (!action) return;
 
-    mixer.current?.stopAllAction();
-    jumpAction.current.setLoop(THREE.LoopOnce, 1);
-    jumpAction.current.time = 0.2; // Start the animation 0.2 seconds in
-    jumpAction.current.play();
+    action.stop();
+    action.reset();
+    action.enabled = true;
+    action.setLoop(THREE.LoopOnce, 1);
+    action.clampWhenFinished = true;
+
+    playAction(action, 0.2, THREE.LoopOnce);
+
+
   };
 
   const playRightTurnAnimation = () => {
@@ -514,11 +596,17 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       return;
     }
 
-    mixer.current.stopAllAction();
-    rightTurnAction.current.setLoop(THREE.LoopOnce, 1);
-    rightTurnAction.current.time = 0.2; // Start the animation 0.2 seconds in
-    rightTurnAction.current.setDuration(0.4);
-    rightTurnAction.current.play();
+    const action = rightTurnAction.current;
+    if (!action) return;
+
+    action.stop();
+    action.reset();
+    action.enabled = true;
+    action.setLoop(THREE.LoopOnce, 1);
+    action.clampWhenFinished = true;
+
+
+    playAction(action, 0.2, THREE.LoopOnce, 5);
   };
 
   const playLeftTurnAnimation = () => {
@@ -526,11 +614,16 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       return;
     }
 
-    mixer.current.stopAllAction();
-    leftTurnAction.current.setLoop(THREE.LoopOnce, 1);
-    leftTurnAction.current.time = 0.2; // Start the animation 0.2 seconds in
-    leftTurnAction.current.setDuration(0.4);
-    leftTurnAction.current.play();
+    const action = leftTurnAction.current;
+    if (!action) return;
+
+    action.stop();
+    action.reset();
+    action.enabled = true;
+    action.setLoop(THREE.LoopOnce, 1);
+    action.clampWhenFinished = true;
+
+    playAction(action, 0.05, THREE.LoopOnce, 3);
   };
 
   const { scene } = useThree()
@@ -545,10 +638,13 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
 
         isJumping.current = false;
         if (jumpAction.current && jumpAction.current.isRunning()) {
-          jumpAction.current.stop();
+          // jumpAction.current.stop();
           onAnimationFinished({ action: jumpAction.current });
         }
-
+        if (backflipAction.current && backflipAction.current.isRunning()) {
+          // backflipAction.current.stop();
+          onAnimationFinished({ action: backflipAction.current });
+        }
       }
 
       if (
@@ -560,10 +656,10 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       ) {
         isOnGround.current = true;
 
-        if (backflipAction.current.isRunning()) {
-          backflipAction.current.stop();
-          onAnimationFinished({ action: backflipAction.current });
-        }
+        // if (backflipAction.current.isRunning()) {
+        //   // backflipAction.current.stop();
+        //   onAnimationFinished({ action: backflipAction.current });
+        // }
       }
 
       if (name === "obstacle-fixed") {
@@ -746,7 +842,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
         jumpPendingRef.current = false;
       }
     }
- 
+
     if (!slideAction.current?.isRunning()) {
       if (isSlidingRef.current) {
         setIsSliding(false);
@@ -901,14 +997,14 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       }
     }
 
-    if (slideAction.current?.isRunning() && skiingAction.current) {
-      const slideDuration = 1.1;
-      const slideTime = slideAction.current.time;
-      if (slideTime >= slideDuration) {
-        skiingAction.current.time = 1.15;
-        slideAction.current.crossFadeTo(skiingAction.current, 0.1, false);
-      }
-    }
+    // if (slideAction.current?.isRunning() && skiingAction.current) {
+    //   const slideDuration = 1.1;
+    //   const slideTime = slideAction.current.time;
+    //   if (slideTime >= slideDuration) {
+    //     skiingAction.current.time = 1.15;
+    //     slideAction.current.crossFadeTo(skiingAction.current, 0.1, false);
+    //   }
+    // }
 
     if (gameState === 'reviving') {
       ref.current.setLinvel(
