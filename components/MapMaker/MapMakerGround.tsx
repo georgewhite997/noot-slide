@@ -17,6 +17,8 @@ import { Segment } from "@/components/Segment";
 import { SegmentObstacles } from "@/components/SegmentObstacles";
 import { useThree } from "@react-three/fiber";
 import { sumUpTo, getChunkOffset, getSmallestZ } from "@/utils";
+import { PLAYER_COLLIDER_WIDTH, SWAY_AMPLITUDE } from "../Player";
+import { SwayBoundaries } from "../SwayBoundaries";
 
 const onTextureLoaded = (texture: THREE.Texture) => {
   texture.wrapS = THREE.RepeatWrapping;
@@ -28,11 +30,13 @@ const onTextureLoaded = (texture: THREE.Texture) => {
 export const MapMakerGround = ({
   makerSegments,
   displayChunkBoundaries,
+  debug = false
 }: {
   makerSegments: {
     chunks: { length: number; obstacles: any[]; isSelected: boolean }[];
   }[];
   displayChunkBoundaries: boolean;
+  debug: boolean;
 }) => {
   const modelsGltf = useAtomValue(modelsGltfAtom);
 
@@ -149,61 +153,18 @@ export const MapMakerGround = ({
                 segment={segment}
                 optimize={false}
               />
-              {displayChunkBoundaries && segment.chunks.length > 0
-                ? segment.chunks.map((chunk, i) => (
-                  <group key={`${chunk.name}-${chunk.beginning}`}>
-                    <mesh
-                      position={[0, chunk.beginning, 2.5]}
-                      onClick={() => {
-                        setSelectedObstacle(
-                          `chunk-${i}-segment-${segment.index}-0`,
-                        );
-                      }}
-                    >
-                      <boxGeometry args={[20, 0.1, 5]} />
-                      <meshStandardMaterial
-                        color={chunk.isSelected ? "lightgreen" : "lightblue"}
-                        opacity={0.5}
-                        transparent
-                      />
-                    </mesh>
-                    <mesh
-                      position={[-5, chunk.beginning + (chunk.length / 2) + (getSmallestZ(chunk.obstacles) + SEGMENT_LENGTH / 2) / 2, 0]}
-                      rotation={[0, 0, Math.PI / 2]}
-                      onClick={() => {
-                        setSelectedObstacle(
-                          `chunk-${i}-segment-${segment.index}-0`,
-                        );
-                      }}
-                    >
-                      <boxGeometry args={[chunk.length + (getSmallestZ(chunk.obstacles) + SEGMENT_LENGTH / 2), 0.1, 2]} />
-                      <meshStandardMaterial
-                        color={chunk.isSelected ? "lightgreen" : "lightblue"}
-                        opacity={0.5}
-                        transparent
-                      />
-                    </mesh>
-                    <mesh
-                      position={[5, chunk.beginning + (chunk.length / 2) + (getSmallestZ(chunk.obstacles) + SEGMENT_LENGTH / 2) / 2, 0]}
-                      rotation={[0, 0, Math.PI / 2]}
-                      onClick={() => {
-                        setSelectedObstacle(
-                          `chunk-${i}-segment-${segment.index}-0`,
-                        );
-                      }}
-                    >
-                      <boxGeometry args={[chunk.length + (getSmallestZ(chunk.obstacles) + SEGMENT_LENGTH / 2), 0.1, 2]} />
-                      <meshStandardMaterial
-                        color={chunk.isSelected ? "lightgreen" : "lightblue"}
-                        opacity={0.5}
-                        transparent
-                      />
-                    </mesh>
-
-
-                  </group>
-                ))
-                : null}
+              {(displayChunkBoundaries && segment.chunks.length > 0) ? segment.chunks.map((chunk, i) => (
+                <ChunkBoundary
+                  key={`${chunk.name}-${chunk.beginning}`}
+                  chunk={chunk}
+                  onClick={() => {
+                    setSelectedObstacle(
+                      `chunk-${i}-segment-${segment.index}-0`,
+                    );
+                  }}
+                />
+              )) : null}
+              {debug ? <SwayBoundaries /> : null}
             </mesh>
           </group>
         ))}
@@ -211,3 +172,49 @@ export const MapMakerGround = ({
     </>
   );
 };
+
+const ChunkBoundary = ({ chunk, onClick }: { chunk: { beginning: number, length: number, obstacles: any[], name: string, isSelected: boolean }, onClick: () => void }) => {
+  const chunkZOffset = (getSmallestZ(chunk.obstacles) + SEGMENT_LENGTH / 2);
+  const chunkEnd = (chunk.length / 2) + chunkZOffset / 2;
+
+  return (
+    <group>
+      <mesh
+        position={[0, chunk.beginning, 2.5]}
+        onClick={onClick}
+      >
+        <boxGeometry args={[20, 0.1, 5]} />
+        <meshStandardMaterial
+          color={chunk.isSelected ? "lightgreen" : "lightblue"}
+          opacity={0.5}
+          transparent
+        />
+      </mesh>
+      <mesh
+        position={[-5, chunk.beginning + chunkEnd, 0]}
+        rotation={[0, 0, Math.PI / 2]}
+        onClick={onClick}
+      >
+        <boxGeometry args={[chunk.length + chunkZOffset, 0.1, 2]} />
+        <meshStandardMaterial
+          color={chunk.isSelected ? "lightgreen" : "lightblue"}
+          opacity={0.5}
+          transparent
+        />
+      </mesh>
+      <mesh
+        position={[5, chunk.beginning + chunkEnd, 0]}
+        rotation={[0, 0, Math.PI / 2]}
+        onClick={onClick}
+      >
+        <boxGeometry args={[chunk.length + chunkZOffset, 0.1, 2]} />
+        <meshStandardMaterial
+          color={chunk.isSelected ? "lightgreen" : "lightblue"}
+          opacity={0.5}
+          transparent
+        />
+      </mesh>
+    </group>
+  )
+}
+

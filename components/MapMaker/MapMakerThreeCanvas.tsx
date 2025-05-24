@@ -102,7 +102,7 @@ export const MapMakerThreeCanvas = () => {
   const [dropdownSelectedObstacle, setDropdownSelectedObstacle] =
     useState<string>(possibleObstacles[0]);
   const [displayChunkBoundaries, setDisplayChunkBoundaries] = useState(true);
-
+  const [displayPlayerBoundaries, setDisplayPlayerBoundaries] = useState(true);
   const [segments, _setSegments] = useState<Segments>(() => {
     if (typeof window === "undefined") return [{ chunks: [{ obstacles: [] }] }];
 
@@ -214,6 +214,7 @@ export const MapMakerThreeCanvas = () => {
       />
     );
   };
+
 
   const RotationControl = ({ index }: { index: 0 | 1 | 2 }) => {
     const setRotation = (v: number) =>
@@ -362,6 +363,7 @@ export const MapMakerThreeCanvas = () => {
                   })),
                 }))}
                 displayChunkBoundaries={displayChunkBoundaries}
+                debug={displayPlayerBoundaries}
               />
             </Physics>
           </Suspense>
@@ -500,6 +502,12 @@ export const MapMakerThreeCanvas = () => {
           >
             Toggle Chunk Boundaries
           </button>
+          <button
+            className="p-1 bg-white rounded-md max-w-min"
+            onClick={() => setDisplayPlayerBoundaries(!displayPlayerBoundaries)}
+          >
+            Toggle Player Boundaries
+          </button>
 
           <button
             className="p-1 bg-white rounded-md max-w-min"
@@ -581,11 +589,15 @@ export const MapMakerThreeCanvas = () => {
 
           <button
             className="p-1 bg-green-500 rounded-md max-w-min"
-            onClick={() =>
+            onClick={() => {
+              let url = window.location.href.replace("map-maker", "");
+              url += `&debug=${displayPlayerBoundaries}`;
+
               window.open(
-                window.location.href.replace("map-maker", ""),
+                url,
                 "_blank",
               )
+            }
             }
           >
             PLAYTEST

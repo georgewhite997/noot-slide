@@ -2,7 +2,7 @@
 
 import { Canvas, useThree } from "@react-three/fiber";
 import { Physics } from "@react-three/rapier";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Ground } from "./Ground";
 import {
   Environment,
@@ -81,6 +81,12 @@ export const ThreeCanvas = () => {
 const Scene = () => {
   const { scene, gl } = useThree(); // Access the scene and renderer (gl)
   const isGamePaused = useAtomValue(isGamePausedAtom);
+  const debug = useMemo(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    return searchParams.get("debug") === "true";
+  }, []);
+
+
 
   useEffect(() => {
     // gl.setClearColor(0xd4e8f0, 1);
@@ -106,9 +112,9 @@ const Scene = () => {
           gravity={[0, -9.81, 0]}
           timeStep="vary"
           paused={isGamePaused}
-        // debug
+          debug={debug}
         >
-          <Ground />
+          <Ground debug={debug} />
         </Physics>
       </Suspense>
 

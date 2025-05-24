@@ -20,7 +20,7 @@ import { Segment } from "./Segment";
 import { Player } from "./Player";
 import { ISegment } from "./shared";
 import { SegmentObstacles } from "./SegmentObstacles";
-
+import { SwayBoundaries } from "./SwayBoundaries";
 
 const worldMatrixComponent1 = new THREE.Quaternion().setFromEuler(
   new THREE.Euler(-Math.PI / 2 + SLOPE_ANGLE, 0, 0),
@@ -34,7 +34,7 @@ const onTextureLoaded = (texture: THREE.Texture) => {
   texture.needsUpdate = true; // Ensure texture updates apply immediately
 };
 
-export const Ground = memo(function Ground() {
+export const Ground = memo(function Ground({ debug = false }: { debug?: boolean }) {
   const gameState = useAtomValue(gameStateAtom);
   // const score = useAtomValue(scoreAtom);
   const modelsGltf = useAtomValue(modelsGltfAtom)
@@ -303,6 +303,8 @@ export const Ground = memo(function Ground() {
               <SegmentObstacles
                 segment={segment}
               />
+
+              {debug ? <SwayBoundaries /> : null}
             </mesh>
           </group>
         ))}

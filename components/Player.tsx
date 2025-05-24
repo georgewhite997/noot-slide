@@ -21,8 +21,16 @@ import { UpgradeLevel } from "@/utils/auth-utils";
 const LANE_TRANSITION_SPEED = 2.5;
 const CAMERA_POSITION_SMOOTHING = 3; // Lower = smoother but slower
 const CAMERA_LOOKAT_SMOOTHING = 5; // Lower = smoother but slower
-const SWAY_AMPLITUDE = 0.03;
 const MAX_REVIVE_COUNT = 3;
+
+export const PLAYER_COLLIDER_WIDTH = 0.45;
+export const SWAY_AMPLITUDE = 0.025;
+
+function getPlayerSine(time: number) {
+  const scale = Math.PI / 2 / 0.55;
+  const angle = time * scale;
+  return Math.sin(angle);
+}
 
 const PLAYER_START_POSITION = new THREE.Vector3(0, 10, -20);
 
@@ -94,7 +102,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
   const [haloQuantity, setHaloQuantity] = useAtom(haloQuantityAtom);
   const [jumpPending, setJumpPending] = useState<boolean>(false);
   const jumpPendingRef = useRef<boolean>(false);
-  
+
 
   const touchStartX = useRef<number>(0);
   const touchStartY = useRef<number>(0);
@@ -455,7 +463,11 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
       playBackflipAnimation();
     } else {
       isOnGround.current = false;
-      Math.random() < 0.9 ? playJumpAnimation() : playBackflipAnimation();
+      if (Math.random() < 0.9) {
+        playJumpAnimation()
+      } else {
+        playBackflipAnimation()
+      }
     }
   }
 
@@ -725,12 +737,6 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
     }
   };
 
-  function getPlayerSine(time: number) {
-    const scale = Math.PI / 2 / 0.55;
-    const angle = time * scale;
-    return Math.sin(angle);
-  }
-
   const idealCameraPosition = new THREE.Vector3(); // Reusable vector
   const lookAtPosition = new THREE.Vector3();
 
@@ -746,7 +752,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
         jumpPendingRef.current = false;
       }
     }
- 
+
     if (!slideAction.current?.isRunning()) {
       if (isSlidingRef.current) {
         setIsSliding(false);
@@ -1019,7 +1025,7 @@ export const Player = memo(function Player({ removeNextObstacles }: { removeNext
         <CuboidCollider
           ref={colliderRef}
           position={[0, colliderY, 0]}
-          args={[0.45, colliderHeight, 0.60]}
+          args={[PLAYER_COLLIDER_WIDTH, colliderHeight, 0.60]}
         />
       </RigidBody>
       <group ref={groupRef}>
